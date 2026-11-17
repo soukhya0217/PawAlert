@@ -4,57 +4,35 @@
 
 @layer base {
   :root {
-    --background: 40 33% 98%; /* Warm cream #FAF7F2 */
-    --foreground: 20 25% 15%; /* Deep warm slate #2E2420 */
+    --background: 228 35% 4%; /* #05070d - Deep Cyber Void */
+    --foreground: 210 40% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 20 25% 15%;
+    --card: 225 28% 7%; /* #0a0e17 */
+    --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 25% 15%;
+    --popover: 225 28% 7%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 14 93% 58%; /* Coral Peach #F75C2E */
-    --primary-foreground: 0 0% 100%;
+    --primary: 76 100% 61%; /* #d4ff3a - Electric Volt Lime */
+    --primary-foreground: 228 35% 4%;
 
-    --secondary: 260 80% 96%; /* Lavender #F3EEFF */
-    --secondary-foreground: 262 60% 40%; /* Royal Lavender */
+    --secondary: 220 22% 14%;
+    --secondary-foreground: 210 40% 95%;
 
-    --muted: 36 25% 94%; /* Soft sand */
-    --muted-foreground: 24 10% 45%;
+    --muted: 220 20% 12%;
+    --muted-foreground: 215 16% 65%;
 
-    --accent: 154 50% 94%; /* Soft mint */
-    --accent-foreground: 154 60% 25%;
+    --accent: 76 100% 61%;
+    --accent-foreground: 228 35% 4%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 356 100% 59%; /* #ff3b30 - High Voltage Emergency Crimson */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 36 20% 90%;
-    --input: 36 20% 88%;
-    --ring: 14 93% 58%;
+    --border: 220 20% 14%;
+    --input: 220 20% 14%;
+    --ring: 76 100% 61%;
 
-    --radius: 1.25rem;
-  }
-
-  .dark {
-    --background: 220 20% 10%;
-    --foreground: 40 20% 95%;
-    --card: 220 18% 14%;
-    --card-foreground: 40 20% 95%;
-    --popover: 220 18% 14%;
-    --popover-foreground: 40 20% 95%;
-    --primary: 14 90% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 260 30% 22%;
-    --secondary-foreground: 260 70% 85%;
-    --muted: 220 15% 20%;
-    --muted-foreground: 220 10% 65%;
-    --accent: 154 30% 20%;
-    --accent-foreground: 154 70% 85%;
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 22%;
-    --input: 220 15% 24%;
-    --ring: 14 90% 60%;
+    --radius: 0.75rem;
   }
 }
 
@@ -63,67 +41,94 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased selection:bg-peach-200 selection:text-primary-900;
+    background-color: #05070d;
+    color: #f8fafc;
     font-feature-settings: "rlig" 1, "calt" 1;
-    background-image: 
-      radial-gradient(circle at 10% 15%, rgba(247, 92, 46, 0.04) 0%, transparent 40%),
-      radial-gradient(circle at 85% 25%, rgba(134, 86, 223, 0.05) 0%, transparent 45%),
-      radial-gradient(circle at 50% 80%, rgba(46, 168, 121, 0.04) 0%, transparent 50%);
-    background-attachment: fixed;
+    overflow-x: hidden;
   }
 }
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #FAF7F2;
+  background: #05070d;
 }
 ::-webkit-scrollbar-thumb {
-  background: #E8E0D2;
+  background: #1b2438;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #D1BFF8;
+  background: #d4ff3a;
 }
 
-/* Paw Print Floating Pattern */
-.bg-paw-pattern {
-  background-image: radial-gradient(#F75C2E 0.6px, transparent 0.6px), radial-gradient(#8656DF 0.6px, #FAF7F2 0.6px);
-  background-size: 30px 30px;
-  background-position: 0 0, 15px 15px;
-  opacity: 0.25;
+/* Overrank Background Grid & Scanlines */
+.grid-lines {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
-/* Glassmorphism Soft Card */
-.glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10px 30px -10px rgba(224, 90, 54, 0.08), 0 4px 12px -4px rgba(0, 0, 0, 0.04);
+.floor-run {
+  background-image: 
+    linear-gradient(to right, rgba(212, 255, 58, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(212, 255, 58, 0.15) 1px, transparent 1px);
+  background-size: 56px 56px;
 }
 
-.dark .glass-card {
-  background: rgba(30, 35, 45, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+/* Glowing Neon Elements */
+.glow-lime {
+  box-shadow: 0 0 24px -4px rgba(212, 255, 58, 0.35);
 }
 
-/* Cute Button Gradient */
-.btn-magical {
-  background: linear-gradient(135deg, #F75C2E 0%, #FF845E 50%, #8656DF 100%);
-  color: white;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 15px rgba(247, 92, 46, 0.25);
+.glow-crimson {
+  box-shadow: 0 0 24px -4px rgba(255, 59, 48, 0.45);
 }
 
-.btn-magical:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(247, 92, 46, 0.35);
+.hud-panel {
+  background: rgba(10, 14, 23, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.btn-magical:active {
-  transform: translateY(0);
+.hud-panel:hover {
+  border-color: rgba(212, 255, 58, 0.3);
+}
+
+/* Leaflet Dark Satellite / Tactical Cartography Filter */
+/* No API key needed! Applies high-tech tactical styling over standard OpenStreetMap tiles */
+.leaflet-tactical-container .leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(2.6) hue-rotate(200deg) saturate(0.2) !important;
+}
+
+.leaflet-tactical-container {
+  background: #060911 !important;
+}
+
+/* Radar rotation */
+@keyframes radarSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-radar-spin {
+  animation: radarSpin 4s linear infinite;
+}
+
+/* Scanline Overlay */
+.scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(255, 255, 255, 0.02) 2px,
+    rgba(255, 255, 255, 0.02) 4px
+  );
 }

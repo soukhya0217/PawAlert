@@ -52,8 +52,8 @@ export default function LocationPicker({
           zoomControl: false,
         });
 
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-          attribution: '&copy; CARTO',
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; OpenStreetMap',
           maxZoom: 19,
         }).addTo(map);
 
@@ -61,23 +61,26 @@ export default function LocationPicker({
           className: "picker-icon",
           html: `
             <div style="
-              background-color: #F75C2E;
-              width: 34px;
-              height: 34px;
+              background-color: #ff3b30;
+              width: 32px;
+              height: 32px;
               border-radius: 9999px;
               display: flex;
               align-items: center;
               justify-content: center;
-              box-shadow: 0 4px 12px rgba(247, 92, 46, 0.4);
-              border: 3px solid #ffffff;
-              font-size: 16px;
+              box-shadow: 0 0 16px rgba(255,59,48,0.7);
+              border: 2px solid #ffffff;
+              color: white;
+              font-family: monospace;
+              font-size: 13px;
+              font-weight: bold;
               transform: translate(-50%, -50%);
             ">
               📍
             </div>
           `,
-          iconSize: [34, 34],
-          iconAnchor: [17, 17],
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
         });
 
         const marker = L.marker([coords[1], coords[0]], {

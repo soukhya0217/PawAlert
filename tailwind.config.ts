@@ -12,6 +12,17 @@ const config: Config = {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        cyber: {
+          bg: "#05070d",
+          panel: "#0a0e17",
+          card: "#0f1422",
+          border: "rgba(255, 255, 255, 0.08)",
+          line: "rgba(212, 255, 58, 0.2)",
+          lime: "#d4ff3a",
+          neon: "#d4ff3a",
+          emergency: "#ff3b30",
+          cyan: "#00f0ff",
+        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

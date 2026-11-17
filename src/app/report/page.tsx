@@ -8,28 +8,30 @@ import {
   Camera,
   Upload,
   CheckCircle2,
-  Sparkles,
   ArrowRight,
-  Shield,
+  ShieldCheck,
   Info,
   Phone,
   User,
   Mail,
+  Radio,
+  Crosshair,
+  Activity
 } from "lucide-react";
 
 const ANIMAL_CATEGORIES = [
-  { label: "Injured Dog", emoji: "🐕", value: "Injured Dog" },
-  { label: "Injured Cat", emoji: "🐈", value: "Injured Cat" },
-  { label: "Injured Bird", emoji: "🕊️", value: "Injured Bird" },
-  { label: "Road Accident Case", emoji: "🚗", value: "Road Accident" },
-  { label: "Abandoned Puppy/Kitten", emoji: "📦", value: "Abandoned Animal" },
-  { label: "Trapped / Ensnared Animal", emoji: "🪤", value: "Trapped Animal" },
-  { label: "Sick / Maggot Wound Case", emoji: "🩺", value: "Sick Animal" },
-  { label: "Starving Community Animal", emoji: "🥣", value: "Starving Animal" },
-  { label: "Animal Cruelty / Abuse", emoji: "⚖️", value: "Animal Abuse" },
-  { label: "Stray Cattle / Cow in Distress", emoji: "🐄", value: "Stray Cattle" },
-  { label: "Wildlife Emergency", emoji: "🦉", value: "Wildlife Emergency" },
-  { label: "Other Incident", emoji: "🐾", value: "Other" },
+  { label: "Injured Stray Dog", code: "DOG", value: "Injured Dog" },
+  { label: "Injured Street Cat", code: "CAT", value: "Injured Cat" },
+  { label: "Injured Bird / Avian", code: "AVN", value: "Injured Bird" },
+  { label: "Vehicular Trauma / Hit & Run", code: "HIT", value: "Road Accident" },
+  { label: "Abandoned Puppy / Kitten", code: "ABN", value: "Abandoned Animal" },
+  { label: "Trapped / Ensnared Animal", code: "TRP", value: "Trapped Animal" },
+  { label: "Maggot Wound / Infection", code: "MED", value: "Sick Animal" },
+  { label: "Starving Community Animal", code: "STR", value: "Starving Animal" },
+  { label: "Cruelty / Intentional Abuse", code: "ABU", value: "Animal Abuse" },
+  { label: "Stray Bovine / Cattle Trauma", code: "COW", value: "Stray Cattle" },
+  { label: "Wildlife Distress", code: "WLD", value: "Wildlife Emergency" },
+  { label: "Other Distress Incident", code: "OTH", value: "Other" },
 ];
 
 export default function ReportAnimalPage() {
@@ -54,13 +56,6 @@ export default function ReportAnimalPage() {
   const [createdIncident, setCreatedIncident] = useState<any | null>(null);
   const [duplicates, setDuplicates] = useState<any[]>([]);
 
-  // Sample quick images for convenience or paste URL
-  const sampleImages = [
-    "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=600&q=80",
-  ];
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -77,7 +72,7 @@ export default function ReportAnimalPage() {
     e.preventDefault();
     setErrorMsg(null);
 
-    const chosenImage = imagePreview || imageUrl || sampleImages[0];
+    const chosenImage = imagePreview || imageUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80";
 
     if (!category || !description || !address) {
       setErrorMsg("Please fill out animal category, condition description, and location.");
@@ -122,46 +117,49 @@ export default function ReportAnimalPage() {
 
   if (createdIncident) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <div className="w-20 h-20 bg-mint-100 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-sm mb-6 animate-bounce">
-          🎉
+      <div className="max-w-2xl mx-auto px-4 py-20 text-center space-y-6">
+        <div className="w-16 h-16 rounded-full border border-emerald-500/40 bg-emerald-950/40 mx-auto flex items-center justify-center text-emerald-400 shadow-[0_0_24px_rgba(16,185,129,0.3)]">
+          <ShieldCheck className="w-8 h-8" />
         </div>
-        <span className="text-xs font-black uppercase tracking-wider text-mint-800 bg-mint-100 px-3 py-1 rounded-full border border-mint-200">
-          Emergency Dispatched
-        </span>
-        <h2 className="text-3xl font-black text-foreground mt-3 tracking-tight">
-          Alert Registered: {createdIncident.incidentId}
-        </h2>
-        <p className="text-sm text-foreground/80 mt-2 max-w-lg mx-auto">
-          Thank you for taking action! Your distress report has been entered into the central accountability grid and broadcasted to verified volunteers in the {createdIncident.location?.city} sector.
-        </p>
+
+        <div className="space-y-2">
+          <span className="font-mono text-xs uppercase tracking-wider text-emerald-400 border border-emerald-500/30 bg-emerald-950/40 px-3 py-1 rounded">
+            EMERGENCY BROADCAST ACTIVE
+          </span>
+          <h2 className="text-3xl font-black font-sans text-white tracking-tight pt-2">
+            Incident Registered: {createdIncident.incidentId}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
+            Your alert has been entered into the live rescue network. Nearby verified volunteers in the {createdIncident.location?.city} sector have received push telemetry.
+          </p>
+        </div>
 
         {duplicates.length > 0 && (
-          <div className="my-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-left max-w-lg mx-auto">
-            <div className="flex items-center gap-2 text-amber-800 font-bold text-xs">
-              <Info className="w-4 h-4 text-amber-600 flex-shrink-0" />
-              <span>Notice: Similar incident recently reported nearby</span>
+          <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-950/20 text-left font-mono text-xs space-y-1 text-amber-300">
+            <div className="flex items-center gap-2 font-bold text-amber-400">
+              <Info className="w-4 h-4 flex-shrink-0" />
+              <span>Duplicate Advisory Detected Nearby</span>
             </div>
-            <p className="text-xs text-amber-900 mt-1">
-              Case <strong>{duplicates[0].incidentId}</strong> is {duplicates[0].distanceMeters}m away (Status: {duplicates[0].status}). Our dispatch team will merge updates if applicable.
+            <p className="text-[11px] text-slate-300 font-sans">
+              Similar case <strong>{duplicates[0].incidentId}</strong> is {duplicates[0].distanceMeters}m away (Status: {duplicates[0].status}). Dispatch coordinators will verify.
             </p>
           </div>
         )}
 
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
             href={`/user/incident/${createdIncident._id}`}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-primary-500 to-peach-500 text-white font-bold text-sm shadow-md shadow-primary-500/25 hover:shadow-lg transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-3 rounded-md bg-[#d4ff3a] font-mono text-xs font-bold text-black hover:bg-[#c2ef2c] shadow-[0_0_16px_rgba(212,255,58,0.3)] transition-all flex items-center justify-center gap-2"
           >
-            <span>Track Live Rescue Progress</span>
+            <span>Open Real-Time Case Telemetry</span>
             <ArrowRight className="w-4 h-4" />
           </a>
 
           <a
             href="/map"
-            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white border border-cream-300 font-bold text-sm text-foreground hover:bg-peach-50 transition-colors"
+            className="w-full sm:w-auto px-6 py-3 rounded-md border border-white/20 bg-[#0a0e17] font-mono text-xs font-bold text-white hover:border-[#d4ff3a]/50 transition-colors"
           >
-            View on Live Map
+            Track on Tactical Map
           </a>
         </div>
       </div>
@@ -169,36 +167,45 @@ export default function ReportAnimalPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="text-center max-w-xl mx-auto mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-black uppercase tracking-wider mb-2 border border-red-200">
-          <AlertTriangle className="w-3.5 h-3.5" /> Emergency Animal Intake
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      
+      {/* Header */}
+      <div className="border-b border-white/10 pb-6">
+        <div className="inline-flex items-center gap-2 mb-2 font-mono text-xs uppercase tracking-wider text-[#ff3b30]">
+          <Radio className="w-3.5 h-3.5 animate-pulse" />
+          <span>Emergency Incident Intake Protocol</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
-          Report an Animal in Distress
+        <h1 className="text-3xl sm:text-4xl font-black font-sans text-white tracking-tight">
+          Report Animal in Distress
         </h1>
-        <p className="text-xs sm:text-sm text-foreground/75 mt-2">
-          Your report immediately triggers a geographical alert to nearby verified animal rescuers and partnered veterinary clinics.
+        <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl font-sans">
+          This form initiates a high-priority dispatch broadcast to verified rescue responders and emergency trauma vans. Zero simulated or false records.
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-3xl p-6 sm:p-10 border border-cream-200 shadow-soft space-y-8"
+        className="rounded-xl border border-white/10 bg-[#0a0e17] p-6 sm:p-8 backdrop-blur-xl space-y-8 shadow-2xl"
       >
         {errorMsg && (
-          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0" />
+          <div className="p-3.5 rounded-lg border border-red-500/40 bg-red-950/30 text-red-300 font-mono text-xs flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-[#ff3b30] flex-shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {/* 1. Category Selection */}
-        <div>
-          <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground mb-3">
-            1. Select Animal Incident Category *
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="font-mono text-xs font-bold uppercase tracking-wider text-white">
+              01 // Animal Category
+            </label>
+            <span className="font-mono text-[10px] text-[#d4ff3a]">
+              ACTIVE: {category.toUpperCase()}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
             {ANIMAL_CATEGORIES.map((cat) => {
               const isSelected = category === cat.value;
               return (
@@ -206,44 +213,42 @@ export default function ReportAnimalPage() {
                   type="button"
                   key={cat.value}
                   onClick={() => setCategory(cat.value)}
-                  className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-2.5 ${
+                  className={`p-3 rounded-lg border text-left transition-all font-mono text-xs ${
                     isSelected
-                      ? "bg-peach-100/80 border-primary-500 text-primary-950 shadow-sm ring-2 ring-primary-500/20 font-black"
-                      : "bg-cream-50/60 border-cream-200 text-foreground/80 hover:bg-cream-100 font-bold"
+                      ? "border-[#d4ff3a] bg-[#d4ff3a]/15 text-[#d4ff3a] shadow-[0_0_12px_rgba(212,255,58,0.2)]"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:border-white/25 hover:text-white"
                   }`}
                 >
-                  <span className="text-xl">{cat.emoji}</span>
-                  <span className="text-xs leading-tight">{cat.label}</span>
+                  <span className="text-[10px] opacity-60 block font-mono">[{cat.code}]</span>
+                  <span className="font-bold leading-tight block mt-1">{cat.label}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* 2. Photo / Evidence Upload */}
-        <div>
-          <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground mb-3">
-            2. Animal Photograph & Visual Evidence *
+        {/* 2. Photo / Visual Evidence */}
+        <div className="space-y-3">
+          <label className="font-mono text-xs font-bold uppercase tracking-wider text-white block">
+            02 // Photographic & Injury Evidence
           </label>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* File Upload Box */}
-            <div className="border-2 border-dashed border-cream-300 rounded-2xl p-6 text-center hover:border-primary-400 transition-colors bg-cream-50/40 flex flex-col items-center justify-center">
-              <Camera className="w-8 h-8 text-primary-500 mb-2" />
-              <p className="text-xs font-bold text-foreground">Upload from Device / Take Photo</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">PNG, JPG, or WEBP up to 10MB</p>
+            <div className="border border-dashed border-white/20 rounded-lg p-6 text-center hover:border-[#d4ff3a]/50 transition-colors bg-white/5 flex flex-col items-center justify-center">
+              <Camera className="w-8 h-8 text-[#d4ff3a] mb-2" />
+              <p className="font-mono text-xs font-bold text-white">Upload Incident Photo</p>
+              <p className="font-mono text-[10px] text-slate-400 mt-0.5">PNG, JPG, or WEBP up to 10MB</p>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileUpload}
-                className="mt-3 block w-full text-xs text-muted-foreground file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-peach-100 file:text-primary-700 hover:file:bg-peach-200 cursor-pointer"
+                className="mt-3 block w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:font-mono file:text-xs file:font-bold file:bg-[#d4ff3a] file:text-black cursor-pointer"
               />
             </div>
 
-            {/* Image Preview / URL Option */}
-            <div className="space-y-2">
+            <div className="space-y-2 flex items-center justify-center">
               {imagePreview ? (
-                <div className="relative h-40 rounded-2xl overflow-hidden border border-cream-300">
+                <div className="relative h-44 w-full rounded-lg overflow-hidden border border-white/20">
                   <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                   <button
                     type="button"
@@ -251,75 +256,61 @@ export default function ReportAnimalPage() {
                       setImagePreview(null);
                       setImageUrl("");
                     }}
-                    className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white text-xs font-bold px-2"
+                    className="absolute top-2 right-2 rounded bg-black/80 border border-white/20 px-2 py-1 font-mono text-[10px] text-white hover:bg-red-900"
                   >
-                    Remove
+                    Clear Photo
                   </button>
                 </div>
               ) : (
-                <div className="p-4 rounded-2xl bg-cream-50 border border-cream-200 space-y-2">
-                  <p className="text-xs font-bold text-foreground">Or select sample image for demo:</p>
-                  <div className="flex gap-2">
-                    {sampleImages.map((src, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => {
-                          setImagePreview(src);
-                          setImageUrl(src);
-                        }}
-                        className="w-16 h-16 rounded-xl overflow-hidden border-2 border-cream-300 hover:border-primary-500 flex-shrink-0"
-                      >
-                        <img src={src} alt="Sample" className="w-full h-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
+                <div className="h-44 w-full rounded-lg border border-white/10 bg-white/5 flex flex-col items-center justify-center text-slate-400 font-mono text-xs p-4 text-center">
+                  <Upload className="w-6 h-6 mb-2 text-slate-500" />
+                  <span>No image selected yet. Clear photos enable faster triage by veterinary teams.</span>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* 3. Condition Description & Priority */}
+        {/* 3. Description & Priority */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-2">
-            <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
-              3. Condition & Visible Injury Details *
+            <label className="font-mono text-xs font-bold uppercase tracking-wider text-white block">
+              03 // Clinical Condition & Visual Symptoms *
             </label>
             <textarea
               required
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="E.g., Hit by car on rear leg, bleeding profusely, unable to stand, whined in distress. Needs urgent ambulance splint..."
-              className="w-full p-3.5 rounded-2xl border border-cream-300 bg-cream-50/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+              placeholder="Describe condition: e.g. severe limp on left hind leg, open bleeding laceration, whimpering in pain, sheltered near tree..."
+              className="w-full p-3.5 rounded-lg border border-white/10 bg-white/5 font-mono text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#d4ff3a] transition-colors"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground">
+            <label className="font-mono text-xs font-bold uppercase tracking-wider text-white block">
               Emergency Priority
             </label>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value as any)}
-              className="w-full p-3.5 rounded-2xl border border-cream-300 bg-cream-50/50 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+              className="w-full p-3.5 rounded-lg border border-white/10 bg-[#05070d] font-mono text-xs text-white focus:outline-none focus:border-[#d4ff3a]"
             >
-              <option value="CRITICAL">🚨 Critical (SLA: 45m)</option>
-              <option value="HIGH">⚠️ High (SLA: 2h)</option>
-              <option value="MEDIUM">Medium (SLA: 6h)</option>
-              <option value="LOW">Low (SLA: 24h)</option>
+              <option value="CRITICAL">🚨 CRITICAL (SLA: 45 min)</option>
+              <option value="HIGH">⚠️ HIGH (SLA: 2 hr)</option>
+              <option value="MEDIUM">MEDIUM (SLA: 6 hr)</option>
+              <option value="LOW">LOW (SLA: 24 hr)</option>
             </select>
-            <p className="text-[11px] text-muted-foreground leading-tight pt-1">
-              AI Triage will automatically verify this priority to ensure genuine trauma cases receive first response.
+            <p className="font-mono text-[10px] text-slate-400 leading-tight pt-1">
+              AI Triage correlates symptom severity and automatically verifies dispatch priority.
             </p>
           </div>
         </div>
 
-        {/* 4. Location Pinpointing */}
-        <div>
-          <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground mb-3">
-            4. Incident Geolocation & Nearby Landmark *
+        {/* 4. Geolocation Pinpointing */}
+        <div className="space-y-3">
+          <label className="font-mono text-xs font-bold uppercase tracking-wider text-white block">
+            04 // Incident Geolocation Pinpoint *
           </label>
           <LocationPicker
             initialCoordinates={coords}
@@ -329,74 +320,63 @@ export default function ReportAnimalPage() {
             }}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
             <input
               type="text"
               value={landmark}
               onChange={(e) => setLandmark(e.target.value)}
-              placeholder="Nearby Landmark (e.g. Opposite Blue Tokai / Metro Pillar 124)"
-              className="p-3 rounded-xl border border-cream-300 bg-cream-50/50 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary-500"
+              placeholder="Nearby Landmark (e.g. Metro Pillar 182 / Near Cafe)"
+              className="p-3 rounded-lg border border-white/10 bg-white/5 font-mono text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#d4ff3a]"
             />
             <input
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="City (e.g. Bangalore)"
-              className="p-3 rounded-xl border border-cream-300 bg-cream-50/50 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="p-3 rounded-lg border border-white/10 bg-white/5 font-mono text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#d4ff3a]"
             />
           </div>
         </div>
 
-        {/* 5. Reporter Contact Details */}
-        <div>
-          <label className="block text-xs font-black uppercase tracking-wider text-muted-foreground mb-3">
-            5. Reporter Contact Details (Kept Confidential)
+        {/* 5. Reporter Information */}
+        <div className="space-y-3">
+          <label className="font-mono text-xs font-bold uppercase tracking-wider text-white block">
+            05 // Reporter Details (Confidential)
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="relative">
-              <User className="w-4 h-4 text-muted-foreground absolute left-3 top-3.5" />
-              <input
-                type="text"
-                value={reporterName}
-                onChange={(e) => setReporterName(e.target.value)}
-                placeholder="Your Full Name"
-                className="w-full pl-9 pr-3 py-3 rounded-xl border border-cream-300 bg-cream-50/50 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary-500"
-              />
-            </div>
-
-            <div className="relative">
-              <Phone className="w-4 h-4 text-muted-foreground absolute left-3 top-3.5" />
-              <input
-                type="tel"
-                value={reporterPhone}
-                onChange={(e) => setReporterPhone(e.target.value)}
-                placeholder="Mobile Number"
-                className="w-full pl-9 pr-3 py-3 rounded-xl border border-cream-300 bg-cream-50/50 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary-500"
-              />
-            </div>
-
-            <div className="relative">
-              <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-3.5" />
-              <input
-                type="email"
-                value={reporterEmail}
-                onChange={(e) => setReporterEmail(e.target.value)}
-                placeholder="Email Address (for live updates)"
-                className="w-full pl-9 pr-3 py-3 rounded-xl border border-cream-300 bg-cream-50/50 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-primary-500"
-              />
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input
+              type="text"
+              value={reporterName}
+              onChange={(e) => setReporterName(e.target.value)}
+              placeholder="Your Full Name"
+              className="p-3 rounded-lg border border-white/10 bg-white/5 font-mono text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#d4ff3a]"
+            />
+            <input
+              type="tel"
+              value={reporterPhone}
+              onChange={(e) => setReporterPhone(e.target.value)}
+              placeholder="Mobile Phone (for rescue driver)"
+              className="p-3 rounded-lg border border-white/10 bg-white/5 font-mono text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#d4ff3a]"
+            />
+            <input
+              type="email"
+              value={reporterEmail}
+              onChange={(e) => setReporterEmail(e.target.value)}
+              placeholder="Email Address"
+              className="p-3 rounded-lg border border-white/10 bg-white/5 font-mono text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#d4ff3a]"
+            />
           </div>
         </div>
 
         {/* Submit Button */}
-        <div className="pt-4 border-t border-cream-200 flex items-center justify-end">
+        <div className="pt-4 border-t border-white/10 flex items-center justify-end">
           <button
             type="submit"
             disabled={submitting}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-red-500 via-primary-500 to-rose-600 text-white font-black text-sm shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-md bg-[#ff3b30] font-mono text-xs font-bold uppercase tracking-wider text-white shadow-[0_0_24px_rgba(255,59,48,0.5)] border border-red-400/40 hover:bg-[#ff4d4d] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            <AlertTriangle className="w-4 h-4 text-white" />
-            <span>{submitting ? "Broadcasting Emergency..." : "Submit Distress Report"}</span>
+            <AlertTriangle className="w-4 h-4" />
+            <span>{submitting ? "Broadcasting Emergency..." : "Broadcast Distress Alert"}</span>
           </button>
         </div>
       </form>

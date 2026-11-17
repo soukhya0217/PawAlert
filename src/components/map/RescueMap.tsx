@@ -1,7 +1,19 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { AlertTriangle, MapPin, CheckCircle2, Heart, Shield, RefreshCw } from "lucide-react";
+import { 
+  AlertTriangle, 
+  MapPin, 
+  RefreshCw, 
+  ShieldCheck, 
+  Radio, 
+  Crosshair, 
+  Compass,
+  Layers,
+  ChevronRight,
+  ExternalLink,
+  Plus
+} from "lucide-react";
 
 interface MapMarkerItem {
   id: string;
@@ -39,8 +51,10 @@ export default function RescueMap({
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [activePriority, setActivePriority] = useState("ALL");
   const [selectedItem, setSelectedItem] = useState<MapMarkerItem | null>(null);
-  const [takingActionId, setTakingActionId] = useState<string | null>(null);
-  const [actionSuccessMessage, setActionSuccessMessage] = useState<string | null>(null);
+  const [cursorCoords, setCursorCoords] = useState<{ lat: number; lng: number }>({
+    lat: initialCenter[0],
+    lng: initialCenter[1],
+  });
 
   const fetchMapData = async () => {
     try {
@@ -50,19 +64,20 @@ export default function RescueMap({
 
       const mapped: MapMarkerItem[] = [];
 
-      if (data.incidents) {
+      // Only populate REAL reported incidents from the database (no fake data)
+      if (data.incidents && Array.isArray(data.incidents)) {
         data.incidents.forEach((inc: any) => {
-          if (inc.location && inc.location.coordinates) {
+          if (inc.location && Array.isArray(inc.location.coordinates) && inc.location.coordinates.length === 2) {
             mapped.push({
               id: inc._id,
               incidentId: inc.incidentId,
-              title: inc.animalCategory,
+              title: inc.animalCategory || "Animal Distress",
               category: inc.animalCategory,
               priority: inc.priority,
               status: inc.status,
               type: "INCIDENT",
               coordinates: inc.location.coordinates, // [lon, lat]
-              address: inc.location.address,
+              address: inc.location.address || "Location logged",
               image: inc.images?.[0],
               assignedVolunteer: inc.assignedVolunteerId?.fullName,
             });
@@ -70,31 +85,10 @@ export default function RescueMap({
         });
       }
 
-      // Also fetch feeding zones
-      try {
-        const feedRes = await fetch("/api/feeding/zones");
-        const feedData = await feedRes.json();
-        if (feedData.zones) {
-          feedData.zones.forEach((z: any) => {
-            if (z.location && z.location.coordinates) {
-              mapped.push({
-                id: z._id,
-                title: z.zoneName,
-                category: "Feeding Zone",
-                status: z.status,
-                type: "FEEDING",
-                coordinates: z.location.coordinates,
-                address: z.location.address,
-                image: z.photos?.[0],
-              });
-            }
-          });
-        }
-      } catch (e) {}
-
       setItems(mapped);
     } catch (e) {
-      console.error("Map fetch error:", e);
+      console.error("Tactical map fetch error:", e);
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -104,7 +98,7 @@ export default function RescueMap({
     fetchMapData();
   }, []);
 
-  // Initialize Leaflet Map
+  // Initialize Tactical Leaflet Map with OpenStreetMap (No API key needed!)
   useEffect(() => {
     if (typeof window === "undefined" || !mapContainerRef.current) return;
 
@@ -114,7 +108,7 @@ export default function RescueMap({
       if (!isMounted || !mapContainerRef.current) return;
 
       if (!leafletMapRef.current) {
-        // Fix Leaflet's default icon path issues
+        // Fix Leaflet's default icon paths
         delete (L.Icon.Default.prototype as any)._getIconUrl;
         L.Icon.Default.mergeOptions({
           iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -128,18 +122,26 @@ export default function RescueMap({
           zoomControl: false,
         });
 
+        // Add custom zoom control at bottom-right
         L.control.zoom({ position: "bottomright" }).addTo(map);
 
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-          attribution: '&copy; <a href="https://carto.com/">CARTO</a>, &copy; OpenStreetMap',
+        // FREE OpenStreetMap Standard Tiles (No API key required!)
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
           maxZoom: 19,
+          subdomains: ["a", "b", "c"],
         }).addTo(map);
+
+        // Update telemetry coordinates on mouse move
+        map.on("mousemove", (e: any) => {
+          setCursorCoords({ lat: e.latlng.lat, lng: e.latlng.lng });
+        });
 
         markersLayerRef.current = L.layerGroup().addTo(map);
         leafletMapRef.current = map;
       }
 
-      // Update markers
+      // Render Active Markers
       if (markersLayerRef.current) {
         markersLayerRef.current.clearLayers();
 
@@ -154,58 +156,55 @@ export default function RescueMap({
           const lat = item.coordinates[1];
           const lon = item.coordinates[0];
 
-          let markerColor = "#F75C2E"; // Default coral
-          let markerEmoji = "🐾";
-
-          if (item.type === "INCIDENT") {
-            if (item.priority === "CRITICAL") {
-              markerColor = "#E11D48";
-              markerEmoji = "🚨";
-            } else if (item.priority === "HIGH") {
-              markerColor = "#F97316";
-              markerEmoji = "⚠️";
-            } else if (item.status === "RESOLVED") {
-              markerColor = "#2EA879";
-              markerEmoji = "✅";
-            }
-          } else if (item.type === "FEEDING") {
-            markerColor = "#2EA879";
-            markerEmoji = "🥣";
-          }
+          const isCritical = item.priority === "CRITICAL";
+          const markerColor = isCritical ? "#ff3b30" : "#d4ff3a";
+          const glowColor = isCritical ? "rgba(255, 59, 48, 0.6)" : "rgba(212, 255, 58, 0.6)";
 
           const customIcon = L.divIcon({
-            className: "custom-div-icon",
+            className: "custom-tactical-marker",
             html: `
-              <div style="
-                background-color: ${markerColor};
-                width: 38px;
-                height: 38px;
-                border-radius: 9999px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-                border: 3px solid #ffffff;
-                font-size: 16px;
-                cursor: pointer;
-                transform: translate(-50%, -50%);
-                transition: transform 0.2s ease;
-              " class="hover:scale-125">
-                ${markerEmoji}
+              <div style="position: relative; width: 32px; height: 32px; cursor: pointer;">
+                <div style="
+                  position: absolute;
+                  inset: 0;
+                  border-radius: 50%;
+                  background: ${glowColor};
+                  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+                "></div>
+                <div style="
+                  position: relative;
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 50%;
+                  background: #0a0e17;
+                  border: 2px solid ${markerColor};
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  box-shadow: 0 0 16px ${markerColor};
+                  color: ${markerColor};
+                  font-family: monospace;
+                  font-size: 11px;
+                  font-weight: bold;
+                ">
+                  ${isCritical ? "!" : "▲"}
+                </div>
               </div>
             `,
-            iconSize: [38, 38],
-            iconAnchor: [19, 19],
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
           });
 
           const marker = L.marker([lat, lon], { icon: customIcon });
 
           marker.on("click", () => {
             setSelectedItem(item);
-            if (onSelectIncident) onSelectIncident(item);
+            if (onSelectIncident) {
+              onSelectIncident(item);
+            }
           });
 
-          markersLayerRef.current.addLayer(marker);
+          marker.addTo(markersLayerRef.current);
         });
       }
     });
@@ -215,180 +214,158 @@ export default function RescueMap({
     };
   }, [items, activeFilter, activePriority]);
 
-  const handleTakeResponsibility = async (incidentId: string) => {
-    try {
-      setTakingActionId(incidentId);
-      const res = await fetch(`/api/incidents/${incidentId}/assign`, {
-        method: "POST",
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        setActionSuccessMessage("Responsibility accepted! Case assigned to you.");
-        fetchMapData();
-      } else {
-        alert(data.error || "Failed to accept case");
-      }
-    } catch (e: any) {
-      alert("Network or server error while taking responsibility");
-    } finally {
-      setTakingActionId(null);
-    }
-  };
-
   return (
-    <div className="relative w-full h-[650px] rounded-3xl overflow-hidden border border-cream-200 shadow-card bg-cream-100">
-      {/* Map Filter Controls Bar */}
-      <div className="absolute top-4 left-4 z-[1000] flex flex-wrap items-center gap-2 bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-lg border border-cream-200 max-w-[90vw]">
-        <button
-          onClick={() => setActiveFilter("ALL")}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-            activeFilter === "ALL"
-              ? "bg-primary-500 text-white shadow-sm"
-              : "text-foreground hover:bg-cream-100"
-          }`}
-        >
-          All Locations ({items.length})
-        </button>
+    <div className="relative w-full rounded-xl border border-white/10 bg-[#0a0e17] overflow-hidden shadow-2xl">
+      {/* Top HUD Telemetry Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#05070d]/90 px-4 py-3 backdrop-blur-md">
+        
+        {/* Sector & Telemetry Info */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Radio className="w-4 h-4 text-[#d4ff3a] animate-pulse" />
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-white">
+              Tactical Sector Grid
+            </span>
+          </div>
 
-        <button
-          onClick={() => setActiveFilter("INCIDENTS")}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
-            activeFilter === "INCIDENTS"
-              ? "bg-rose-500 text-white shadow-sm"
-              : "text-foreground hover:bg-cream-100"
-          }`}
-        >
-          <AlertTriangle className="w-3.5 h-3.5" />
-          Emergencies
-        </button>
+          <div className="hidden sm:flex items-center gap-2 font-mono text-[11px] text-slate-400">
+            <span className="h-3 w-[1px] bg-white/20" />
+            <span>LAT: {cursorCoords.lat.toFixed(4)}° N</span>
+            <span className="h-3 w-[1px] bg-white/20" />
+            <span>LON: {cursorCoords.lng.toFixed(4)}° E</span>
+          </div>
+        </div>
 
-        <button
-          onClick={() => setActiveFilter("FEEDING")}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
-            activeFilter === "FEEDING"
-              ? "bg-mint-500 text-white shadow-sm"
-              : "text-foreground hover:bg-cream-100"
-          }`}
-        >
-          🥣 Feeding Zones
-        </button>
+        {/* Filter Controls & Live Count */}
+        <div className="flex items-center gap-2">
+          {/* Active Incident Badge (Zero False Data) */}
+          <div className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300">
+            <span className={`h-2 w-2 rounded-full ${items.length > 0 ? "bg-[#ff3b30] animate-ping" : "bg-emerald-400"}`} />
+            <span>ACTIVE ALERTS:</span>
+            <strong className={`font-mono ${items.length > 0 ? "text-[#ff3b30]" : "text-[#d4ff3a]"}`}>
+              {items.length}
+            </strong>
+          </div>
 
-        <div className="h-4 w-px bg-cream-300 hidden sm:block"></div>
-
-        {/* Priority Filter */}
-        <select
-          value={activePriority}
-          onChange={(e) => setActivePriority(e.target.value)}
-          aria-label="Filter incidents by priority"
-          className="text-xs font-bold px-2 py-1.5 bg-cream-50 rounded-xl border border-cream-300 text-foreground focus:outline-none focus:ring-1 focus:ring-primary-500"
-        >
-          <option value="ALL">All Priorities</option>
-          <option value="CRITICAL">🚨 Critical Only</option>
-          <option value="HIGH">⚠️ High Priority</option>
-          <option value="MEDIUM">Medium Priority</option>
-          <option value="LOW">Low Priority</option>
-        </select>
-
-        <button
-          onClick={fetchMapData}
-          className="p-1.5 rounded-xl text-muted-foreground hover:bg-cream-100 transition-colors"
-          title="Refresh Map"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-        </button>
+          {/* Refresh Button */}
+          <button
+            onClick={fetchMapData}
+            disabled={loading}
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-white/10 bg-white/5 text-slate-300 hover:border-[#d4ff3a]/40 hover:text-white transition-colors disabled:opacity-50"
+            title="Refresh Radar Grid"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#d4ff3a]" : ""}`} />
+          </button>
+        </div>
       </div>
 
-      {/* Selected Item Floating Modal */}
-      {selectedItem && (
-        <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:w-96 z-[1000] bg-white rounded-3xl p-5 shadow-2xl border border-cream-200 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-peach-100 text-primary-700">
-                  {selectedItem.priority || selectedItem.type}
-                </span>
-                <span className="text-xs font-bold text-muted-foreground">
-                  {selectedItem.incidentId || "ZONE"}
+      {/* Map Canvas with Dark Satellite Overlay */}
+      <div className="relative h-[520px] w-full bg-[#05070d]">
+        <div 
+          ref={mapContainerRef} 
+          className="h-full w-full leaflet-tactical-container z-0" 
+        />
+
+        {/* Tactical Crosshair Center Watermark */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-25">
+          <Crosshair className="w-16 h-16 text-[#d4ff3a]/40" />
+        </div>
+
+        {/* Clean Empty State Overlay (When Database Contains Zero Incidents) */}
+        {!loading && items.length === 0 && (
+          <div className="absolute inset-x-4 bottom-6 md:inset-x-auto md:left-6 md:bottom-6 z-20 max-w-md rounded-lg border border-white/15 bg-[#05070d]/95 p-4 shadow-2xl backdrop-blur-xl">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-white">
+                    Sector Clear // Standby Mode
+                  </h4>
+                  <span className="rounded bg-emerald-950 px-1.5 py-0.2 font-mono text-[9px] text-emerald-400">
+                    ZERO INCIDENTS
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  No active animal distress cases reported in this sector. The response network is on standby ready to dispatch volunteers.
+                </p>
+                <div className="pt-2">
+                  <a
+                    href="/report"
+                    className="inline-flex items-center gap-1.5 rounded bg-[#ff3b30] px-3 py-1.5 font-mono text-[11px] font-bold text-white shadow-[0_0_12px_rgba(255,59,48,0.4)] hover:bg-[#ff4d4d] transition-all"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Report Animal in Distress</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Selected Incident Drawer / Inspection Card */}
+        {selectedItem && (
+          <div className="absolute top-4 right-4 z-20 w-80 max-w-[90%] rounded-lg border border-white/15 bg-[#05070d]/95 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-right-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-3">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-[#d4ff3a]">
+                INCIDENT ID: {selectedItem.incidentId || selectedItem.id.slice(-6)}
+              </span>
+              <button 
+                onClick={() => setSelectedItem(null)}
+                className="text-slate-400 hover:text-white text-xs font-mono"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-sm text-white">{selectedItem.title}</span>
+                <span className="rounded px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase bg-red-950 text-red-400 border border-red-500/30">
+                  {selectedItem.priority || "NORMAL"}
                 </span>
               </div>
-              <h3 className="text-base font-black text-foreground mt-1">{selectedItem.title}</h3>
+
+              <p className="text-xs text-slate-300 font-mono flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#ff3b30] flex-shrink-0" />
+                <span className="truncate">{selectedItem.address}</span>
+              </p>
+
+              <div className="pt-3 border-t border-white/10 flex gap-2">
+                <a
+                  href={`/user/incident/${selectedItem.id}`}
+                  className="flex-1 rounded bg-[#d4ff3a] py-1.5 text-center font-mono text-xs font-bold text-black hover:bg-[#c2ef2c] transition-colors"
+                >
+                  Take Responsibility
+                </a>
+              </div>
             </div>
-            <button
-              onClick={() => setSelectedItem(null)}
-              className="text-muted-foreground hover:text-foreground text-sm font-bold p-1"
-            >
-              ✕
-            </button>
           </div>
+        )}
+      </div>
 
-          {selectedItem.image && (
-            <div className="mt-3 h-32 w-full rounded-2xl overflow-hidden bg-cream-100">
-              <img
-                src={selectedItem.image}
-                alt={selectedItem.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-
-          <div className="mt-3 flex items-start gap-2 text-xs text-foreground/80">
-            <MapPin className="w-4 h-4 text-primary-500 flex-shrink-0 mt-0.5" />
-            <p className="line-clamp-2">{selectedItem.address}</p>
-          </div>
-
-          <div className="mt-3 pt-3 border-t border-cream-200 flex items-center justify-between text-xs">
-            <span className="font-bold text-muted-foreground">
-              Status: <span className="text-foreground">{selectedItem.status.replace(/_/g, " ")}</span>
-            </span>
-            {selectedItem.assignedVolunteer && (
-              <span className="text-mint-600 font-bold">Rescuer: {selectedItem.assignedVolunteer}</span>
-            )}
-          </div>
-
-          {/* Action buttons */}
-          <div className="mt-4 flex items-center gap-2">
-            {selectedItem.type === "INCIDENT" && !selectedItem.assignedVolunteer && (
-              <button
-                onClick={() => handleTakeResponsibility(selectedItem.id)}
-                disabled={takingActionId === selectedItem.id}
-                className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-red-500 to-primary-500 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
-              >
-                <Shield className="w-3.5 h-3.5" />
-                {takingActionId === selectedItem.id ? "Assigning..." : "Take Responsibility"}
-              </button>
-            )}
-
-            <a
-              href={
-                selectedItem.type === "INCIDENT"
-                  ? `/user/incident/${selectedItem.id}`
-                  : `/volunteer/feeding`
-              }
-              className="py-2 px-3 rounded-xl bg-peach-100 text-primary-700 font-bold text-xs hover:bg-peach-200 transition-colors text-center"
-            >
-              Full Details →
-            </a>
-          </div>
-
-          {actionSuccessMessage && (
-            <div className="mt-2 text-xs font-bold text-mint-700 bg-mint-50 p-2 rounded-xl text-center">
-              {actionSuccessMessage}
-            </div>
-          )}
+      {/* Bottom HUD Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#05070d]/90 px-4 py-2.5 font-mono text-[11px] text-slate-400">
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-[#ff3b30]" />
+            <span>CRITICAL RESCUE</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-[#d4ff3a]" />
+            <span>VERIFIED ALERT</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            <span>FEEDING ZONE</span>
+          </span>
         </div>
-      )}
 
-      {/* Leaflet Mount Container */}
-      <div ref={mapContainerRef} className="w-full h-full z-0" />
-
-      {/* Leaflet CSS requirement */}
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossOrigin=""
-      />
+        <div className="hidden md:flex items-center gap-2 text-slate-500">
+          <span>TILE SOURCE: OPENSTREETMAP (100% UNRESTRICTED)</span>
+        </div>
+      </div>
     </div>
   );
 }

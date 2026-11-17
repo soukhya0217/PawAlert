@@ -550,3 +550,33 @@ export async function POST() {
     return NextResponse.json({ error: err.message || "Failed to seed database" }, { status: 500 });
   }
 }
+
+export async function DELETE() {
+  try {
+    await connectDB();
+    await Incident.deleteMany({});
+    await RescueAssignment.deleteMany({});
+    await Animal.deleteMany({});
+    await MedicalRecord.deleteMany({});
+    await FeedingZone.deleteMany({});
+    await FeedingActivity.deleteMany({});
+    await Shelter.deleteMany({});
+    await Veterinarian.deleteMany({});
+    await AdoptionListing.deleteMany({});
+    await MissingAnimal.deleteMany({});
+    await Donation.deleteMany({});
+    await Notification.deleteMany({});
+    await VolunteerProfile.deleteMany({});
+    await NGO.deleteMany({});
+    // Keep users or delete demo accounts so it is 100% clean
+    await User.deleteMany({});
+
+    return NextResponse.json({
+      message: "Database wiped completely clean. Zero false records remaining.",
+      status: "CLEAN_EMPTY",
+    });
+  } catch (err: any) {
+    console.error("Wipe error:", err);
+    return NextResponse.json({ error: err.message || "Failed to wipe database" }, { status: 500 });
+  }
+}

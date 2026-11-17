@@ -1,71 +1,87 @@
 "use client";
 
 import React from "react";
-import { Heart, Phone, ShieldCheck, Mail, MapPin, Sparkles, AlertCircle } from "lucide-react";
+import { Phone, ShieldCheck, Mail, MapPin, Radio, AlertTriangle } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-cream-100 border-t border-cream-200 mt-20 relative overflow-hidden">
-      {/* Decorative Warm Top Bar */}
-      <div className="h-2 w-full bg-gradient-to-r from-primary-400 via-peach-400 to-lavender-400"></div>
+    <footer className="border-t border-white/10 bg-[#05070d] text-slate-400 relative overflow-hidden">
+      {/* Top Laser Accent */}
+      <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#d4ff3a]/50 to-transparent"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-primary-500 text-white flex items-center justify-center text-xl shadow-md shadow-primary-500/30">
-                🐾
-              </div>
-              <span className="text-2xl font-black tracking-tight text-foreground">
-                POWER<span className="text-primary-500">ALERT</span>
+            <div className="flex items-center gap-2.5">
+              <svg width="28" height="28" viewBox="0 0 40 40" aria-hidden="true">
+                <path 
+                  d="M20 2 36 11v18L20 38 4 29V11z" 
+                  fill="rgba(212, 255, 58, 0.05)" 
+                  stroke="#d4ff3a" 
+                  strokeWidth="2.2" 
+                />
+                <path 
+                  d="M11.5 27 20 18.5 28.5 27" 
+                  fill="none" 
+                  stroke="#d4ff3a" 
+                  strokeWidth="2.5" 
+                />
+              </svg>
+              <span className="font-mono text-lg font-black tracking-[0.14em] text-white">
+                POWER<span className="text-[#d4ff3a]">ALERT</span>
               </span>
             </div>
-            <p className="text-sm text-foreground/75 leading-relaxed max-w-sm">
-              Connecting citizen reporters, verified rescuers, veterinarians, and animal welfare NGOs in real-time. Speed, reliability, and compassion for every soul in distress.
+
+            <p className="text-xs text-slate-400 leading-relaxed max-w-sm font-sans">
+              Decentralized animal emergency response and welfare accountability network. Zero duplicate assignments, verified rescue milestones, and permanent medical audit logs.
             </p>
 
-            <div className="p-4 rounded-2xl bg-white border border-cream-300 shadow-sm inline-flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 animate-pulse">
-                <Phone className="w-5 h-5" />
+            <div className="p-3.5 rounded-lg border border-red-500/20 bg-red-950/20 inline-flex items-center gap-3">
+              <div className="w-8 h-8 rounded-md bg-[#ff3b30] text-white flex items-center justify-center flex-shrink-0 animate-pulse">
+                <Phone className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-[11px] font-bold text-red-600 uppercase tracking-wider">24/7 Emergency Dispatch</p>
-                <p className="text-base font-black text-foreground">+91 (800) 425-PAWS</p>
+                <p className="font-mono text-[10px] font-bold text-red-400 uppercase tracking-wider">
+                  24/7 Emergency Dispatch
+                </p>
+                <p className="font-mono text-sm font-black text-white">
+                  +91 (800) 425-PAWS
+                </p>
               </div>
             </div>
           </div>
 
           {/* Quick Rescue Links */}
           <div>
-            <h4 className="text-sm font-black text-foreground uppercase tracking-wider mb-4 flex items-center gap-1.5">
-              <AlertCircle className="w-4 h-4 text-primary-500" /> Rescue Action
+            <h4 className="font-mono text-xs font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5 text-[#ff3b30]" /> Dispatch Actions
             </h4>
-            <ul className="space-y-2.5 text-sm text-foreground/80 font-medium">
+            <ul className="space-y-2 text-xs font-mono">
               <li>
-                <a href="/report" className="hover:text-primary-600 transition-colors flex items-center gap-1">
-                  Report Distressed Animal
+                <a href="/report" className="hover:text-[#d4ff3a] transition-colors">
+                  &gt; Report Animal
                 </a>
               </li>
               <li>
-                <a href="/map" className="hover:text-primary-600 transition-colors">
-                  Interactive Rescue Map
+                <a href="/map" className="hover:text-[#d4ff3a] transition-colors">
+                  &gt; Tactical Radar Map
                 </a>
               </li>
               <li>
-                <a href="/missing" className="hover:text-primary-600 transition-colors">
-                  Missing Pet Alerts
+                <a href="/missing" className="hover:text-[#d4ff3a] transition-colors">
+                  &gt; Missing Pet Radar
                 </a>
               </li>
               <li>
-                <a href="/adoption" className="hover:text-primary-600 transition-colors">
-                  Adopt a Rescued Pet
+                <a href="/adoption" className="hover:text-[#d4ff3a] transition-colors">
+                  &gt; Verified Adoptions
                 </a>
               </li>
               <li>
-                <a href="/donate" className="hover:text-primary-600 transition-colors">
-                  Emergency Medical Fund
+                <a href="/donate" className="hover:text-[#d4ff3a] transition-colors">
+                  &gt; Medical Fund
                 </a>
               </li>
             </ul>
@@ -73,74 +89,57 @@ export default function Footer() {
 
           {/* Community & Roles */}
           <div>
-            <h4 className="text-sm font-black text-foreground uppercase tracking-wider mb-4 flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-lavender-500" /> Guardianship
+            <h4 className="font-mono text-xs font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#d4ff3a]" /> Guardianship
             </h4>
-            <ul className="space-y-2.5 text-sm text-foreground/80 font-medium">
+            <ul className="space-y-2 text-xs font-mono">
               <li>
-                <a href="/volunteer-register" className="hover:text-primary-600 transition-colors">
-                  Volunteer Application
+                <a href="/volunteer-register" className="hover:text-[#d4ff3a] transition-colors">
+                  &gt; Volunteer Enlistment
                 </a>
               </li>
               <li>
-                <a href="/ngo-register" className="hover:text-primary-600 transition-colors">
-                  Register Shelter / NGO
+                <a href="/ngo-register" className="hover:text-[#d4ff3a] transition-colors">
+                  &gt; Register Shelter / NGO
                 </a>
               </li>
               <li>
-                <a href="/how-it-works" className="hover:text-primary-600 transition-colors">
-                  Rescue Protocols
+                <a href="/how-it-works" className="hover:text-[#d4ff3a] transition-colors">
+                  &gt; Protocol Specification
                 </a>
               </li>
               <li>
-                <a href="/about" className="hover:text-primary-600 transition-colors">
-                  Sanctuary Mission
-                </a>
-              </li>
-              <li>
-                <a href="/contact" className="hover:text-primary-600 transition-colors">
-                  Contact Dispatch
+                <a href="/about" className="hover:text-[#d4ff3a] transition-colors">
+                  &gt; Sanctuary Mission
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Standards & Transparency */}
+          {/* System & Architecture */}
           <div>
-            <h4 className="text-sm font-black text-foreground uppercase tracking-wider mb-4 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-mint-500" /> Trust & Care
+            <h4 className="font-mono text-xs font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-1.5">
+              <Radio className="w-3.5 h-3.5 text-emerald-400" /> Platform Architecture
             </h4>
-            <ul className="space-y-2.5 text-sm text-foreground/80 font-medium">
-              <li className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span className="w-2 h-2 rounded-full bg-mint-500"></span> 100% 80G Tax Deductible
-              </li>
-              <li className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span className="w-2 h-2 rounded-full bg-sky-500"></span> Concurrency Safe Rescues
-              </li>
-              <li className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span className="w-2 h-2 rounded-full bg-peach-500"></span> GeoJSON 2dsphere Match
-              </li>
-              <li className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span className="w-2 h-2 rounded-full bg-lavender-500"></span> Automated SLA Escalations
-              </li>
-              <li className="pt-2">
-                <a
-                  href="/login"
-                  className="inline-block text-xs font-bold text-primary-600 bg-peach-50 border border-peach-200 px-3 py-1.5 rounded-xl hover:bg-peach-100 transition-colors"
-                >
-                  Admin & Volunteer Portal →
-                </a>
-              </li>
-            </ul>
+            <div className="space-y-2 text-[11px] font-mono text-slate-400">
+              <p>• GEOJSON 2DSPHERE</p>
+              <p>• ATOMIC MUTEX DISPATCH</p>
+              <p>• 12-STAGE RESCUE AUDIT</p>
+              <p>• ZERO FAKE DATA GUARANTEE</p>
+            </div>
           </div>
+
         </div>
 
-        {/* Bottom Credits */}
-        <div className="mt-12 pt-8 border-t border-cream-200 flex flex-col sm:flex-row items-center justify-between text-xs text-muted-foreground gap-4">
-          <p>© 2026 POWER ALERT Platform. Production-Ready Animal Rescue & Welfare Management.</p>
-          <p className="flex items-center gap-1">
-            Built with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> for every animal in distress.
-          </p>
+        {/* Bottom Bar */}
+        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-slate-400">
+          <p>© {new Date().getFullYear()} POWER ALERT. Every Life Matters. Every Alert Counts.</p>
+          <div className="flex items-center gap-4 text-slate-400">
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#d4ff3a]" />
+              SECURE PROTOCOL
+            </span>
+          </div>
         </div>
       </div>
     </footer>

@@ -1,182 +1,138 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import HeroSection from "@/components/home/HeroSection";
 import UrgentAlertsBanner from "@/components/home/UrgentAlertsBanner";
 import StatsSection from "@/components/home/StatsSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import RescueMap from "@/components/map/RescueMap";
-import { AlertTriangle, Heart, Shield, Sparkles, PawPrint, ArrowRight, CheckCircle2 } from "lucide-react";
+import { 
+  Crosshair, 
+  ArrowRight, 
+  ShieldCheck, 
+  Heart, 
+  MapPin, 
+  Activity,
+  Layers
+} from "lucide-react";
 
 export default function HomePage() {
-  const [seedStatus, setSeedStatus] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Auto-trigger seeder on initial mount if empty
-    fetch("/api/seed", { method: "POST" })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status !== "ALREADY_SEEDED") {
-          console.log("Seeding result:", data);
-        }
-      })
-      .catch((e) => console.log("Auto-seed check:", e));
-  }, []);
-
-  const handleManualSeed = async () => {
-    try {
-      setSeedStatus("Seeding demo data...");
-      const res = await fetch("/api/seed", { method: "POST" });
-      const data = await res.json();
-      setSeedStatus(data.message || "Database seeded!");
-      setTimeout(() => setSeedStatus(null), 4000);
-    } catch (e: any) {
-      setSeedStatus("Error: " + e.message);
-    }
-  };
-
   return (
-    <div className="space-y-12">
-      {/* Hero */}
+    <div className="space-y-16 pb-20">
+      {/* 1. Cyber-Tactical Hero Section */}
       <HeroSection />
 
-      {/* Urgent Emergency Live Ticker */}
+      {/* 2. Urgent Live Emergencies Ticker (Only appears if real emergencies exist) */}
       <UrgentAlertsBanner />
 
-      {/* Real-time Interactive Rescue Map Spotlight */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      {/* 3. Live Tactical Map Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 border-b border-white/10 pb-6">
           <div>
-            <span className="text-xs font-black uppercase tracking-wider text-primary-600 bg-peach-100 px-3 py-1 rounded-full border border-peach-200">
-              Live Geographic Grid
-            </span>
-            <h2 className="text-3xl font-black text-foreground mt-3 tracking-tight">
-              Interactive Emergency & Sanctuary Map
+            <div className="inline-flex items-center gap-2 mb-2 font-mono text-xs uppercase tracking-wider text-[#d4ff3a]">
+              <Crosshair className="w-3.5 h-3.5" />
+              <span>Geospatial Radar Intelligence</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white font-sans tracking-tight">
+              Live Emergency & Rescue Grid
             </h2>
-            <p className="text-sm text-foreground/75 mt-1 max-w-xl">
-              Real-time visualization of reported animal distress cases, active rescues in transit, daily feeding points, and veterinary hospitals.
+            <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl font-sans">
+              Real-time visualization of animal distress alerts and nearby rescue squad availability. No fake records.
             </p>
           </div>
 
           <a
             href="/map"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white border border-cream-300 font-bold text-sm text-foreground hover:bg-peach-50 hover:border-peach-300 shadow-sm transition-all"
+            className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-[#0a0e17] px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white hover:border-[#d4ff3a]/50 hover:text-[#d4ff3a] transition-all group"
           >
-            <span>Full Screen Map Experience</span>
-            <ArrowRight className="w-4 h-4 text-primary-500" />
+            <span>Full-Screen Radar View</span>
+            <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-1 group-hover:text-[#d4ff3a] transition-transform" />
           </a>
         </div>
 
+        {/* Tactical Map Container */}
         <RescueMap />
       </section>
 
-      {/* Key Stats Counter */}
+      {/* 4. Real-time Platform Telemetry (Dynamic Metrics, 0 Fake Data) */}
       <StatsSection />
 
-      {/* How It Works Journey */}
+      {/* 5. 12-Stage Rescue Protocol Architecture */}
       <HowItWorksSection />
 
-      {/* Compassionate Adoption & Feeding Spotlight Cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* 6. Tactical Spotlight Modules */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          {/* Card 1: Adoption */}
-          <div className="rounded-3xl p-8 bg-gradient-to-br from-peach-100/90 via-peach-50 to-white border border-peach-200/80 shadow-soft flex flex-col justify-between relative overflow-hidden group">
-            <div className="space-y-4 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-white text-rose-500 flex items-center justify-center text-2xl shadow-sm">
-                🐶
+          {/* Card 1: Adoption Protocol */}
+          <div className="rounded-xl border border-white/10 bg-[#0a0e17] p-8 backdrop-blur-md hover:border-[#d4ff3a]/40 transition-all flex flex-col justify-between group">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[#d4ff3a]">
+                  <Heart className="w-5 h-5" />
+                </div>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#d4ff3a] border border-[#d4ff3a]/30 bg-[#d4ff3a]/10 px-2.5 py-0.5 rounded">
+                  REHABILITATION & PLACEMENT
+                </span>
               </div>
-              <span className="text-xs font-black uppercase tracking-wider text-primary-700 bg-white/80 px-3 py-1 rounded-full border border-peach-200">
-                Loving Companions
-              </span>
-              <h3 className="text-2xl font-black text-foreground">
-                Adopt a Rescued Survivor
+
+              <h3 className="text-xl font-bold font-sans text-white group-hover:text-[#d4ff3a] transition-colors">
+                Adopt a Verified Survivor
               </h3>
-              <p className="text-sm text-foreground/80 leading-relaxed">
-                Every rescued animal has a story of resilience. Our vaccinated, sterilized, and medically cleared companions are ready to bring unconditional joy into your family.
+
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-sans">
+                Every rescued animal is sterilized, vaccinated, microchipped, and medically documented. Browse verified profiles and complete the transparent adoption questionnaire online.
               </p>
             </div>
 
-            <div className="mt-8 relative z-10 flex items-center justify-between">
+            <div className="mt-8 pt-4 border-t border-white/10 flex items-center justify-between">
+              <span className="font-mono text-xs text-slate-400">STATUS: OPEN FOR FOSTER & ADOPTION</span>
               <a
                 href="/adoption"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary-500 text-white font-bold text-sm shadow-md shadow-primary-500/25 hover:bg-primary-600 transition-all"
+                className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[#d4ff3a] hover:underline"
               >
-                <Heart className="w-4 h-4" />
-                <span>Meet Adoptable Animals</span>
+                <span>Browse Profiles</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </a>
-              <span className="text-xs font-bold text-primary-800">100% Free Adoption</span>
             </div>
           </div>
 
-          {/* Card 2: Feeding Network */}
-          <div className="rounded-3xl p-8 bg-gradient-to-br from-mint-100/90 via-mint-50 to-white border border-mint-200/80 shadow-soft flex flex-col justify-between relative overflow-hidden group">
-            <div className="space-y-4 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-white text-mint-600 flex items-center justify-center text-2xl shadow-sm">
-                🥣
+          {/* Card 2: Feeding Zones */}
+          <div className="rounded-xl border border-white/10 bg-[#0a0e17] p-8 backdrop-blur-md hover:border-[#d4ff3a]/40 transition-all flex flex-col justify-between group">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-emerald-400">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 rounded">
+                  COMMUNITY NUTRITION
+                </span>
               </div>
-              <span className="text-xs font-black uppercase tracking-wider text-mint-800 bg-white/80 px-3 py-1 rounded-full border border-mint-200">
-                Community Hunger Relief
-              </span>
-              <h3 className="text-2xl font-black text-foreground">
-                Street Animal Feeding & Water Drives
+
+              <h3 className="text-xl font-bold font-sans text-white group-hover:text-emerald-400 transition-colors">
+                Feeding Grid & Water Points
               </h3>
-              <p className="text-sm text-foreground/80 leading-relaxed">
-                Join our volunteer network providing daily nutritious meals and clean drinking water bowls to community dogs, cats, and birds across registered feeding zones.
+
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-sans">
+                Coordinate daily feeding routes across street zones. Volunteers log timestamps, food inventory, drinking water checks, and health observations with photo proof.
               </p>
             </div>
 
-            <div className="mt-8 relative z-10 flex items-center justify-between">
+            <div className="mt-8 pt-4 border-t border-white/10 flex items-center justify-between">
+              <span className="font-mono text-xs text-slate-400">COORDINATED VOLUNTEER ZONES</span>
               <a
-                href="/volunteer-register"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-mint-600 text-white font-bold text-sm shadow-md shadow-mint-600/25 hover:bg-mint-700 transition-all"
+                href="/map"
+                className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-emerald-400 hover:underline"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Become a Feeding Guardian</span>
+                <span>Locate Bowls on Grid</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </a>
-              <span className="text-xs font-bold text-mint-800">GPS Tracked Daily</span>
             </div>
           </div>
 
         </div>
       </section>
 
-      {/* Emergency Report Banner CTA */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="rounded-4xl p-10 bg-gradient-to-r from-red-500 via-primary-500 to-rose-600 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8 relative overflow-hidden">
-          <div className="space-y-3 max-w-2xl text-center lg:text-left">
-            <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-white text-xs font-black uppercase tracking-wider backdrop-blur-sm">
-              Urgent Citizen Action
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
-              See an Animal Suffering on the Road Right Now?
-            </h2>
-            <p className="text-white/90 text-sm leading-relaxed">
-              Do not walk away. Take 30 seconds to snap a picture and submit the GPS location. Nearby rescuers will be mobilized immediately.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
-            <a
-              href="/report"
-              className="px-8 py-4 rounded-2xl bg-white text-red-600 font-black text-base shadow-lg hover:bg-cream-50 hover:scale-105 active:scale-100 transition-all flex items-center justify-center gap-2"
-            >
-              <AlertTriangle className="w-5 h-5 text-red-600" />
-              <span>Report Emergency Now</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Developer / Demo Quick Seeder Pill */}
-      <div className="text-center pb-8">
-        <button
-          onClick={handleManualSeed}
-          className="text-xs font-bold text-muted-foreground/60 hover:text-primary-600 transition-colors"
-        >
-          {seedStatus || "⚙️ Demo Setup: Click here to populate sample data & demo users"}
-        </button>
-      </div>
     </div>
   );
 }
