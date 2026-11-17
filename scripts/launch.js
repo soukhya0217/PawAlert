@@ -124,7 +124,8 @@ async function main() {
     const text = chunk.toString();
     process.stdout.write(text);
 
-    if (text.includes('Ready in') || text.includes('ready in') || text.includes(`http://localhost:${port}`)) {
+    // Only trigger once Next.js signals it is ready or compiled
+    if (text.includes('Ready in') || text.includes('ready in') || text.includes('Compiled')) {
       setTimeout(triggerBrowser, 300);
     }
   });

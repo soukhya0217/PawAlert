@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title POWER ALERT - Production Animal Rescue Platform
+title POWER ALERT - Animal Rescue Platform
 
 echo ==============================================================
 echo   POWER ALERT: Animal Rescue Platform
@@ -20,8 +20,8 @@ echo [2/3] Verifying Node.js environment...
 where node >nul 2>nul
 if %errorlevel% neq 0 (
     echo.
-    echo [ERROR] Node.js is not found on your system PATH!
-    echo Please install Node.js (version 18 or 20) from https://nodejs.org/
+    echo [ERROR] Node.js is not found on your system PATH.
+    echo Please install Node.js from https://nodejs.org/
     echo.
     pause
     exit /b 1
@@ -32,11 +32,8 @@ echo.
 
 node scripts/launch.js
 
-if %errorlevel% neq 0 (
-    echo.
-    echo ==============================================================
-    echo [NOTICE] Application process finished with code %errorlevel%.
-    echo If this was unexpected, review the messages above.
-    echo ==============================================================
-    pause
-)
+echo.
+echo ==============================================================
+echo [INFO] POWER ALERT process has ended.
+echo ==============================================================
+pause
