@@ -33,6 +33,10 @@ export async function connectDB(): Promise<typeof mongoose> {
     };
 
     let uri: string = process.env.MONGODB_URI || "";
+    // If uri contains unconfigured placeholders, treat as empty to avoid DNS timeouts
+    if (uri.includes("<username>") || uri.includes("<password>")) {
+      uri = "";
+    }
 
     // Fallback: If no URI provided, use MongoMemoryServer or local default
     if (!uri) {

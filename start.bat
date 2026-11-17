@@ -1,6 +1,7 @@
 @echo off
+setlocal
 cd /d "%~dp0"
-title POWER ALERT - Animal Rescue Platform
+title POWER ALERT - Production Animal Rescue Platform
 
 echo ==============================================================
 echo   POWER ALERT: Animal Rescue Platform
@@ -10,23 +11,32 @@ echo.
 
 if not exist ".env.local" (
     if exist ".env.example" (
-        echo [INFO] Creating .env.local configuration...
+        echo [1/3] Initializing environment settings...
         copy /y ".env.example" ".env.local" >nul
     )
 )
 
-echo [1/2] Opening browser to http://localhost:3000 ...
-start "" "http://localhost:3000"
+echo [2/3] Verifying Node.js environment...
+where node >nul 2>nul
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Node.js is not found on your system PATH!
+    echo Please install Node.js (version 18 or 20) from https://nodejs.org/
+    echo.
+    pause
+    exit /b 1
+)
 
-echo [2/2] Starting POWER ALERT Next.js server...
-echo.
-echo ==============================================================
-echo Server is running! Press Ctrl+C in this window to stop it.
-echo ==============================================================
+echo [3/3] Launching POWER ALERT and opening browser...
 echo.
 
-call npm run dev
+node scripts/launch.js
 
-echo.
-echo [INFO] Next.js server process has terminated.
-pause
+if %errorlevel% neq 0 (
+    echo.
+    echo ==============================================================
+    echo [NOTICE] Application process finished with code %errorlevel%.
+    echo If this was unexpected, review the messages above.
+    echo ==============================================================
+    pause
+)
