@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from "lucide-react";
+import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, UserPlus, HeartHandshake, Building2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -62,22 +62,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-16">
+    <div className="max-w-md mx-auto px-4 py-12 sm:py-16">
+      {/* Brand Header */}
       <div className="text-center mb-8">
-        <div className="w-14 h-14 rounded-[18px] border-[2px] border-[#1B3B2B] bg-[#FFB703] flex items-center justify-center text-2xl mx-auto shadow-bento mb-3">
+        <div className="w-16 h-16 rounded-[22px] border-[3px] border-[#1E1B4B] bg-[#FFB703] flex items-center justify-center text-3xl mx-auto shadow-pixar mb-3">
           🐾
         </div>
-        <h1 className="text-3xl font-black font-display text-[#1B3B2B] tracking-tight">
+        <h1 className="text-3xl font-black font-display text-[#1E1B4B] tracking-tight">
           Sign In to PawAlert
         </h1>
-        <p className="text-xs text-[#1B3B2B]/70 mt-1 font-sans">
-          Central Field Dispatch & Guardian Network
+        <p className="text-xs text-[#1E1B4B]/70 mt-1 font-sans">
+          Central Animal Rescue Dispatch & Guardian Command
         </p>
       </div>
 
-      <div className="bento-card-white p-6 sm:p-8 space-y-6">
+      {/* Main Login Card */}
+      <div className="pixar-card p-6 sm:p-8 space-y-6">
         {errorMsg && (
-          <div className="p-3.5 rounded-[14px] border-[2px] border-[#FF5A4E] bg-[#FF5A4E]/10 text-[#FF5A4E] text-xs font-bold flex items-center gap-2">
+          <div className="p-3.5 rounded-[16px] border-[2px] border-[#EF4444] bg-[#EF4444]/10 text-[#EF4444] text-xs font-bold flex items-center gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -85,35 +87,44 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="font-display text-xs font-bold text-[#1B3B2B] block mb-1">
+            <label className="font-display text-xs font-bold text-[#1E1B4B] block mb-1">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-[#1B3B2B]/50 absolute left-3 top-3.5" />
+              <Mail className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="commander@pawalert.org"
-                className="w-full pl-9 pr-3 py-2.5 rounded-[14px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] text-xs font-sans text-[#1B3B2B] focus:outline-none focus:ring-2 focus:ring-[#FF5A4E]"
+                placeholder="rescuer@pawalert.org"
+                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
 
           <div>
-            <label className="font-display text-xs font-bold text-[#1B3B2B] block mb-1">
-              Password
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="font-display text-xs font-bold text-[#1E1B4B]">
+                Password
+              </label>
+              {/* Forgot Password Link */}
+              <a
+                href="/forgot-password"
+                className="text-xs font-display font-bold text-[#FF7A00] hover:text-[#EA580C] underline decoration-[#FF7A00]/40 transition-colors"
+              >
+                Forgot password?
+              </a>
+            </div>
             <div className="relative">
-              <Lock className="w-4 h-4 text-[#1B3B2B]/50 absolute left-3 top-3.5" />
+              <Lock className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-9 pr-3 py-2.5 rounded-[14px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] text-xs font-sans text-[#1B3B2B] focus:outline-none focus:ring-2 focus:ring-[#FF5A4E]"
+                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
@@ -121,7 +132,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="bento-btn w-full flex items-center justify-center gap-2 rounded-[16px] bg-[#FF5A4E] py-3 text-sm text-white disabled:opacity-50 mt-2"
+            className="pixar-btn w-full flex items-center justify-center gap-2 rounded-[18px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] py-3 text-sm font-bold text-white shadow-pixar disabled:opacity-50 mt-2"
           >
             <span>{loading ? "Authenticating..." : "Sign In to Dispatch"}</span>
             <ArrowRight className="w-4 h-4" />
@@ -129,16 +140,54 @@ export default function LoginPage() {
         </form>
 
         {/* Quick Admin Access Button */}
-        <div className="pt-4 border-t-[2px] border-[#1B3B2B]/10 space-y-2">
+        <div className="pt-4 border-t-[2px] border-[#1E1B4B]/10 space-y-2">
           <button
             type="button"
             onClick={handleQuickAdminLogin}
-            className="bento-btn w-full flex items-center justify-center gap-2 rounded-[14px] bg-[#FFB703] py-2 text-xs text-[#1B3B2B]"
+            className="pixar-btn w-full flex items-center justify-center gap-2 rounded-[16px] bg-[#FFB703] py-2.5 text-xs font-bold text-[#1E1B4B] shadow-pixar-sm"
           >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Fill Admin Credentials</span>
+            <ShieldCheck className="w-4 h-4 text-[#1E1B4B]" />
+            <span>Fill Admin Credentials (1-Click)</span>
           </button>
         </div>
+
+        {/* Sign Up / Registration Options */}
+        <div className="pt-4 border-t-[2px] border-[#1E1B4B]/10 space-y-3">
+          <div className="text-center">
+            <span className="font-display text-xs text-[#1E1B4B]/70">
+              New to PawAlert?
+            </span>
+          </div>
+
+          {/* Primary Citizen Sign Up Button */}
+          <a
+            href="/register"
+            className="pixar-btn w-full flex items-center justify-center gap-2 rounded-[16px] bg-[#FFF1DC] py-2.5 text-xs font-bold text-[#1E1B4B] shadow-pixar-sm hover:bg-[#FFE8C2]"
+          >
+            <UserPlus className="w-4 h-4 text-[#FF7A00]" />
+            <span>Create Citizen Account (Sign Up)</span>
+          </a>
+
+          {/* Specialized Onboarding Pathways */}
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <a
+              href="/volunteer-register"
+              className="pixar-btn rounded-[14px] bg-[#FFF9F0] p-2 text-center text-[11px] font-bold text-[#1E1B4B] shadow-pixar-sm flex items-center justify-center gap-1.5 hover:bg-[#FFF1DC]"
+            >
+              <HeartHandshake className="w-3.5 h-3.5 text-[#10B981]" />
+              <span>Join as Volunteer</span>
+            </a>
+
+            <a
+              href="/ngo-register"
+              className="pixar-btn rounded-[14px] bg-[#FFF9F0] p-2 text-center text-[11px] font-bold text-[#1E1B4B] shadow-pixar-sm flex items-center justify-center gap-1.5 hover:bg-[#FFF1DC]"
+            >
+              <Building2 className="w-3.5 h-3.5 text-[#1D4ED8]" />
+              <span>Register NGO</span>
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   );

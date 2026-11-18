@@ -195,14 +195,14 @@ export default function AdminMap({
   };
 
   return (
-    <div className={`relative w-full rounded-[32px] border-[4px] border-[#1E1B4B] bg-[#FFF9F0] overflow-hidden shadow-pixar ${className}`}>
+    <div className={`relative w-full rounded-[28px] sm:rounded-[32px] border-[3px] sm:border-[4px] border-[#1E1B4B] bg-[#FFF9F0] overflow-hidden shadow-pixar ${className}`}>
       
       {/* Top Map HUD Controls */}
-      <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2.5">
+      <div className="absolute top-3 left-3 right-3 sm:top-4 sm:left-4 sm:right-auto z-20 flex flex-wrap items-center gap-2">
         {/* Status Pill */}
-        <div className="flex items-center gap-2 rounded-[20px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] px-4 py-2 shadow-pixar-sm">
-          <span className={`h-3 w-3 rounded-full ${incidents.length > 0 ? "bg-[#EF4444] animate-ping" : "bg-[#10B981]"}`} />
-          <span className="font-display text-xs font-bold text-[#1E1B4B]">
+        <div className="flex items-center gap-1.5 rounded-[16px] sm:rounded-[20px] border-[2px] sm:border-[3px] border-[#1E1B4B] bg-[#FFF9F0] px-3 py-1.5 sm:px-4 sm:py-2 shadow-pixar-sm">
+          <span className={`h-2.5 w-2.5 rounded-full ${incidents.length > 0 ? "bg-[#EF4444] animate-ping" : "bg-[#10B981]"}`} />
+          <span className="font-display text-[11px] sm:text-xs font-bold text-[#1E1B4B]">
             {incidents.length > 0 ? `${incidents.length} ACTIVE ALERTS` : "SANCTUARY ALL QUIET"}
           </span>
         </div>
@@ -227,11 +227,11 @@ export default function AdminMap({
         {/* GPS Locate Me Button */}
         <button
           onClick={handleFlyToMyLocation}
-          className="pixar-btn bg-[#FFB703] text-[#1E1B4B] px-3.5 py-2 text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold"
+          className="pixar-btn bg-[#FFB703] text-[#1E1B4B] px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold"
           title="Locate Me (GPS)"
         >
           <Navigation className="w-3.5 h-3.5" />
-          <span>Locate Me (GPS)</span>
+          <span>Locate Me</span>
         </button>
 
         {/* Quick Demo Cases Seed Button */}
@@ -239,17 +239,17 @@ export default function AdminMap({
           <button
             onClick={handleLoadSampleAlerts}
             disabled={seeding}
-            className="pixar-btn bg-[#10B981] text-white px-3.5 py-2 text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold disabled:opacity-50"
+            className="pixar-btn bg-[#10B981] text-white px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold disabled:opacity-50"
             title="Load Sample Live Rescue Alerts"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{seeding ? "Loading..." : "⚡ Load Sample Alerts"}</span>
+            <span>{seeding ? "Loading..." : "⚡ Sample Alerts"}</span>
           </button>
         ) : (
           <button
             onClick={handleClearAllAlerts}
             disabled={seeding}
-            className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] px-3 py-2 text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold hover:bg-[#EF4444] hover:text-white transition-all disabled:opacity-50"
+            className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs shadow-pixar-sm flex items-center gap-1 font-bold hover:bg-[#EF4444] hover:text-white transition-all disabled:opacity-50"
             title="Clear Alerts (Test Empty State)"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -259,13 +259,13 @@ export default function AdminMap({
       </div>
 
       {/* Map Canvas with explicit height */}
-      <div className="w-full h-[520px] sm:h-[560px] relative z-0">
-        <div ref={containerRef} className="w-full h-[520px] sm:h-[560px] relative z-0" />
+      <div className="w-full h-[440px] sm:h-[560px] relative z-0">
+        <div ref={containerRef} className="w-full h-[440px] sm:h-[560px] relative z-0" />
       </div>
 
       {/* Heartwarming Empty State Card (When 0 active incidents in MongoDB) */}
       {incidents.length === 0 && (
-        <div className="absolute bottom-5 left-5 right-5 sm:left-5 sm:right-auto z-20 max-w-md rounded-[26px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 p-5 shadow-pixar backdrop-blur-md">
+        <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-auto z-20 max-w-md rounded-[22px] sm:rounded-[26px] border-[2px] sm:border-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 p-4 sm:p-5 shadow-pixar backdrop-blur-md">
           <div className="flex items-center gap-4">
             {/* Cute Sleeping Puppy & Kitten SVG Illustration with Zzz bubbles */}
             <div className="relative flex-shrink-0 w-14 h-14 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] flex items-center justify-center text-2xl shadow-pixar-sm">
@@ -306,7 +306,7 @@ export default function AdminMap({
 
       {/* Selected Incident Drawer */}
       {selectedIncident && (
-        <div className="absolute bottom-5 right-5 z-20 w-84 max-w-[90%] rounded-[26px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-5 shadow-pixar animate-in fade-in slide-in-from-right-4">
+        <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:right-5 sm:left-auto z-20 w-auto sm:w-84 max-w-full rounded-[24px] sm:rounded-[26px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-4 sm:p-5 shadow-pixar animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-right-4">
           <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B] pb-2 mb-2.5">
             <span className="font-mono text-[11px] font-black text-[#FF7A00]">
               {selectedIncident.incidentId}

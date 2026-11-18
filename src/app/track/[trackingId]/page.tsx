@@ -131,57 +131,57 @@ export default function TrackingPage() {
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
       
       {/* Top Header & Tracking ID */}
-      <div className="flex items-center justify-between border-b-[2px] border-[#1B3B2B] pb-4">
+      <div className="flex items-center justify-between border-b-[3px] border-[#1E1B4B] pb-4">
         <button
           onClick={() => router.push("/")}
-          className="bento-btn flex items-center gap-1.5 rounded-[14px] bg-[#FFFBF5] px-3 py-1.5 text-xs text-[#1B3B2B]"
+          className="pixar-btn flex items-center gap-1.5 rounded-[16px] bg-[#FFF9F0] px-4 py-2 text-xs font-bold text-[#1E1B4B] shadow-pixar-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Home</span>
         </button>
 
         <div className="text-right">
-          <span className="font-mono text-[10px] text-[#1B3B2B]/60 uppercase tracking-widest block">
+          <span className="font-mono text-[10px] text-[#1E1B4B]/60 uppercase tracking-widest block font-bold">
             LIVE TRACKER
           </span>
-          <span className="font-mono text-sm font-black text-[#FF5A4E]">
+          <span className="font-mono text-sm sm:text-base font-black text-[#FF7A00]">
             {incident.incidentId || trackingId}
           </span>
         </div>
       </div>
 
       {/* Main Status Bento Card */}
-      <div className="bento-card-white p-6 sm:p-8 space-y-6 relative overflow-hidden">
+      <div className="pixar-card p-6 sm:p-8 space-y-6 relative overflow-hidden">
         
         {/* Ink Stamp Overlay if RESOLVED */}
         {currentStageIdx === 3 && (
           <div
             ref={stampRef}
-            className="absolute top-4 right-4 sm:top-6 sm:right-8 z-30 pointer-events-none rounded-[16px] border-[4px] border-[#2EC4B6] bg-[#2EC4B6]/15 px-4 py-2 text-center text-[#2EC4B6] font-display font-black text-xl uppercase tracking-wider rotate-[-12deg] shadow-lg"
+            className="absolute top-4 right-4 sm:top-6 sm:right-8 z-30 pointer-events-none rounded-[18px] border-[4px] border-[#10B981] bg-[#10B981]/15 px-4 py-2 text-center text-[#10B981] font-display font-black text-xl uppercase tracking-wider rotate-[-12deg] shadow-lg"
           >
             🐾 SAFELY RESCUED!
           </div>
         )}
 
         <div>
-          <span className="inline-block rounded-[12px] border-[2px] border-[#1B3B2B] bg-[#FFB703] px-3 py-1 font-display text-[11px] font-bold text-[#1B3B2B] shadow-bento-sm mb-2">
+          <span className="inline-block rounded-[14px] border-[2px] border-[#1E1B4B] bg-[#FFB703] px-3.5 py-1 font-display text-xs font-bold text-[#1E1B4B] shadow-pixar-sm mb-2">
             {incident.animalCategory || "Animal in Distress"}
           </span>
-          <h1 className="text-3xl font-black font-display text-[#1B3B2B]">
+          <h1 className="text-3xl font-black font-display text-[#1E1B4B]">
             Rescue Mission Status
           </h1>
-          <p className="text-xs text-[#1B3B2B]/75 mt-1 font-sans">
+          <p className="text-xs text-[#1E1B4B]/75 mt-1 font-sans">
             {incident.conditionDescription}
           </p>
         </div>
 
         {/* Animated Walking Paw-Trail Tracker */}
-        <div className="py-6 border-y-[2px] border-[#1B3B2B] space-y-4">
-          <span className="font-mono text-[11px] font-bold text-[#1B3B2B] uppercase tracking-wider block">
+        <div className="py-6 border-y-[3px] border-[#1E1B4B] space-y-4">
+          <span className="font-mono text-[11px] font-bold text-[#1E1B4B] uppercase tracking-wider block">
             4-STAGE RESCUE TRAIL
           </span>
 
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3.5">
             {STAGES.map((st, idx) => {
               const isPast = idx < currentStageIdx;
               const isCurrent = idx === currentStageIdx;
@@ -189,12 +189,12 @@ export default function TrackingPage() {
               return (
                 <div
                   key={st.id}
-                  className={`walking-paw-step rounded-[18px] border-[2px] border-[#1B3B2B] p-3.5 transition-all flex flex-col justify-between ${
+                  className={`walking-paw-step rounded-[20px] border-[3px] border-[#1E1B4B] p-3.5 transition-all flex flex-col justify-between ${
                     isCurrent
-                      ? "bg-[#FF5A4E] text-white shadow-bento scale-[1.02]"
+                      ? "bg-[#FF7A00] text-white shadow-pixar scale-[1.02]"
                       : isPast
-                      ? "bg-[#2EC4B6] text-white"
-                      : "bg-[#F5EFE6] text-[#1B3B2B]/60"
+                      ? "bg-[#10B981] text-white shadow-pixar-sm"
+                      : "bg-[#FFF1DC] text-[#1E1B4B]/60"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
@@ -223,32 +223,32 @@ export default function TrackingPage() {
         {/* Location & Volunteer Details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Location */}
-          <div className="rounded-[18px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-4 space-y-1">
-            <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1B3B2B]">
-              <MapPin className="w-4 h-4 text-[#FF5A4E]" />
+          <div className="rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-1 shadow-pixar-sm">
+            <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B]">
+              <MapPin className="w-4 h-4 text-[#FF7A00]" />
               <span>Location Coordinates</span>
             </div>
-            <p className="text-xs text-[#1B3B2B]/80 font-sans truncate">
+            <p className="text-xs text-[#1E1B4B]/80 font-sans truncate">
               {incident.location?.address || "Address logged"}
             </p>
             {incident.location?.coordinates && (
-              <p className="font-mono text-[10px] text-[#1B3B2B]/60">
+              <p className="font-mono text-[10px] text-[#1E1B4B]/60">
                 GPS: {incident.location.coordinates[1]?.toFixed(4)}° N, {incident.location.coordinates[0]?.toFixed(4)}° E
               </p>
             )}
           </div>
 
           {/* Assigned Volunteer Squad */}
-          <div className="rounded-[18px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-4 space-y-1">
-            <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1B3B2B]">
-              <ShieldCheck className="w-4 h-4 text-[#2EC4B6]" />
+          <div className="rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-1 shadow-pixar-sm">
+            <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B]">
+              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
               <span>Assigned Volunteer Squad</span>
             </div>
-            <p className="text-xs text-[#1B3B2B]/80 font-sans">
+            <p className="text-xs text-[#1E1B4B]/80 font-sans">
               {incident.assignedVolunteerId?.fullName || "First eligible responder locking case..."}
             </p>
             {incident.assignedVolunteerId?.mobile && (
-              <p className="font-mono text-[10px] text-[#1B3B2B]/60">
+              <p className="font-mono text-[10px] text-[#1E1B4B]/60">
                 Direct Contact: {incident.assignedVolunteerId.mobile}
               </p>
             )}
@@ -256,17 +256,17 @@ export default function TrackingPage() {
         </div>
 
         {/* Action Bar */}
-        <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+        <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <a
             href="/map"
-            className="bento-btn rounded-[14px] bg-[#2EC4B6] px-4 py-2 text-xs text-white"
+            className="pixar-btn rounded-[16px] bg-[#10B981] px-5 py-2.5 text-xs font-bold text-white shadow-pixar-sm text-center"
           >
             View Live on Tactical Map
           </a>
 
           <a
             href="/report"
-            className="bento-btn rounded-[14px] bg-[#FF5A4E] px-4 py-2 text-xs text-white"
+            className="pixar-btn rounded-[16px] bg-[#FF7A00] px-5 py-2.5 text-xs font-bold text-white shadow-pixar-sm text-center"
           >
             Report Another Incident
           </a>

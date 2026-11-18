@@ -67,7 +67,7 @@ export default function DioramaHero() {
   };
 
   return (
-    <section className="relative overflow-hidden twilight-hero-gradient rounded-[36px] mx-2 sm:mx-4 lg:mx-8 my-4 p-6 sm:p-10 lg:p-14 border-[4px] border-[#1E1B4B] shadow-2xl">
+    <section className="relative overflow-hidden twilight-hero-gradient rounded-[28px] sm:rounded-[36px] mx-2 sm:mx-4 lg:mx-8 my-3 sm:my-4 p-5 sm:p-10 lg:p-14 border-[3px] sm:border-[4px] border-[#1E1B4B] shadow-2xl">
       
       {/* Golden Sunset Radial Horizon Glow */}
       <div 
@@ -137,7 +137,7 @@ export default function DioramaHero() {
               </span>
 
               {/* Chunky 3D Display Header */}
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black font-display text-white leading-[1.05] tracking-tight font-pixar-3d">
+              <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black font-display text-white leading-[1.08] tracking-tight font-pixar-3d break-words">
                 BE THEIR VOICE. <br />
                 <span className="text-[#FBBF24] font-pixar-gold">
                   PawAlert
@@ -148,56 +148,56 @@ export default function DioramaHero() {
                 Because every paw matters.
               </p>
 
-              <p className="text-sm sm:text-base text-slate-200 font-sans leading-relaxed max-w-xl pt-1">
+              <p className="text-xs sm:text-base text-slate-200 font-sans leading-relaxed max-w-xl pt-1">
                 When an injured, abandoned, or distressed animal cries for help, every second counts. Drop an instant GPS pin on our community radar—connecting verified field rescuers, ambulances, and vet clinics with 100% transparency.
               </p>
             </div>
 
             {/* Chunky 3D Primary Action Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <a
                 href="/report"
-                className="pixar-btn bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white px-7 py-4 text-base font-bold shadow-pixar"
+                className="pixar-btn bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white px-6 sm:px-7 py-3.5 sm:py-4 text-sm sm:text-base font-bold shadow-pixar text-center justify-center"
               >
-                <AlertTriangle className="w-5 h-5 mr-2" />
+                <AlertTriangle className="w-5 h-5 mr-2 inline" />
                 <span>Report Animal in Distress</span>
               </a>
 
               <a
                 href="/map"
-                className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] px-6 py-4 text-sm font-bold shadow-pixar hover:bg-[#FFF1DC]"
+                className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] px-5 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-bold shadow-pixar hover:bg-[#FFF1DC] text-center justify-center"
               >
-                <Compass className="w-4 h-4 text-[#10B981] mr-2" />
+                <Compass className="w-4 h-4 text-[#10B981] mr-2 inline" />
                 <span>Open Sanctuary Map</span>
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-4 h-4 ml-2 inline" />
               </a>
             </div>
 
-            {/* Real MongoDB Telemetry Ticker (Zero Fake Data) */}
-            <div className="pt-6 border-t-[2px] border-white/20 grid grid-cols-3 gap-4 font-display text-white">
+            {/* Real MongoDB Telemetry Ticker */}
+            <div className="pt-5 sm:pt-6 border-t-[2px] border-white/20 grid grid-cols-3 gap-2 sm:gap-4 font-display text-white text-center sm:text-left">
               <div>
-                <p className="text-3xl sm:text-4xl font-black text-[#FF7A00] font-pixar-glow">
+                <p className="text-2xl sm:text-4xl font-black text-[#FF7A00] font-pixar-glow">
                   <span ref={activeAlertsRef}>0</span>
                 </p>
-                <p className="font-mono text-[11px] text-slate-300 uppercase mt-0.5">
+                <p className="font-mono text-[10px] sm:text-[11px] text-slate-300 uppercase mt-0.5">
                   Active Alerts
                 </p>
               </div>
 
               <div>
-                <p className="text-3xl sm:text-4xl font-black text-[#10B981] font-pixar-glow">
+                <p className="text-2xl sm:text-4xl font-black text-[#10B981] font-pixar-glow">
                   <span ref={rescuedRef}>0</span>
                 </p>
-                <p className="font-mono text-[11px] text-slate-300 uppercase mt-0.5">
+                <p className="font-mono text-[10px] sm:text-[11px] text-slate-300 uppercase mt-0.5">
                   Safely Rescued
                 </p>
               </div>
 
               <div>
-                <p className="text-3xl sm:text-4xl font-black text-[#FBBF24] font-pixar-glow">
+                <p className="text-2xl sm:text-4xl font-black text-[#FBBF24] font-pixar-glow">
                   <span ref={volunteersRef}>0</span>
                 </p>
-                <p className="font-mono text-[11px] text-slate-300 uppercase mt-0.5">
+                <p className="font-mono text-[10px] sm:text-[11px] text-slate-300 uppercase mt-0.5">
                   Volunteers Ready
                 </p>
               </div>
@@ -209,7 +209,7 @@ export default function DioramaHero() {
           <div 
             onPointerMove={(e) => handleCardPointerMove(e, 4)}
             onPointerLeave={handleCardPointerLeave}
-            className="anime-pixar-hero lg:col-span-5 pixar-card-gold p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden min-h-[440px]"
+            className="anime-pixar-hero lg:col-span-5 pixar-card-gold p-3.5 sm:p-6 flex flex-col justify-between relative overflow-hidden min-h-[340px] sm:min-h-[440px]"
           >
             {/* Diorama Top Bar */}
             <div className="flex items-center justify-between z-10 mb-2">
@@ -219,15 +219,15 @@ export default function DioramaHero() {
                   Golden-Hour Field Sanctuary
                 </span>
               </div>
-              <span className="font-mono text-[10px] text-[#1E1B4B] font-bold uppercase bg-[#FFF9F0] px-2.5 py-1 rounded-[12px] border-[2px] border-[#1E1B4B]">
-                Drag 360° Orbit
+              <span className="font-mono text-[9px] sm:text-[10px] text-[#1E1B4B] font-bold uppercase bg-[#FFF9F0] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-[12px] border-[2px] border-[#1E1B4B]">
+                Touch/Drag Orbit
               </span>
             </div>
 
             {/* Three.js Canvas Container */}
             <div 
               ref={dioramaContainerRef} 
-              className="w-full h-[330px] sm:h-[370px] relative z-0 cursor-grab active:cursor-grabbing flex items-center justify-center"
+              className="w-full h-[260px] sm:h-[350px] relative z-0 cursor-grab active:cursor-grabbing flex items-center justify-center touch-none"
             />
 
             {/* Diorama Footer */}

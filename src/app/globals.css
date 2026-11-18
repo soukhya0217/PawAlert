@@ -284,3 +284,22 @@
 .stamp-slam {
   animation: stampSlam 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
+
+/* Mobile Touch & Viewport Hardening */
+@media (max-width: 768px) {
+  /* Prevent iOS automatic zoom on text input focus */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Smooth touch response without delay */
+  button, a, input, [role="button"] {
+    touch-action: manipulation;
+  }
+}

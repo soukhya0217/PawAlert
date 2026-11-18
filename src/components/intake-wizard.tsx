@@ -723,10 +723,10 @@ export default function IntakeWizard() {
             </div>
 
             {/* Anatomical Paw Pad Selector Container */}
-            <div className="rounded-[28px] border-[3px] border-[#1E1B4B] bg-[#FFF1DC] p-6 shadow-pixar flex flex-col items-center justify-center relative">
+            <div className="rounded-[28px] border-[3px] border-[#1E1B4B] bg-[#FFF1DC] p-4 sm:p-6 shadow-pixar flex flex-col items-center justify-center relative">
               
               {/* 4 Toe Pads Row */}
-              <div className="flex items-center justify-center gap-3.5 sm:gap-5 mb-5">
+              <div className="flex items-center justify-center gap-2 sm:gap-5 mb-5 w-full max-w-sm">
                 {[
                   { id: "STABLE", label: "Stable", bg: "#10B981", shadow: "#059669" },
                   { id: "ABANDONED", label: "Abandoned", bg: "#FFB703", shadow: "#D97706" },
@@ -742,22 +742,22 @@ export default function IntakeWizard() {
                         animateToeBeanPress(e.currentTarget);
                         setSeverity(bean.id as any);
                       }}
-                      className={`relative h-20 w-16 sm:h-22 sm:w-18 rounded-[24px] border-[3px] border-[#1E1B4B] flex flex-col items-center justify-center transition-all overflow-hidden ${
+                      className={`relative flex-1 max-w-[76px] h-18 sm:h-22 rounded-[20px] sm:rounded-[24px] border-[3px] border-[#1E1B4B] flex flex-col items-center justify-center transition-all overflow-hidden ${
                         isSelected
-                          ? "scale-110 -translate-y-1 shadow-pixar"
+                          ? "scale-105 sm:scale-110 -translate-y-1 shadow-pixar"
                           : "opacity-80 hover:opacity-100 hover:scale-105 shadow-pixar-sm"
                       }`}
                       style={{ backgroundColor: bean.bg }}
                     >
                       {/* Glossy Top Reflection Highlight */}
-                      <div className="absolute top-1 left-2 right-2 h-4 rounded-full bg-white/40 pointer-events-none" />
+                      <div className="absolute top-1 left-2 right-2 h-3.5 sm:h-4 rounded-full bg-white/40 pointer-events-none" />
 
-                      <span className="font-display text-[11px] font-black text-[#1E1B4B] leading-none z-10">
+                      <span className="font-display text-[10px] sm:text-[11px] font-black text-[#1E1B4B] leading-none z-10">
                         {bean.label}
                       </span>
                       {isSelected && (
-                        <span className="text-[10px] mt-1 z-10 font-mono font-bold text-[#1E1B4B]">
-                          ● ACTIVE
+                        <span className="text-[9px] sm:text-[10px] mt-1 z-10 font-mono font-bold text-[#1E1B4B]">
+                          ● ON
                         </span>
                       )}
                     </button>
@@ -772,7 +772,7 @@ export default function IntakeWizard() {
                   animateToeBeanPress(e.currentTarget);
                   setSeverity("CRITICAL");
                 }}
-                className={`relative h-24 w-44 sm:w-52 rounded-[32px] border-[3px] border-[#1E1B4B] flex flex-col items-center justify-center transition-all overflow-hidden ${
+                className={`relative h-20 sm:h-24 w-full max-w-[240px] sm:max-w-[280px] rounded-[28px] sm:rounded-[32px] border-[3px] border-[#1E1B4B] flex flex-col items-center justify-center transition-all overflow-hidden ${
                   severity === "CRITICAL"
                     ? "bg-[#EF4444] text-white shadow-pixar scale-105 -translate-y-1 animate-pulse"
                     : "bg-[#EF4444]/35 text-[#1E1B4B] hover:bg-[#EF4444]/60 hover:scale-102 shadow-pixar-sm"
@@ -782,7 +782,7 @@ export default function IntakeWizard() {
                 <div className="absolute top-1.5 left-4 right-4 h-5 rounded-full bg-white/35 pointer-events-none" />
 
                 <span className="text-xl mb-0.5 z-10">🚨</span>
-                <span className="font-display text-sm font-black uppercase tracking-wider z-10">
+                <span className="font-display text-xs sm:text-sm font-black uppercase tracking-wider z-10">
                   CRITICAL TRAUMA
                 </span>
                 <span className="font-mono text-[9px] uppercase z-10 font-bold">

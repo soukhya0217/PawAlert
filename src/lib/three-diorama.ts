@@ -321,9 +321,40 @@ export function initThreeDiorama({ container, activeIncidentsCount = 0 }: Dioram
     isDragging = false;
   };
 
+  // Mobile Touch Support
+  const onTouchStart = (e: TouchEvent) => {
+    if (e.touches.length > 0) {
+      isDragging = true;
+      prevMouseX = e.touches[0].clientX;
+    }
+  };
+
+  const onTouchMove = (e: TouchEvent) => {
+    if (e.touches.length > 0) {
+      const touch = e.touches[0];
+      const rect = container.getBoundingClientRect();
+      mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+
+      if (isDragging) {
+        const deltaX = touch.clientX - prevMouseX;
+        prevMouseX = touch.clientX;
+        targetRotationY += deltaX * 0.008;
+      }
+    }
+  };
+
+  const onTouchEnd = () => {
+    isDragging = false;
+  };
+
   window.addEventListener("mousedown", onMouseDown);
   window.addEventListener("mousemove", onMouseMove);
   window.addEventListener("mouseup", onMouseUp);
+
+  container.addEventListener("touchstart", onTouchStart, { passive: true });
+  container.addEventListener("touchmove", onTouchMove, { passive: true });
+  window.addEventListener("touchend", onTouchEnd);
 
   const onResize = () => {
     if (!container) return;
@@ -389,6 +420,11 @@ export function initThreeDiorama({ container, activeIncidentsCount = 0 }: Dioram
     window.removeEventListener("mousedown", onMouseDown);
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
+    if (container) {
+      container.removeEventListener("touchstart", onTouchStart);
+      container.removeEventListener("touchmove", onTouchMove);
+    }
+    window.removeEventListener("touchend", onTouchEnd);
     window.removeEventListener("resize", onResize);
 
     if (container && renderer.domElement && container.contains(renderer.domElement)) {

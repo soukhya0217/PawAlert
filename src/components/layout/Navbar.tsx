@@ -249,9 +249,15 @@ export default function Navbar() {
               <div className="flex items-center gap-2">
                 <a
                   href="/login"
-                  className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] px-4 py-2.5 text-xs shadow-pixar-sm"
+                  className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] px-3.5 py-2 text-xs shadow-pixar-sm font-bold"
                 >
                   Sign In
+                </a>
+                <a
+                  href="/register"
+                  className="hidden sm:inline-flex pixar-btn bg-[#FFB703] text-[#1E1B4B] px-3.5 py-2 text-xs shadow-pixar-sm font-bold"
+                >
+                  Sign Up
                 </a>
               </div>
             )}
@@ -268,7 +274,7 @@ export default function Navbar() {
 
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden border-t-[3px] border-[#1E1B4B] bg-[#FFF9F0] px-4 py-4 space-y-2">
+          <div className="lg:hidden border-t-[3px] border-[#1E1B4B] bg-[#FFF9F0] px-4 py-4 space-y-2.5">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -284,6 +290,58 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
+
+            {/* Mobile Auth Actions */}
+            {!currentUser ? (
+              <div className="pt-3 border-t-[2px] border-[#1E1B4B]/10 grid grid-cols-2 gap-2">
+                <a
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] py-2.5 text-center text-xs font-bold shadow-pixar-sm"
+                >
+                  Sign In
+                </a>
+                <a
+                  href="/register"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="pixar-btn bg-[#FFB703] text-[#1E1B4B] py-2.5 text-center text-xs font-bold shadow-pixar-sm"
+                >
+                  Sign Up
+                </a>
+              </div>
+            ) : (
+              <div className="pt-3 border-t-[2px] border-[#1E1B4B]/10 space-y-2">
+                <a
+                  href="/admin/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="pixar-btn w-full flex items-center justify-center gap-2 bg-[#FFF9F0] text-[#1E1B4B] py-2.5 text-xs font-bold shadow-pixar-sm"
+                >
+                  <ShieldCheck className="w-4 h-4 text-[#10B981]" />
+                  <span>Command Dashboard</span>
+                </a>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="pixar-btn w-full flex items-center justify-center gap-2 bg-[#EF4444]/15 text-[#EF4444] py-2 text-xs font-bold shadow-pixar-sm"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
+
+            <div className="pt-2">
+              <a
+                href="/report"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="pixar-btn w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white py-3 text-xs font-bold shadow-pixar-sm"
+              >
+                <AlertTriangle className="w-4 h-4 text-white animate-pulse" />
+                <span>Report Animal in Distress</span>
+              </a>
+            </div>
           </div>
         )}
       </header>
