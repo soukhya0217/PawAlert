@@ -6,17 +6,17 @@ export interface DioramaOptions {
 }
 
 export function initThreeDiorama({ container, activeIncidentsCount = 0 }: DioramaOptions) {
-  const width = container.clientWidth || 500;
-  const height = container.clientHeight || 400;
+  const width = container.clientWidth || 550;
+  const height = container.clientHeight || 450;
 
   // 1. Scene & Camera Setup
   const scene = new THREE.Scene();
 
-  const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
-  camera.position.set(14, 12, 16);
-  camera.lookAt(0, 1, 0);
+  const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 1000);
+  camera.position.set(13, 11, 15);
+  camera.lookAt(0, 1.2, 0);
 
-  // 2. WebGL Renderer
+  // 2. WebGL Renderer with High-Quality Shadows
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -24,179 +24,281 @@ export function initThreeDiorama({ container, activeIncidentsCount = 0 }: Dioram
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
 
-  // 3. Lighting Setup (Sunlit Meadow Atmosphere)
-  const ambientLight = new THREE.AmbientLight(0xfff6ea, 1.4);
-  scene.add(ambientLight);
+  // 3. Pixar Golden-Hour Lighting
+  // Hemisphere Twilight Sky light
+  const hemiLight = new THREE.HemisphereLight(0x4a2e80, 0xf97316, 1.2);
+  scene.add(hemiLight);
 
-  const sunLight = new THREE.DirectionalLight(0xffedd5, 1.8);
-  sunLight.position.set(15, 25, 12);
+  // Warm Golden Sunlight (sunset angle)
+  const sunLight = new THREE.DirectionalLight(0xffb703, 2.2);
+  sunLight.position.set(16, 20, 14);
   sunLight.castShadow = true;
   sunLight.shadow.mapSize.width = 1024;
   sunLight.shadow.mapSize.height = 1024;
+  sunLight.shadow.bias = -0.0005;
   scene.add(sunLight);
 
-  const fillLight = new THREE.DirectionalLight(0x2ec4b6, 0.4);
-  fillLight.position.set(-10, 8, -10);
+  // Fill Light from twilight horizon
+  const fillLight = new THREE.DirectionalLight(0x9d4edd, 0.6);
+  fillLight.position.set(-14, 8, -12);
   scene.add(fillLight);
 
   // Root Diorama Group
   const dioramaGroup = new THREE.Group();
   scene.add(dioramaGroup);
 
-  // 4. Floating Island Base
+  // 4. Stylized Floating Sanctuary Base
   // Top Meadow
-  const topGeo = new THREE.CylinderGeometry(7.5, 7.8, 1.2, 8);
-  const topMat = new THREE.MeshLambertMaterial({ color: 0x95d5b2 });
+  const topGeo = new THREE.CylinderGeometry(8, 8.4, 1.2, 24);
+  const topMat = new THREE.MeshLambertMaterial({ color: 0x80b918 });
   const topMesh = new THREE.Mesh(topGeo, topMat);
   topMesh.position.y = 0;
   topMesh.receiveShadow = true;
   dioramaGroup.add(topMesh);
 
-  // Earth Sub-layers
-  const earthGeo = new THREE.CylinderGeometry(7.8, 3.5, 4.5, 8);
-  const earthMat = new THREE.MeshLambertMaterial({ color: 0xb08968 });
+  // Cobblestone Pathway across meadow
+  const pathGeo = new THREE.RingGeometry(1.5, 4.2, 16, 1, 0, Math.PI * 0.9);
+  const pathMat = new THREE.MeshLambertMaterial({ color: 0xe29578, side: THREE.DoubleSide });
+  const pathMesh = new THREE.Mesh(pathGeo, pathMat);
+  pathMesh.rotation.x = -Math.PI / 2;
+  pathMesh.position.set(-0.5, 0.61, 0.5);
+  pathMesh.receiveShadow = true;
+  dioramaGroup.add(pathMesh);
+
+  // Earth Cliff layers
+  const earthGeo = new THREE.CylinderGeometry(8.4, 3.8, 5, 12);
+  const earthMat = new THREE.MeshLambertMaterial({ color: 0x99582a });
   const earthMesh = new THREE.Mesh(earthGeo, earthMat);
-  earthMesh.position.y = -2.6;
+  earthMesh.position.y = -3;
   dioramaGroup.add(earthMesh);
 
-  // Pond
-  const pondGeo = new THREE.CircleGeometry(2.2, 16);
+  // Pond with crystal reflections
+  const pondGeo = new THREE.CircleGeometry(2.4, 20);
   const pondMat = new THREE.MeshBasicMaterial({ color: 0x48cae4 });
   const pondMesh = new THREE.Mesh(pondGeo, pondMat);
   pondMesh.rotation.x = -Math.PI / 2;
-  pondMesh.position.set(2.2, 0.62, 1.8);
+  pondMesh.position.set(3, 0.62, 2);
   dioramaGroup.add(pondMesh);
 
-  // 5. Low-Poly Trees with Wind Sway
-  const trees: THREE.Group[] = [];
-  const treePositions = [
-    [-4, 0.6, -3],
-    [-2.5, 0.6, -4.5],
-    [4.2, 0.6, -3],
-    [-4.5, 0.6, 2],
-  ];
+  // 5. Stylized Ivy-Covered Brick Archway
+  const archGroup = new THREE.Group();
+  const pillarGeo = new THREE.BoxGeometry(0.7, 3.6, 0.7);
+  const archMat = new THREE.MeshLambertMaterial({ color: 0xb56576 });
 
-  treePositions.forEach(([x, y, z]) => {
-    const tree = new THREE.Group();
-    // Trunk
-    const trunkGeo = new THREE.CylinderGeometry(0.2, 0.3, 1.4, 6);
-    const trunkMat = new THREE.MeshLambertMaterial({ color: 0x6f4e37 });
-    const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-    trunk.position.y = 0.7;
-    trunk.castShadow = true;
-    tree.add(trunk);
+  const leftPillar = new THREE.Mesh(pillarGeo, archMat);
+  leftPillar.position.set(-1.8, 1.8, -3.5);
+  leftPillar.castShadow = true;
+  archGroup.add(leftPillar);
 
-    // Leaves
-    const leavesGeo = new THREE.ConeGeometry(1.3, 2.2, 6);
-    const leavesMat = new THREE.MeshLambertMaterial({ color: 0x52b788 });
-    const leaves = new THREE.Mesh(leavesGeo, leavesMat);
-    leaves.position.y = 2.2;
-    leaves.castShadow = true;
-    tree.add(leaves);
+  const rightPillar = new THREE.Mesh(pillarGeo, archMat);
+  rightPillar.position.set(1.8, 1.8, -3.5);
+  rightPillar.castShadow = true;
+  archGroup.add(rightPillar);
 
-    tree.position.set(x, y, z);
-    dioramaGroup.add(tree);
-    trees.push(tree);
-  });
+  const beamGeo = new THREE.BoxGeometry(4.4, 0.6, 0.8);
+  const beam = new THREE.Mesh(beamGeo, archMat);
+  beam.position.set(0, 3.6, -3.5);
+  beam.castShadow = true;
+  archGroup.add(beam);
 
-  // 6. Procedural Low-Poly Animals
-  // Dog Group
-  const dog = new THREE.Group();
-  const dogBody = new THREE.Mesh(
-    new THREE.BoxGeometry(1.2, 0.8, 0.7),
-    new THREE.MeshLambertMaterial({ color: 0xe09f3e })
+  // Archway Ivy Foliage
+  const ivyGeo = new THREE.DodecahedronGeometry(0.5);
+  const ivyMat = new THREE.MeshLambertMaterial({ color: 0x55a630 });
+  for (let i = 0; i < 6; i++) {
+    const ivy = new THREE.Mesh(ivyGeo, ivyMat);
+    ivy.position.set(-1.8 + i * 0.7, 3.8, -3.4 + (i % 2) * 0.2);
+    archGroup.add(ivy);
+  }
+  dioramaGroup.add(archGroup);
+
+  // 6. Glowing Streetlamp
+  const lampGroup = new THREE.Group();
+  const poleGeo = new THREE.CylinderGeometry(0.12, 0.16, 3.2, 8);
+  const poleMat = new THREE.MeshLambertMaterial({ color: 0x1e1b4b });
+  const pole = new THREE.Mesh(poleGeo, poleMat);
+  pole.position.set(4, 1.6, -1.5);
+  pole.castShadow = true;
+  lampGroup.add(pole);
+
+  // Lantern Head
+  const lanternGeo = new THREE.BoxGeometry(0.7, 0.8, 0.7);
+  const lanternMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+  const lantern = new THREE.Mesh(lanternGeo, lanternMat);
+  lantern.position.set(4, 3.2, -1.5);
+  lampGroup.add(lantern);
+
+  // Warm Amber Streetlamp Glow Light
+  const lampLight = new THREE.PointLight(0xffb703, 1.8, 8);
+  lampLight.position.set(4, 3.3, -1.5);
+  lampGroup.add(lampLight);
+  dioramaGroup.add(lampGroup);
+
+  // 7. Expressive Pixar Animal Companions
+  // A. Scruffy Golden Puppy with soulful head tracking & tail wag
+  const puppyGroup = new THREE.Group();
+
+  // Puppy Body
+  const puppyBodyGeo = new THREE.BoxGeometry(1.3, 0.9, 0.8);
+  const puppyMat = new THREE.MeshLambertMaterial({ color: 0xf4a261 });
+  const puppyBody = new THREE.Mesh(puppyBodyGeo, puppyMat);
+  puppyBody.position.y = 0.7;
+  puppyBody.castShadow = true;
+  puppyGroup.add(puppyBody);
+
+  // Puppy Head Pivot Group
+  const puppyHeadPivot = new THREE.Group();
+  puppyHeadPivot.position.set(0.7, 1.2, 0);
+
+  const puppyHeadGeo = new THREE.BoxGeometry(0.85, 0.8, 0.75);
+  const puppyHead = new THREE.Mesh(puppyHeadGeo, puppyMat);
+  puppyHead.castShadow = true;
+  puppyHeadPivot.add(puppyHead);
+
+  // Floppy Ears
+  const earGeo = new THREE.BoxGeometry(0.25, 0.6, 0.3);
+  const earMat = new THREE.MeshLambertMaterial({ color: 0xe76f51 });
+  const leftEar = new THREE.Mesh(earGeo, earMat);
+  leftEar.position.set(0.1, 0.15, 0.45);
+  puppyHeadPivot.add(leftEar);
+
+  const rightEar = new THREE.Mesh(earGeo, earMat);
+  rightEar.position.set(0.1, 0.15, -0.45);
+  puppyHeadPivot.add(rightEar);
+
+  // Snout & Nose
+  const snoutGeo = new THREE.BoxGeometry(0.45, 0.35, 0.45);
+  const snoutMat = new THREE.MeshLambertMaterial({ color: 0x264653 });
+  const snout = new THREE.Mesh(snoutGeo, snoutMat);
+  snout.position.set(0.55, -0.15, 0);
+  puppyHeadPivot.add(snout);
+
+  // Cute Collar & Golden Heart Tag
+  const collarGeo = new THREE.TorusGeometry(0.42, 0.08, 6, 12);
+  const collarMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
+  const collar = new THREE.Mesh(collarGeo, collarMat);
+  collar.rotation.y = Math.PI / 2;
+  collar.position.set(0, -0.35, 0);
+  puppyHeadPivot.add(collar);
+
+  const tagGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.04, 8);
+  const tagMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+  const tag = new THREE.Mesh(tagGeo, tagMat);
+  tag.position.set(0.38, -0.42, 0);
+  puppyHeadPivot.add(tag);
+
+  puppyGroup.add(puppyHeadPivot);
+
+  // Puppy Tail Pivot
+  const puppyTailPivot = new THREE.Group();
+  puppyTailPivot.position.set(-0.65, 0.9, 0);
+  const tailGeo = new THREE.CylinderGeometry(0.08, 0.12, 0.7, 6);
+  const puppyTail = new THREE.Mesh(tailGeo, earMat);
+  puppyTail.rotation.z = Math.PI / 3;
+  puppyTail.position.set(-0.25, 0.15, 0);
+  puppyTailPivot.add(puppyTail);
+  puppyGroup.add(puppyTailPivot);
+
+  puppyGroup.position.set(-1.2, 0.6, 1.2);
+  dioramaGroup.add(puppyGroup);
+
+  // B. Curious Tabby Kitten
+  const kittenGroup = new THREE.Group();
+  const kittenBodyGeo = new THREE.BoxGeometry(0.85, 0.65, 0.55);
+  const kittenMat = new THREE.MeshLambertMaterial({ color: 0xffb703 });
+  const kittenBody = new THREE.Mesh(kittenBodyGeo, kittenMat);
+  kittenBody.position.y = 0.5;
+  kittenBody.castShadow = true;
+  kittenGroup.add(kittenBody);
+
+  const kittenHeadPivot = new THREE.Group();
+  kittenHeadPivot.position.set(0.45, 0.95, 0);
+  const kittenHeadGeo = new THREE.BoxGeometry(0.55, 0.55, 0.5);
+  const kittenHead = new THREE.Mesh(kittenHeadGeo, kittenMat);
+  kittenHeadPivot.add(kittenHead);
+
+  // Pointy Ears
+  const catEarGeo = new THREE.ConeGeometry(0.18, 0.35, 4);
+  const catLeftEar = new THREE.Mesh(catEarGeo, earMat);
+  catLeftEar.position.set(0.1, 0.35, 0.18);
+  kittenHeadPivot.add(catLeftEar);
+
+  const catRightEar = new THREE.Mesh(catEarGeo, earMat);
+  catRightEar.position.set(0.1, 0.35, -0.18);
+  kittenHeadPivot.add(catRightEar);
+
+  kittenGroup.add(kittenHeadPivot);
+
+  kittenGroup.position.set(1.5, 0.6, -1);
+  dioramaGroup.add(kittenGroup);
+
+  // C. Perched Songbird on Archway
+  const birdGroup = new THREE.Group();
+  const birdBody = new THREE.Mesh(
+    new THREE.SphereGeometry(0.22, 8, 8),
+    new THREE.MeshLambertMaterial({ color: 0x48cae4 })
   );
-  dogBody.position.y = 0.7;
-  dogBody.castShadow = true;
-  dog.add(dogBody);
-
-  const dogHead = new THREE.Mesh(
-    new THREE.BoxGeometry(0.7, 0.7, 0.6),
-    new THREE.MeshLambertMaterial({ color: 0xe09f3e })
+  birdGroup.add(birdBody);
+  const birdBeak = new THREE.Mesh(
+    new THREE.ConeGeometry(0.08, 0.2, 4),
+    new THREE.MeshBasicMaterial({ color: 0xfbbf24 })
   );
-  dogHead.position.set(0.7, 1.2, 0);
-  dogHead.castShadow = true;
-  dog.add(dogHead);
+  birdBeak.rotation.z = -Math.PI / 2;
+  birdBeak.position.set(0.22, 0.05, 0);
+  birdGroup.add(birdBeak);
 
-  const dogSnout = new THREE.Mesh(
-    new THREE.BoxGeometry(0.4, 0.3, 0.4),
-    new THREE.MeshLambertMaterial({ color: 0x333333 })
-  );
-  dogSnout.position.set(1.1, 1.1, 0);
-  dog.add(dogSnout);
+  birdGroup.position.set(1.4, 4.15, -3.5);
+  dioramaGroup.add(birdGroup);
 
-  dog.position.set(-1, 0.6, 1);
-  dioramaGroup.add(dog);
-
-  // Cat Group
-  const cat = new THREE.Group();
-  const catBody = new THREE.Mesh(
-    new THREE.BoxGeometry(0.8, 0.6, 0.5),
-    new THREE.MeshLambertMaterial({ color: 0xffffff })
-  );
-  catBody.position.y = 0.5;
-  catBody.castShadow = true;
-  cat.add(catBody);
-
-  const catHead = new THREE.Mesh(
-    new THREE.BoxGeometry(0.5, 0.5, 0.5),
-    new THREE.MeshLambertMaterial({ color: 0xffffff })
-  );
-  catHead.position.set(0.5, 0.9, 0);
-  cat.add(catHead);
-
-  cat.position.set(1.5, 0.6, -1.2);
-  dioramaGroup.add(cat);
-
-  // 7. Dynamic Beacons (ONLY spawned if active incidents > 0!)
+  // 8. Glowing 3D Rescue Beacons (ONLY IF real incidents exist!)
   const beacons: THREE.Mesh[] = [];
   if (activeIncidentsCount > 0) {
     const beaconCount = Math.min(activeIncidentsCount, 4);
-    const beaconSpots = [
-      [2.5, 0.6, 2],
+    const beaconLocations = [
       [-2.5, 0.6, 2.5],
-      [0, 0.6, -2.5],
-      [-3, 0.6, -1],
+      [2.2, 0.6, -2.5],
+      [3.2, 0.6, 1.5],
+      [-3.2, 0.6, -1],
     ];
 
     for (let i = 0; i < beaconCount; i++) {
-      const [bx, by, bz] = beaconSpots[i];
-      const beaconGeo = new THREE.CylinderGeometry(0.25, 0.25, 5, 12);
+      const [bx, by, bz] = beaconLocations[i];
+      const beaconGeo = new THREE.CylinderGeometry(0.3, 0.3, 6, 16);
       const beaconMat = new THREE.MeshBasicMaterial({
-        color: 0xff5a4e,
+        color: 0xff7a00,
         transparent: true,
-        opacity: 0.65,
+        opacity: 0.75,
       });
       const beacon = new THREE.Mesh(beaconGeo, beaconMat);
-      beacon.position.set(bx, by + 2.5, bz);
+      beacon.position.set(bx, by + 3, bz);
       dioramaGroup.add(beacon);
       beacons.push(beacon);
     }
   }
 
-  // 8. Peaceful Meadow Pollen Particles (When sanctuary is peaceful)
-  const particleCount = 40;
+  // 9. Golden Firefly / Stardust Particle Swarm
+  const particleCount = 55;
   const particleGeo = new THREE.BufferGeometry();
-  const particlePos = new Float32Array(particleCount * 3);
+  const particlePositions = new Float32Array(particleCount * 3);
   for (let i = 0; i < particleCount * 3; i += 3) {
-    particlePos[i] = (Math.random() - 0.5) * 12;
-    particlePos[i + 1] = Math.random() * 6 + 1;
-    particlePos[i + 2] = (Math.random() - 0.5) * 12;
+    particlePositions[i] = (Math.random() - 0.5) * 14;
+    particlePositions[i + 1] = Math.random() * 7 + 0.8;
+    particlePositions[i + 2] = (Math.random() - 0.5) * 14;
   }
-  particleGeo.setAttribute("position", new THREE.BufferAttribute(particlePos, 3));
+  particleGeo.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
   const particleMat = new THREE.PointsMaterial({
-    color: 0xffb703,
-    size: 0.18,
+    color: 0xfbbf24,
+    size: 0.25,
     transparent: true,
-    opacity: 0.7,
+    opacity: 0.85,
   });
   const particleSystem = new THREE.Points(particleGeo, particleMat);
   dioramaGroup.add(particleSystem);
 
-  // 9. Interactive Drag / Orbit Parallax
+  // 10. Mouse Interaction: 360° Drag Orbit + Cursor Head Tracking
   let isDragging = false;
   let prevMouseX = 0;
   let targetRotationY = 0;
+  const mouse = { x: 0, y: 0 };
 
   const onMouseDown = (e: MouseEvent) => {
     isDragging = true;
@@ -204,10 +306,15 @@ export function initThreeDiorama({ container, activeIncidentsCount = 0 }: Dioram
   };
 
   const onMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return;
-    const deltaX = e.clientX - prevMouseX;
-    prevMouseX = e.clientX;
-    targetRotationY += deltaX * 0.008;
+    const rect = container.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+    if (isDragging) {
+      const deltaX = e.clientX - prevMouseX;
+      prevMouseX = e.clientX;
+      targetRotationY += deltaX * 0.008;
+    }
   };
 
   const onMouseUp = () => {
@@ -218,7 +325,6 @@ export function initThreeDiorama({ container, activeIncidentsCount = 0 }: Dioram
   window.addEventListener("mousemove", onMouseMove);
   window.addEventListener("mouseup", onMouseUp);
 
-  // Resize Listener
   const onResize = () => {
     if (!container) return;
     const w = container.clientWidth;
@@ -229,42 +335,45 @@ export function initThreeDiorama({ container, activeIncidentsCount = 0 }: Dioram
   };
   window.addEventListener("resize", onResize);
 
-  // 10. Animation Loop
+  // 11. Animation Loop
   let animationId: number;
-  let clock = new THREE.Clock();
+  const clock = new THREE.Clock();
 
   const animate = () => {
     animationId = requestAnimationFrame(animate);
     const elapsedTime = clock.getElapsedTime();
 
-    // Smooth Island Rotation with user drag + gentle auto-sway
+    // Island auto-sway & user orbit
     dioramaGroup.rotation.y += (targetRotationY - dioramaGroup.rotation.y) * 0.08;
     if (!isDragging) {
-      targetRotationY += 0.002;
+      targetRotationY += 0.0025;
     }
 
-    // Animal Idle Breathing & Bobbing
-    dog.position.y = 0.6 + Math.sin(elapsedTime * 2.5) * 0.04;
-    dog.rotation.z = Math.sin(elapsedTime * 2) * 0.02;
+    // Puppy Idle Breathing, Tail Wag & Cursor Head Tracking
+    puppyGroup.position.y = 0.6 + Math.sin(elapsedTime * 3) * 0.04;
+    puppyTailPivot.rotation.z = Math.sin(elapsedTime * 12) * 0.35; // enthusiastic tail wag!
+    puppyHeadPivot.rotation.y = THREE.MathUtils.lerp(puppyHeadPivot.rotation.y, mouse.x * 0.6, 0.05);
+    puppyHeadPivot.rotation.x = THREE.MathUtils.lerp(puppyHeadPivot.rotation.x, -mouse.y * 0.4, 0.05);
 
-    cat.position.y = 0.6 + Math.cos(elapsedTime * 2.8) * 0.03;
+    // Kitten Idle Sway
+    kittenGroup.position.y = 0.6 + Math.cos(elapsedTime * 2.8) * 0.03;
+    kittenHeadPivot.rotation.y = THREE.MathUtils.lerp(kittenHeadPivot.rotation.y, mouse.x * 0.4, 0.04);
 
-    // Trees Gentle Wind Sway
-    trees.forEach((tree, idx) => {
-      tree.rotation.z = Math.sin(elapsedTime * 1.5 + idx) * 0.03;
-    });
+    // Songbird Fluttering
+    birdGroup.position.y = 4.15 + Math.sin(elapsedTime * 6) * 0.05;
 
-    // Beacons Pulsing (if active)
+    // Beacons Pulsing (if active incidents exist)
     beacons.forEach((b) => {
-      b.scale.set(1 + Math.sin(elapsedTime * 5) * 0.15, 1, 1 + Math.sin(elapsedTime * 5) * 0.15);
+      const s = 1 + Math.sin(elapsedTime * 6) * 0.18;
+      b.scale.set(s, 1, s);
     });
 
-    // Floating Pollen Particles Rise
+    // Firefly Particles Floating & Twinkling
     const positions = particleSystem.geometry.attributes.position.array as Float32Array;
     for (let i = 1; i < particleCount * 3; i += 3) {
-      positions[i] += 0.01;
-      if (positions[i] > 7) {
-        positions[i] = 1;
+      positions[i] += 0.015;
+      if (positions[i] > 8) {
+        positions[i] = 0.8;
       }
     }
     particleSystem.geometry.attributes.position.needsUpdate = true;

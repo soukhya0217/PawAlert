@@ -6,11 +6,11 @@ import {
   MapPin, 
   ShieldCheck, 
   Heart, 
-  Navigation, 
   Sparkles, 
   ArrowRight,
-  Activity,
-  Compass
+  Compass,
+  Radio,
+  Sun
 } from "lucide-react";
 import { initThreeDiorama } from "@/lib/three-diorama";
 import { 
@@ -36,7 +36,7 @@ export default function DioramaHero() {
   const earRightRef = useRef<SVGGElement>(null);
   const tailRef = useRef<SVGGElement>(null);
 
-  // Initialize 3D Three.js Diorama
+  // Initialize Three.js Golden-Hour Sanctuary
   useEffect(() => {
     if (!dioramaContainerRef.current) return;
     const cleanup = initThreeDiorama({
@@ -50,15 +50,15 @@ export default function DioramaHero() {
 
   // Trigger Anime.js Staggered Entrance on Load
   useEffect(() => {
-    animateBentoEntrance(".anime-bento-hero");
+    animateBentoEntrance(".anime-pixar-hero");
   }, []);
 
-  // Trigger Rolling Number Counters when incidents change
+  // Rolling Counters
   useEffect(() => {
     if (!loading) {
-      animateCounter(activeAlertsRef.current, 0, incidents.length, 1000);
-      animateCounter(volunteersRef.current, 0, 0, 1000); // Authentic 0 when empty
-      animateCounter(rescuedRef.current, 0, 0, 1000); // Authentic 0 when empty
+      animateCounter(activeAlertsRef.current, 0, incidents.length, 1200);
+      animateCounter(volunteersRef.current, 0, 0, 1200);
+      animateCounter(rescuedRef.current, 0, 0, 1200);
     }
   }, [incidents.length, loading]);
 
@@ -67,162 +67,180 @@ export default function DioramaHero() {
   };
 
   return (
-    <section className="relative overflow-hidden pt-6 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <section className="relative overflow-hidden twilight-hero-gradient rounded-[36px] mx-2 sm:mx-4 lg:mx-8 my-4 p-6 sm:p-10 lg:p-14 border-[4px] border-[#1E1B4B] shadow-2xl">
       
-      {/* Top Banner Tag */}
-      <div className="anime-bento-hero mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div 
-          onMouseEnter={handleMascotHover}
-          className="inline-flex items-center gap-2.5 rounded-[18px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] px-3.5 py-1.5 shadow-bento-sm cursor-pointer transition-all hover:bg-[#F5EFE6]"
-        >
-          {/* Interactive SVG Mascot with Ears & Tail */}
-          <svg width="26" height="26" viewBox="0 0 40 40" className="overflow-visible">
-            {/* Tail */}
-            <g ref={tailRef} style={{ transformOrigin: "10px 30px" }}>
-              <path d="M12 28 C6 24, 4 16, 8 12" stroke="#1B3B2B" strokeWidth="3" strokeLinecap="round" fill="none" />
-            </g>
-            {/* Left Ear */}
-            <g ref={earLeftRef} style={{ transformOrigin: "15px 14px" }}>
-              <path d="M14 14 C12 6, 8 6, 11 16" fill="#FFB703" stroke="#1B3B2B" strokeWidth="2.5" />
-            </g>
-            {/* Right Ear */}
-            <g ref={earRightRef} style={{ transformOrigin: "26px 14px" }}>
-              <path d="M26 14 C28 6, 32 6, 29 16" fill="#FFB703" stroke="#1B3B2B" strokeWidth="2.5" />
-            </g>
-            {/* Dog Head */}
-            <circle cx="20" cy="22" r="11" fill="#FFB703" stroke="#1B3B2B" strokeWidth="2.5" />
-            {/* Eyes */}
-            <circle cx="16" cy="20" r="1.8" fill="#1B3B2B" />
-            <circle cx="24" cy="20" r="1.8" fill="#1B3B2B" />
-            {/* Cute Snout & Nose */}
-            <ellipse cx="20" cy="24" rx="4" ry="3" fill="#FFFBF5" stroke="#1B3B2B" strokeWidth="1.5" />
-            <polygon points="18.5,23 21.5,23 20,25" fill="#1B3B2B" />
-          </svg>
+      {/* Golden Sunset Radial Horizon Glow */}
+      <div 
+        aria-hidden="true" 
+        className="pointer-events-none absolute -bottom-20 left-1/2 -translate-x-1/2 w-[750px] h-[450px] twilight-glow-sunset blur-3xl -z-0 opacity-80"
+      />
 
-          <span className="font-display text-xs font-bold text-[#1B3B2B]">
-            PawAlert Field Sentinel
-          </span>
-          <span className="font-mono text-[10px] text-[#2EC4B6] font-bold">
-            ● GPS ACTIVE
-          </span>
-        </div>
-
-        <div className="font-mono text-xs font-bold text-[#1B3B2B]/75 flex items-center gap-2">
-          <span>COORDINATES: 12.9716° N, 77.5946° E</span>
-        </div>
+      {/* Floating Stardust Sparkles */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
+        <span className="animate-firefly absolute top-12 left-[10%] text-[#FBBF24] text-xl opacity-75">✨</span>
+        <span className="animate-firefly absolute top-28 right-[15%] text-[#FFB703] text-2xl opacity-60" style={{ animationDelay: "1.2s" }}>✨</span>
+        <span className="animate-firefly absolute bottom-16 left-[22%] text-[#F97316] text-lg opacity-80" style={{ animationDelay: "2.4s" }}>🐾</span>
+        <span className="animate-firefly absolute top-1/2 right-[25%] text-[#FBBF24] text-sm opacity-50" style={{ animationDelay: "0.8s" }}>✨</span>
       </div>
 
-      {/* Main Hero Bento Grid (Kinetic Overrank Layout in Warm Sanctuary Styling) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      <div className="relative z-10 max-w-7xl mx-auto w-full">
         
-        {/* Left Column (7 cols): Punchy Headline, Actions, Telemetry */}
-        <div 
-          onPointerMove={(e) => handleCardPointerMove(e, 4)}
-          onPointerLeave={handleCardPointerLeave}
-          className="anime-bento-hero lg:col-span-7 bento-card p-6 sm:p-10 flex flex-col justify-between space-y-6"
-        >
-          <div className="space-y-4">
-            <span className="inline-block rounded-[14px] border-[2px] border-[#1B3B2B] bg-[#FFB703] px-3 py-1 font-display text-xs font-bold text-[#1B3B2B] shadow-bento-sm">
-              24/7 Community Animal Rescue & Wildlife Care
+        {/* Top Storybook Ribbon */}
+        <div className="anime-pixar-hero mb-8 flex flex-wrap items-center justify-between gap-4">
+          <div 
+            onMouseEnter={handleMascotHover}
+            className="inline-flex items-center gap-2.5 rounded-[22px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] px-4 py-2 shadow-pixar-sm cursor-pointer transition-all hover:scale-105"
+          >
+            {/* Interactive SVG Companion Mascot */}
+            <svg width="28" height="28" viewBox="0 0 40 40" className="overflow-visible">
+              <g ref={tailRef} style={{ transformOrigin: "10px 30px" }}>
+                <path d="M11 28 C5 24, 3 16, 7 12" stroke="#1E1B4B" strokeWidth="3" strokeLinecap="round" fill="none" />
+              </g>
+              <g ref={earLeftRef} style={{ transformOrigin: "15px 14px" }}>
+                <path d="M14 14 C12 5, 7 5, 11 16" fill="#F97316" stroke="#1E1B4B" strokeWidth="2.5" />
+              </g>
+              <g ref={earRightRef} style={{ transformOrigin: "26px 14px" }}>
+                <path d="M26 14 C28 5, 33 5, 29 16" fill="#F97316" stroke="#1E1B4B" strokeWidth="2.5" />
+              </g>
+              <circle cx="20" cy="22" r="11" fill="#FBBF24" stroke="#1E1B4B" strokeWidth="2.5" />
+              <circle cx="16" cy="20" r="2" fill="#1E1B4B" />
+              <circle cx="24" cy="20" r="2" fill="#1E1B4B" />
+              <circle cx="17" cy="19.2" r="0.6" fill="#FFFFFF" />
+              <circle cx="25" cy="19.2" r="0.6" fill="#FFFFFF" />
+              <ellipse cx="20" cy="24.5" rx="4.5" ry="3" fill="#FFF9F0" stroke="#1E1B4B" strokeWidth="1.5" />
+              <polygon points="18.5,23.5 21.5,23.5 20,25.5" fill="#1E1B4B" />
+            </svg>
+
+            <span className="font-display text-xs font-bold text-[#1E1B4B]">
+              BE THEIR VOICE
             </span>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black font-display text-[#1B3B2B] leading-[1.08] tracking-tight">
-              Every Life Matters. <br />
-              <span className="text-[#FF5A4E] underline decoration-[#1B3B2B] decoration-wavy decoration-2">
-                Every Alert Counts.
-              </span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-[#1B3B2B]/80 font-sans leading-relaxed max-w-xl">
-              Spot an injured, abandoned, or distressed animal? Drop a 1-click GPS pin. Our verified volunteers, trauma vans, and partnered veterinarians coordinate immediate medical triage with end-to-end accountability.
-            </p>
+            <span className="font-mono text-[10px] text-[#FF7A00] font-black uppercase">
+              ● REAL DISPATCH
+            </span>
           </div>
 
-          {/* Primary Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <a
-              href="/report"
-              className="bento-btn inline-flex items-center gap-2 rounded-[18px] bg-[#FF5A4E] px-6 py-3.5 text-sm text-white"
-            >
-              <AlertTriangle className="w-4 h-4" />
-              <span>Report Animal in Distress</span>
-            </a>
-
-            <a
-              href="/map"
-              className="bento-btn inline-flex items-center gap-2 rounded-[18px] bg-[#FFFBF5] px-5 py-3.5 text-sm text-[#1B3B2B]"
-            >
-              <Compass className="w-4 h-4 text-[#2EC4B6]" />
-              <span>Explore Tactical Map</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-
-          {/* Real Live Telemetry Counters (Anime.js Rolling Counter) */}
-          <div className="pt-6 border-t-[2px] border-[#1B3B2B] grid grid-cols-3 gap-4 font-display">
-            <div>
-              <p className="text-2xl sm:text-3xl font-black text-[#FF5A4E]">
-                <span ref={activeAlertsRef}>0</span>
-              </p>
-              <p className="font-mono text-[11px] text-[#1B3B2B]/75 uppercase">
-                Active Emergencies
-              </p>
-            </div>
-
-            <div>
-              <p className="text-2xl sm:text-3xl font-black text-[#2EC4B6]">
-                <span ref={rescuedRef}>0</span>
-              </p>
-              <p className="font-mono text-[11px] text-[#1B3B2B]/75 uppercase">
-                Safely Rescued
-              </p>
-            </div>
-
-            <div>
-              <p className="text-2xl sm:text-3xl font-black text-[#FFB703]">
-                <span ref={volunteersRef}>0</span>
-              </p>
-              <p className="font-mono text-[11px] text-[#1B3B2B]/75 uppercase">
-                Ready Volunteers
-              </p>
-            </div>
+          <div className="font-mono text-xs text-[#FBBF24] font-bold flex items-center gap-2 drop-shadow">
+            <Sun className="w-4 h-4 text-[#FBBF24] animate-spin" style={{ animationDuration: "16s" }} />
+            <span>GOLDEN HOUR SANCTUARY // ZERO FAKE DATA</span>
           </div>
         </div>
 
-        {/* Right Column (5 cols): Interactive 3D Three.js Diorama */}
-        <div 
-          onPointerMove={(e) => handleCardPointerMove(e, 4)}
-          onPointerLeave={handleCardPointerLeave}
-          className="anime-bento-hero lg:col-span-5 bento-card-white p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden min-h-[420px]"
-        >
-          {/* Diorama Header HUD */}
-          <div className="flex items-center justify-between z-10 mb-2">
-            <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#2EC4B6] animate-pulse" />
-              <span className="font-display text-xs font-bold text-[#1B3B2B]">
-                3D Sentinel Habitat Island
+        {/* Hero Grid: Storybook Headline + 3D Pixar Diorama */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          {/* Left Column (7 cols): Chunky 3D Extruded Title & Actions */}
+          <div className="anime-pixar-hero lg:col-span-7 space-y-6">
+            
+            <div className="space-y-3">
+              <span className="inline-block rounded-[16px] border-[2px] border-[#FBBF24] bg-[#FFB703]/20 px-3.5 py-1 font-display text-xs font-bold text-[#FBBF24] backdrop-blur-md">
+                🐾 Emergency Animal Rescue & Welfare Network
+              </span>
+
+              {/* Chunky 3D Display Header */}
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black font-display text-white leading-[1.05] tracking-tight font-pixar-3d">
+                BE THEIR VOICE. <br />
+                <span className="text-[#FBBF24] font-pixar-gold">
+                  PawAlert
+                </span>
+              </h1>
+
+              <p className="text-base sm:text-xl font-display font-bold text-[#F97316] font-pixar-sunset">
+                Because every paw matters.
+              </p>
+
+              <p className="text-sm sm:text-base text-slate-200 font-sans leading-relaxed max-w-xl pt-1">
+                When an injured, abandoned, or distressed animal cries for help, every second counts. Drop an instant GPS pin on our community radar—connecting verified field rescuers, ambulances, and vet clinics with 100% transparency.
+              </p>
+            </div>
+
+            {/* Chunky 3D Primary Action Buttons */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <a
+                href="/report"
+                className="pixar-btn bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white px-7 py-4 text-base font-bold shadow-pixar"
+              >
+                <AlertTriangle className="w-5 h-5 mr-2" />
+                <span>Report Animal in Distress</span>
+              </a>
+
+              <a
+                href="/map"
+                className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] px-6 py-4 text-sm font-bold shadow-pixar hover:bg-[#FFF1DC]"
+              >
+                <Compass className="w-4 h-4 text-[#10B981] mr-2" />
+                <span>Open Sanctuary Map</span>
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </a>
+            </div>
+
+            {/* Real MongoDB Telemetry Ticker (Zero Fake Data) */}
+            <div className="pt-6 border-t-[2px] border-white/20 grid grid-cols-3 gap-4 font-display text-white">
+              <div>
+                <p className="text-3xl sm:text-4xl font-black text-[#FF7A00] font-pixar-glow">
+                  <span ref={activeAlertsRef}>0</span>
+                </p>
+                <p className="font-mono text-[11px] text-slate-300 uppercase mt-0.5">
+                  Active Alerts
+                </p>
+              </div>
+
+              <div>
+                <p className="text-3xl sm:text-4xl font-black text-[#10B981] font-pixar-glow">
+                  <span ref={rescuedRef}>0</span>
+                </p>
+                <p className="font-mono text-[11px] text-slate-300 uppercase mt-0.5">
+                  Safely Rescued
+                </p>
+              </div>
+
+              <div>
+                <p className="text-3xl sm:text-4xl font-black text-[#FBBF24] font-pixar-glow">
+                  <span ref={volunteersRef}>0</span>
+                </p>
+                <p className="font-mono text-[11px] text-slate-300 uppercase mt-0.5">
+                  Volunteers Ready
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right Column (5 cols): 3D Pixar Miniature Golden-Hour World */}
+          <div 
+            onPointerMove={(e) => handleCardPointerMove(e, 4)}
+            onPointerLeave={handleCardPointerLeave}
+            className="anime-pixar-hero lg:col-span-5 pixar-card-gold p-4 sm:p-6 flex flex-col justify-between relative overflow-hidden min-h-[440px]"
+          >
+            {/* Diorama Top Bar */}
+            <div className="flex items-center justify-between z-10 mb-2">
+              <div className="flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full bg-[#10B981] animate-ping" />
+                <span className="font-display text-xs font-bold text-[#1E1B4B]">
+                  Golden-Hour Field Sanctuary
+                </span>
+              </div>
+              <span className="font-mono text-[10px] text-[#1E1B4B] font-bold uppercase bg-[#FFF9F0] px-2.5 py-1 rounded-[12px] border-[2px] border-[#1E1B4B]">
+                Drag 360° Orbit
               </span>
             </div>
-            <span className="font-mono text-[10px] text-[#1B3B2B]/60 uppercase bg-[#F5EFE6] px-2 py-0.5 rounded-[10px] border border-[#1B3B2B]/20">
-              Drag to Orbit 360°
-            </span>
+
+            {/* Three.js Canvas Container */}
+            <div 
+              ref={dioramaContainerRef} 
+              className="w-full h-[330px] sm:h-[370px] relative z-0 cursor-grab active:cursor-grabbing flex items-center justify-center"
+            />
+
+            {/* Diorama Footer */}
+            <div className="z-10 pt-2 border-t-[2px] border-[#1E1B4B] flex items-center justify-between text-xs font-display">
+              <span className="text-[#1E1B4B] font-bold">
+                {incidents.length === 0 ? "🌿 Sunlit Courtyard (Peaceful)" : `🚨 ${incidents.length} Rescue Beacons Active`}
+              </span>
+              <span className="font-mono text-[11px] text-[#FF7A00] font-black">
+                THREE.JS COMPANIONS
+              </span>
+            </div>
           </div>
 
-          {/* Three.js Canvas Container */}
-          <div 
-            ref={dioramaContainerRef} 
-            className="w-full h-[320px] sm:h-[350px] relative z-0 cursor-grab active:cursor-grabbing flex items-center justify-center"
-          />
-
-          {/* Habitat Status Footer */}
-          <div className="z-10 pt-2 border-t-[2px] border-[#1B3B2B] flex items-center justify-between text-xs font-display">
-            <span className="text-[#1B3B2B]/80 font-bold">
-              {incidents.length === 0 ? "🌿 Sunlit Meadow (All Clear)" : `🚨 ${incidents.length} Emergency Beacons Active`}
-            </span>
-            <span className="font-mono text-[11px] text-[#FF5A4E] font-bold">
-              THREE.JS 60FPS
-            </span>
-          </div>
         </div>
 
       </div>

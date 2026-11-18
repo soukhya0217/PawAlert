@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { MapPin, Navigation, RefreshCw, Shield, AlertTriangle, CheckCircle, Heart } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Navigation, Heart, AlertTriangle, Compass, Sparkles } from "lucide-react";
 import { IncidentData } from "@/lib/use-recent-incidents";
 
 interface AdminMapProps {
@@ -28,7 +28,6 @@ export default function AdminMap({
   const [filterPriority, setFilterPriority] = useState<string>("ALL");
   const [mapReady, setMapReady] = useState(false);
 
-  // Initialize Leaflet cleanly inside useEffect
   useEffect(() => {
     if (typeof window === "undefined" || !containerRef.current) return;
 
@@ -38,21 +37,16 @@ export default function AdminMap({
     import("leaflet").then((L) => {
       if (!isMounted || !containerRef.current) return;
 
-      // Ensure container has dimensions before initializing
       const rect = containerRef.current.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
 
-      // Prevent re-initialization if already active
       if (mapRef.current) {
         try {
           mapRef.current.remove();
-        } catch (e) {
-          // ignore cleanup error
-        }
+        } catch (e) {}
         mapRef.current = null;
       }
 
-      // Safe marker icon defaults
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -60,14 +54,12 @@ export default function AdminMap({
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
 
-      // Initialize map instance
       leafletInstance = L.map(containerRef.current, {
         center: initialCenter,
         zoom: initialZoom,
         zoomControl: false,
       });
 
-      // Smooth zoom controls on top-right to avoid footer clashes
       L.control.zoom({ position: "topright" }).addTo(leafletInstance);
 
       // Fast, reliable OpenStreetMap raster tiles
@@ -81,14 +73,12 @@ export default function AdminMap({
       mapRef.current = leafletInstance;
       setMapReady(true);
 
-      // Invalidate size immediately once loaded
       setTimeout(() => {
         if (mapRef.current) {
           mapRef.current.invalidateSize();
         }
-      }, 200);
+      }, 250);
 
-      // Set up ResizeObserver to prevent any gray / half-rendered tiles
       if (containerRef.current && window.ResizeObserver) {
         resizeObserverRef.current = new ResizeObserver(() => {
           if (mapRef.current) {
@@ -107,15 +97,13 @@ export default function AdminMap({
       if (mapRef.current) {
         try {
           mapRef.current.remove();
-        } catch (e) {
-          // ignore cleanup error
-        }
+        } catch (e) {}
         mapRef.current = null;
       }
     };
   }, [initialCenter, initialZoom]);
 
-  // Update Markers whenever incidents or filter changes
+  // Update Markers
   useEffect(() => {
     if (!mapRef.current || !markersGroupRef.current) return;
 
@@ -129,23 +117,22 @@ export default function AdminMap({
 
       filtered.forEach((inc) => {
         if (!inc.location || !Array.isArray(inc.location.coordinates)) return;
-
         const [lon, lat] = inc.location.coordinates;
         if (typeof lat !== "number" || typeof lon !== "number") return;
 
         const isCritical = inc.priority === "CRITICAL";
-        const pinBg = isCritical ? "#FF5A4E" : "#FFB703";
+        const pinBg = isCritical ? "#EF4444" : "#FBBF24";
         const emoji = isCritical ? "🚨" : "🐾";
 
         const customIcon = L.divIcon({
-          className: "paw-marker-container",
+          className: "paw-pin-marker",
           html: `
-            <div class="paw-marker-pin" style="background-color: ${pinBg};">
-              <span class="paw-marker-icon">${emoji}</span>
+            <div class="paw-pin-body" style="background-color: ${pinBg};">
+              <span class="paw-pin-emoji">${emoji}</span>
             </div>
           `,
-          iconSize: [40, 40],
-          iconAnchor: [20, 36],
+          iconSize: [44, 44],
+          iconAnchor: [22, 40],
         });
 
         const marker = L.marker([lat, lon], { icon: customIcon });
@@ -174,28 +161,28 @@ export default function AdminMap({
   };
 
   return (
-    <div className={`relative w-full rounded-[24px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] overflow-hidden shadow-bento ${className}`}>
+    <div className={`relative w-full rounded-[32px] border-[4px] border-[#1E1B4B] bg-[#FFF9F0] overflow-hidden shadow-pixar ${className}`}>
       
       {/* Top Map HUD Controls */}
-      <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2">
-        {/* Status Chip */}
-        <div className="flex items-center gap-2 rounded-[16px] border-[2px] border-[#1B3B2B] bg-[#F5EFE6] px-3.5 py-1.5 shadow-bento-sm">
-          <span className={`h-2.5 w-2.5 rounded-full ${incidents.length > 0 ? "bg-[#FF5A4E] animate-ping" : "bg-[#2EC4B6]"}`} />
-          <span className="font-display text-xs font-bold text-[#1B3B2B]">
-            {incidents.length > 0 ? `${incidents.length} ACTIVE ALERTS` : "SANCTUARY SECURE"}
+      <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2.5">
+        {/* Status Pill */}
+        <div className="flex items-center gap-2 rounded-[20px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] px-4 py-2 shadow-pixar-sm">
+          <span className={`h-3 w-3 rounded-full ${incidents.length > 0 ? "bg-[#EF4444] animate-ping" : "bg-[#10B981]"}`} />
+          <span className="font-display text-xs font-bold text-[#1E1B4B]">
+            {incidents.length > 0 ? `${incidents.length} ACTIVE ALERTS` : "SANCTUARY ALL QUIET"}
           </span>
         </div>
 
-        {/* Priority Filter Toggle */}
-        <div className="hidden sm:flex items-center gap-1 rounded-[16px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-1 shadow-bento-sm">
+        {/* Priority Filter */}
+        <div className="hidden sm:flex items-center gap-1 rounded-[18px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-1 shadow-pixar-sm">
           {["ALL", "CRITICAL", "HIGH"].map((p) => (
             <button
               key={p}
               onClick={() => setFilterPriority(p)}
-              className={`rounded-[12px] px-2.5 py-1 text-[11px] font-bold font-display transition-all ${
+              className={`rounded-[14px] px-3 py-1.5 text-xs font-bold font-display transition-all ${
                 filterPriority === p
-                  ? "bg-[#1B3B2B] text-white"
-                  : "text-[#1B3B2B] hover:bg-[#F5EFE6]"
+                  ? "bg-[#1E1B4B] text-white"
+                  : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
               }`}
             >
               {p}
@@ -203,36 +190,50 @@ export default function AdminMap({
           ))}
         </div>
 
-        {/* GPS Button */}
+        {/* GPS Locate Me Button */}
         <button
           onClick={handleFlyToMyLocation}
-          className="bento-btn flex items-center gap-1.5 rounded-[16px] bg-[#2EC4B6] px-3 py-1.5 text-xs text-white"
-          title="Fly to My Coordinates"
+          className="pixar-btn bg-[#FFB703] text-[#1E1B4B] px-3.5 py-2 text-xs shadow-pixar-sm flex items-center gap-1.5"
+          title="Locate Me (GPS)"
         >
           <Navigation className="w-3.5 h-3.5" />
-          <span>My GPS</span>
+          <span>Locate Me (GPS)</span>
         </button>
       </div>
 
-      {/* Map Canvas */}
-      <div className="min-h-[420px] h-full w-full relative z-0">
-        <div ref={containerRef} className="h-full w-full min-h-[420px] relative z-0" />
+      {/* Map Canvas with min-h-[400px] explicit height */}
+      <div className="min-h-[420px] sm:min-h-[460px] h-full w-full relative z-0">
+        <div ref={containerRef} className="h-full w-full min-h-[420px] sm:min-h-[460px] relative z-0" />
       </div>
 
-      {/* Empty State Banner (When 0 active incidents) */}
+      {/* Heartwarming Empty State Card (When 0 active incidents in MongoDB) */}
       {incidents.length === 0 && (
-        <div className="absolute bottom-4 left-4 right-4 sm:left-4 sm:right-auto z-20 max-w-sm rounded-[20px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5]/95 p-4 shadow-bento backdrop-blur-md">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[14px] border-[2px] border-[#1B3B2B] bg-[#2EC4B6]/20 text-[#2EC4B6]">
-              <Heart className="w-5 h-5 fill-[#2EC4B6]" />
+        <div className="absolute bottom-5 left-5 right-5 sm:left-5 sm:right-auto z-20 max-w-md rounded-[26px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 p-5 shadow-pixar backdrop-blur-md">
+          <div className="flex items-center gap-4">
+            {/* Cute Sleeping Puppy & Kitten SVG Illustration with Zzz bubbles */}
+            <div className="relative flex-shrink-0 w-14 h-14 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] flex items-center justify-center text-2xl shadow-pixar-sm">
+              <span>🐶</span>
+              <span className="absolute -top-3 -right-2 font-display text-xs font-black text-[#FF7A00] animate-bounce">
+                Zzz
+              </span>
             </div>
-            <div>
-              <p className="font-display text-xs font-bold text-[#1B3B2B]">
-                All Quiet in the Field
+
+            <div className="space-y-1">
+              <h4 className="font-display text-sm font-bold text-[#1E1B4B]">
+                All Quiet in the Neighborhood
+              </h4>
+              <p className="text-xs text-[#1E1B4B]/75 leading-tight font-sans">
+                Zero active distress cases logged. All rescue squads and ambulances are resting on standby.
               </p>
-              <p className="text-[11px] text-[#1B3B2B]/75 leading-tight">
-                No active emergencies in MongoDB. Volunteer squads are on standby.
-              </p>
+              <div className="pt-2">
+                <a
+                  href="/report"
+                  className="pixar-btn bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white px-3.5 py-1.5 text-xs shadow-pixar-sm inline-flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Spot an Animal in Need? Be Their Voice</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -240,28 +241,28 @@ export default function AdminMap({
 
       {/* Selected Incident Drawer */}
       {selectedIncident && (
-        <div className="absolute bottom-4 right-4 z-20 w-80 max-w-[90%] rounded-[20px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-4 shadow-bento">
-          <div className="flex items-center justify-between border-b-[2px] border-[#1B3B2B] pb-2 mb-2">
-            <span className="font-mono text-[10px] font-bold text-[#FF5A4E]">
+        <div className="absolute bottom-5 right-5 z-20 w-80 max-w-[90%] rounded-[24px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-5 shadow-pixar animate-in fade-in slide-in-from-right-4">
+          <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B] pb-2 mb-2">
+            <span className="font-mono text-[10px] font-bold text-[#FF7A00]">
               {selectedIncident.incidentId}
             </span>
             <button
               onClick={() => setSelectedIncident(null)}
-              className="text-xs font-bold text-[#1B3B2B] hover:text-[#FF5A4E]"
+              className="text-xs font-bold text-[#1E1B4B] hover:text-[#EF4444]"
             >
               ✕
             </button>
           </div>
-          <p className="font-display text-sm font-bold text-[#1B3B2B]">
+          <p className="font-display text-base font-bold text-[#1E1B4B]">
             {selectedIncident.animalCategory}
           </p>
-          <p className="text-xs text-[#1B3B2B]/80 line-clamp-2 mt-1">
+          <p className="text-xs text-[#1E1B4B]/75 line-clamp-2 mt-1 font-sans">
             {selectedIncident.conditionDescription}
           </p>
-          <div className="mt-3 flex gap-2">
+          <div className="mt-3">
             <a
               href={`/track/${selectedIncident.incidentId}`}
-              className="bento-btn w-full rounded-[12px] bg-[#FF5A4E] py-1.5 text-center text-xs text-white"
+              className="pixar-btn w-full bg-[#FF7A00] text-white py-2 text-center text-xs shadow-pixar-sm"
             >
               Track Live Rescue
             </a>

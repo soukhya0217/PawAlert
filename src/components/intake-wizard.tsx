@@ -7,15 +7,13 @@ import {
   MapPin, 
   Navigation, 
   AlertTriangle, 
-  CheckCircle2, 
   ArrowRight, 
   ArrowLeft,
-  Heart,
-  Upload,
+  Sparkles,
   User,
   Phone,
   Mail,
-  Sparkles
+  Compass
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { animateToeBeanPress, handleCardPointerMove, handleCardPointerLeave } from "@/lib/animations";
@@ -29,6 +27,234 @@ const SPECIES = [
   { label: "Other Animal", emoji: "🐾", value: "Other" },
 ];
 
+/* -------------------------------------------------------------
+   REACTIVE ILLUSTRATED COMPANION MASCOT (PIXAR STORYBOOK SVG)
+   Dynamically morphs facial expressions, eye shapes, and accessories
+   based on current wizard step (0-3) and severity selection.
+------------------------------------------------------------- */
+function MascotCompanion({
+  step,
+  severity,
+}: {
+  step: number;
+  severity: "STABLE" | "ABANDONED" | "DEHYDRATED" | "INJURED" | "CRITICAL";
+}) {
+  // Determine speech bubble text
+  let speech = "Who needs our help today?";
+  if (step === 1) speech = "Pinpoint where they are waiting!";
+  else if (step === 2) {
+    switch (severity) {
+      case "STABLE":
+        speech = "Resting calmly. Scheduling gentle transit!";
+        break;
+      case "ABANDONED":
+        speech = "Vulnerable neonates! Sending rescue squad!";
+        break;
+      case "DEHYDRATED":
+        speech = "Severely parched! Hydration team alerted!";
+        break;
+      case "INJURED":
+        speech = "Visible physical trauma. Splint squad en route!";
+        break;
+      case "CRITICAL":
+        speech = "CODE RED! Emergency siren ambulance dispatched!";
+        break;
+    }
+  } else if (step === 3) {
+    speech = "Almost there! Rescuers are standing by!";
+  }
+
+  return (
+    <div className="flex items-center gap-3.5 rounded-[24px] border-[3px] border-[#1E1B4B] bg-[#FFF1DC] p-3.5 shadow-pixar-sm mb-6 transition-all duration-300">
+      {/* Pixar Style Interactive SVG Mascot Avatar */}
+      <div className="relative flex-shrink-0 w-16 h-16 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] overflow-hidden flex items-center justify-center shadow-pixar-sm">
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          <defs>
+            {/* Soft Warm Radial Fur Gradient */}
+            <radialGradient id="furGrad" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stopColor="#FDBA74" />
+              <stop offset="70%" stopColor="#FB923C" />
+              <stop offset="100%" stopColor="#EA580C" />
+            </radialGradient>
+            <radialGradient id="earGrad" cx="50%" cy="30%" r="50%">
+              <stop offset="0%" stopColor="#F472B6" />
+              <stop offset="100%" stopColor="#E11D48" />
+            </radialGradient>
+          </defs>
+
+          {/* Left Floppy Ear */}
+          <path
+            d={
+              step === 2 && severity === "ABANDONED"
+                ? "M 20 35 Q 8 60 18 72 Q 28 65 26 40 Z" // Droopy sad ear
+                : step === 2 && severity === "CRITICAL"
+                ? "M 22 35 Q 5 15 15 8 Q 28 20 26 38 Z" // Perked alarmed ear
+                : "M 22 35 Q 10 25 15 50 Q 25 45 26 38 Z" // Standard floppy ear
+            }
+            fill="url(#furGrad)"
+            stroke="#1E1B4B"
+            strokeWidth="3"
+          />
+          <path
+            d={
+              step === 2 && severity === "ABANDONED"
+                ? "M 18 42 Q 12 58 18 64 Q 23 58 22 42 Z"
+                : "M 18 34 Q 13 28 17 44 Q 22 40 22 34 Z"
+            }
+            fill="url(#earGrad)"
+            opacity="0.75"
+          />
+
+          {/* Right Floppy Ear */}
+          <path
+            d={
+              step === 2 && severity === "ABANDONED"
+                ? "M 80 35 Q 92 60 82 72 Q 72 65 74 40 Z"
+                : step === 2 && severity === "CRITICAL"
+                ? "M 78 35 Q 95 15 85 8 Q 72 20 74 38 Z"
+                : "M 78 35 Q 90 25 85 50 Q 75 45 74 38 Z"
+            }
+            fill="url(#furGrad)"
+            stroke="#1E1B4B"
+            strokeWidth="3"
+          />
+          <path
+            d={
+              step === 2 && severity === "ABANDONED"
+                ? "M 82 42 Q 88 58 82 64 Q 77 58 78 42 Z"
+                : "M 82 34 Q 87 28 83 44 Q 78 40 78 34 Z"
+            }
+            fill="url(#earGrad)"
+            opacity="0.75"
+          />
+
+          {/* Head Base */}
+          <circle cx="50" cy="54" r="32" fill="url(#furGrad)" stroke="#1E1B4B" strokeWidth="3" />
+
+          {/* Muzzle */}
+          <ellipse cx="50" cy="64" rx="18" ry="14" fill="#FEF08A" stroke="#1E1B4B" strokeWidth="2.5" />
+
+          {/* Nose */}
+          <ellipse cx="50" cy="58" rx="5" ry="3.5" fill="#1E1B4B" />
+          <ellipse cx="48.5" cy="57" rx="1.5" ry="0.8" fill="#FFFFFF" opacity="0.8" />
+
+          {/* Eyes & Expressions */}
+          {step === 2 && severity === "STABLE" ? (
+            /* Happy Smiling Eyes (Arcs) */
+            <>
+              <path d="M 34 50 Q 40 43 44 50" fill="none" stroke="#1E1B4B" strokeWidth="3.5" strokeLinecap="round" />
+              <path d="M 56 50 Q 60 43 66 50" fill="none" stroke="#1E1B4B" strokeWidth="3.5" strokeLinecap="round" />
+              {/* Rosy Cheeks */}
+              <circle cx="32" cy="56" r="4" fill="#F43F5E" opacity="0.4" />
+              <circle cx="68" cy="56" r="4" fill="#F43F5E" opacity="0.4" />
+              {/* Smiling Mouth */}
+              <path d="M 46 64 Q 50 68 54 64" fill="none" stroke="#1E1B4B" strokeWidth="2.5" strokeLinecap="round" />
+            </>
+          ) : step === 2 && severity === "ABANDONED" ? (
+            /* Giant Soulful Watery Eyes (Pixar Puss in Boots) */
+            <>
+              <ellipse cx="38" cy="48" rx="8" ry="9" fill="#1E1B4B" />
+              <ellipse cx="62" cy="48" rx="8" ry="9" fill="#1E1B4B" />
+              {/* Glassy Highlights */}
+              <circle cx="36" cy="45" r="3.5" fill="#FFFFFF" />
+              <circle cx="40" cy="51" r="1.5" fill="#FFFFFF" />
+              <circle cx="60" cy="45" r="3.5" fill="#FFFFFF" />
+              <circle cx="64" cy="51" r="1.5" fill="#FFFFFF" />
+              {/* Teardrop */}
+              <circle cx="29" cy="57" r="2.2" fill="#38BDF8" opacity="0.85" />
+              {/* Sad W-Mouth */}
+              <path d="M 45 66 Q 48 64 50 66 Q 52 64 55 66" fill="none" stroke="#1E1B4B" strokeWidth="2.5" strokeLinecap="round" />
+            </>
+          ) : step === 2 && severity === "DEHYDRATED" ? (
+            /* Panting Tongue Out */
+            <>
+              <ellipse cx="38" cy="48" rx="6" ry="6" fill="#1E1B4B" />
+              <ellipse cx="62" cy="48" rx="6" ry="6" fill="#1E1B4B" />
+              <circle cx="36.5" cy="46" r="2" fill="#FFFFFF" />
+              <circle cx="60.5" cy="46" r="2" fill="#FFFFFF" />
+              {/* Hanging Pink Tongue */}
+              <path d="M 47 64 C 47 72 53 72 53 64 Z" fill="#F43F5E" stroke="#1E1B4B" strokeWidth="2" />
+              {/* Water Drop particle */}
+              <circle cx="70" cy="38" r="3" fill="#38BDF8" />
+            </>
+          ) : step === 2 && severity === "INJURED" ? (
+            /* Caring puppy with Band-Aid on cheek */
+            <>
+              <ellipse cx="38" cy="48" rx="6" ry="6" fill="#1E1B4B" />
+              <ellipse cx="62" cy="48" rx="6" ry="6" fill="#1E1B4B" />
+              <circle cx="36.5" cy="46" r="2.2" fill="#FFFFFF" />
+              <circle cx="60.5" cy="46" r="2.2" fill="#FFFFFF" />
+              {/* Cute Criss-cross Band-aid */}
+              <rect x="23" y="44" width="10" height="4" rx="2" transform="rotate(25 28 46)" fill="#FED7AA" stroke="#1E1B4B" strokeWidth="1.5" />
+              <rect x="23" y="44" width="10" height="4" rx="2" transform="rotate(-25 28 46)" fill="#FED7AA" stroke="#1E1B4B" strokeWidth="1.5" />
+              {/* Gentle Mouth */}
+              <path d="M 46 64 Q 50 67 54 64" fill="none" stroke="#1E1B4B" strokeWidth="2" strokeLinecap="round" />
+            </>
+          ) : step === 2 && severity === "CRITICAL" ? (
+            /* Emergency Siren on Head & Wide Urgent Eyes */
+            <>
+              <ellipse cx="38" cy="48" rx="7" ry="7" fill="#1E1B4B" />
+              <ellipse cx="62" cy="48" rx="7" ry="7" fill="#1E1B4B" />
+              <circle cx="38" cy="48" r="3" fill="#EF4444" />
+              <circle cx="62" cy="48" r="3" fill="#EF4444" />
+              <circle cx="36" cy="46" r="1.2" fill="#FFFFFF" />
+              <circle cx="60" cy="46" r="1.2" fill="#FFFFFF" />
+              {/* Emergency Siren on forehead */}
+              <rect x="44" y="14" width="12" height="12" rx="4" fill="#EF4444" stroke="#1E1B4B" strokeWidth="2.5" />
+              <circle cx="50" cy="20" r="3" fill="#FDE047" />
+              {/* Siren Light Rays */}
+              <line x1="38" y1="12" x2="42" y2="16" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" />
+              <line x1="62" y1="12" x2="58" y2="16" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" />
+              {/* Alarmed Open Mouth */}
+              <ellipse cx="50" cy="66" rx="3.5" ry="4.5" fill="#1E1B4B" />
+            </>
+          ) : step === 3 ? (
+            /* Hero Rescuer Bandana & Determined Eyes */
+            <>
+              <ellipse cx="38" cy="48" rx="6.5" ry="6.5" fill="#1E1B4B" />
+              <ellipse cx="62" cy="48" rx="6.5" ry="6.5" fill="#1E1B4B" />
+              <circle cx="36" cy="46" r="2.2" fill="#FFFFFF" />
+              <circle cx="60" cy="46" r="2.2" fill="#FFFFFF" />
+              {/* Rescuer Headband / Bandana */}
+              <path d="M 24 38 Q 50 32 76 38" fill="none" stroke="#FF7A00" strokeWidth="6" strokeLinecap="round" />
+              {/* Rescuer Paw Badge */}
+              <circle cx="50" cy="35" r="4.5" fill="#FFB703" stroke="#1E1B4B" strokeWidth="1.5" />
+              <path d="M 46 64 Q 50 68 54 64" fill="none" stroke="#1E1B4B" strokeWidth="2.5" strokeLinecap="round" />
+            </>
+          ) : (
+            /* Default Curious Eyes (Step 0 & 1) */
+            <>
+              <ellipse cx="38" cy="48" rx="6" ry="6.5" fill="#1E1B4B" />
+              <ellipse cx="62" cy="48" rx="6" ry="6.5" fill="#1E1B4B" />
+              <circle cx="36" cy="46" r="2.2" fill="#FFFFFF" />
+              <circle cx="60" cy="46" r="2.2" fill="#FFFFFF" />
+              <circle cx="40" cy="51" r="1" fill="#FFFFFF" />
+              <circle cx="64" cy="51" r="1" fill="#FFFFFF" />
+              <path d="M 46 64 Q 50 67 54 64" fill="none" stroke="#1E1B4B" strokeWidth="2.5" strokeLinecap="round" />
+            </>
+          )}
+        </svg>
+      </div>
+
+      {/* Speech Bubble with Pixar Storybook Typography */}
+      <div className="flex-1">
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <span className="font-display text-[11px] font-bold text-[#FF7A00] uppercase tracking-wider">
+            {step === 0 && "Step 1 // Identification"}
+            {step === 1 && "Step 2 // Geolocation"}
+            {step === 2 && `Step 3 // Triage [${severity}]`}
+            {step === 3 && "Step 4 // Final Dispatch"}
+          </span>
+          <Sparkles className="w-3 h-3 text-[#FFB703]" />
+        </div>
+        <p className="font-display text-sm font-bold text-[#1E1B4B] leading-tight">
+          {speech}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function IntakeWizard() {
   const router = useRouter();
 
@@ -37,7 +263,7 @@ export default function IntakeWizard() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   
-  // Map coordinates & address
+  // Map coordinates & address (Default Bangalore center)
   const [coords, setCoords] = useState<[number, number]>([77.5946, 12.9716]); // [lon, lat]
   const [address, setAddress] = useState("Bangalore City Center, Karnataka");
   const [isLocating, setIsLocating] = useState(false);
@@ -58,6 +284,7 @@ export default function IntakeWizard() {
   const mapInstanceRef = useRef<any>(null);
   const markerInstanceRef = useRef<any>(null);
   const accuracyCircleRef = useRef<any>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   // Handle Photo Upload
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,22 +346,23 @@ export default function IntakeWizard() {
 
       L.control.zoom({ position: "bottomright" }).addTo(map);
 
-      // Fast CartoDB Voyager / OSM tiles
+      // Fast, reliable OpenStreetMap raster tiles (Zero API Key errors!)
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; OpenStreetMap',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
+        subdomains: ["a", "b", "c"],
       }).addTo(map);
 
-      // Custom SVG Paw Marker
+      // Custom SVG Glowing Paw Marker with Twilight Border
       const pawPinIcon = L.divIcon({
         className: "paw-marker-container",
         html: `
-          <div class="paw-marker-pin" style="background-color: #FF5A4E;">
-            <span class="paw-marker-icon">🐾</span>
+          <div style="width:44px;height:44px;border-radius:22px;border:3px solid #1E1B4B;background:#FF7A00;box-shadow:0 6px 0 #1E1B4B;display:flex;align-items:center;justify-content:center;font-size:20px;color:#FFFFFF;cursor:pointer;">
+            <span>🐾</span>
           </div>
         `,
-        iconSize: [40, 40],
-        iconAnchor: [20, 36],
+        iconSize: [44, 44],
+        iconAnchor: [22, 40],
       });
 
       const marker = L.marker([lat, lon], {
@@ -165,16 +393,21 @@ export default function IntakeWizard() {
         }
       }, 250);
 
-      const resizeObserver = new ResizeObserver(() => {
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.invalidateSize();
-        }
-      });
-      resizeObserver.observe(mapContainerRef.current);
+      if (mapContainerRef.current && window.ResizeObserver) {
+        resizeObserverRef.current = new ResizeObserver(() => {
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.invalidateSize();
+          }
+        });
+        resizeObserverRef.current.observe(mapContainerRef.current);
+      }
     });
 
     return () => {
       isMounted = false;
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
       if (mapInstanceRef.current) {
         try {
           mapInstanceRef.current.remove();
@@ -208,10 +441,10 @@ export default function IntakeWizard() {
             }
             accuracyCircleRef.current = L.circle([latitude, longitude], {
               radius: accuracy,
-              color: "#2EC4B6",
-              fillColor: "#2EC4B6",
-              fillOpacity: 0.2,
-              weight: 2,
+              color: "#FF7A00",
+              fillColor: "#FFB703",
+              fillOpacity: 0.25,
+              weight: 3,
             }).addTo(mapInstanceRef.current);
           });
         }
@@ -254,7 +487,7 @@ export default function IntakeWizard() {
         particleCount: 120,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ["#FF5A4E", "#FFB703", "#2EC4B6", "#1B3B2B"],
+        colors: ["#FF7A00", "#FFB703", "#10B981", "#1E1B4B"],
       });
 
       router.push(`/track/${data.incident.incidentId}`);
@@ -265,53 +498,38 @@ export default function IntakeWizard() {
     }
   };
 
-  // Cute Mascot Mood Text based on Paw Pad Severity
-  const getSeverityMood = () => {
-    switch (severity) {
-      case "STABLE":
-        return { emoji: "🐶", title: "Resting, needs checkup", desc: "No immediate bleeding. Will be scheduled for gentle recovery transit." };
-      case "ABANDONED":
-        return { emoji: "🥺", title: "Scared & Motherless", desc: "Vulnerable neonates or lonely stray in danger of starvation." };
-      case "DEHYDRATED":
-        return { emoji: "🥣", title: "Severely Parched", desc: "Extreme heat exhaustion. Immediate clean water basins & glucose needed." };
-      case "INJURED":
-        return { emoji: "🩹", title: "Physical Trauma", desc: "Visible limping or lacerations. Ambulance splint team alerted." };
-      case "CRITICAL":
-        return { emoji: "🚨", title: "EMERGENCY: Trauma Alert", desc: "Vehicular accident / severe hemorrhage. Immediate sirens dispatched." };
-    }
-  };
-
-  const mood = getSeverityMood();
-
   return (
     <div className="max-w-2xl mx-auto w-full">
       {/* Wizard Step Progress Tracker */}
-      <div className="flex items-center justify-between mb-8 px-2">
+      <div className="flex items-center justify-between mb-6 px-2">
         {["1. Species & Photo", "2. Pinpoint GPS", "3. Squishy Paw Pad", "4. Contact & Send"].map((title, idx) => (
           <div key={idx} className="flex items-center gap-1.5 sm:gap-2">
             <div
-              className={`flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-[14px] border-[2px] border-[#1B3B2B] font-display text-xs font-bold transition-all ${
+              className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-[16px] border-[3px] border-[#1E1B4B] font-display text-xs font-bold transition-all ${
                 step === idx
-                  ? "bg-[#FF5A4E] text-white shadow-bento-sm scale-105"
+                  ? "bg-[#FF7A00] text-white shadow-pixar-sm scale-105"
                   : step > idx
-                  ? "bg-[#2EC4B6] text-white"
-                  : "bg-[#FFFBF5] text-[#1B3B2B]"
+                  ? "bg-[#10B981] text-white shadow-pixar-sm"
+                  : "bg-[#FFF9F0] text-[#1E1B4B]"
               }`}
             >
               {step > idx ? "✓" : idx + 1}
             </div>
-            <span className="hidden sm:inline font-display text-xs font-bold text-[#1B3B2B]">
+            <span className="hidden sm:inline font-display text-xs font-bold text-[#1E1B4B]">
               {title.split(". ")[1]}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Main Bento Form Card */}
-      <div className="bento-card-white p-6 sm:p-8 space-y-6">
+      {/* Reactive Illustrated Companion Mascot Header */}
+      <MascotCompanion step={step} severity={severity} />
+
+      {/* Main Pixar Storybook Form Card */}
+      <div className="pixar-card p-6 sm:p-8 space-y-6">
         
         {errorMsg && (
-          <div className="rounded-[16px] border-[2px] border-[#FF5A4E] bg-[#FF5A4E]/10 p-3.5 text-xs font-bold text-[#FF5A4E] flex items-center gap-2">
+          <div className="rounded-[18px] border-[3px] border-[#EF4444] bg-[#EF4444]/10 p-4 text-xs font-bold text-[#EF4444] flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -321,13 +539,13 @@ export default function IntakeWizard() {
         {step === 0 && (
           <div className="space-y-6 animate-in fade-in duration-300">
             <div>
-              <span className="font-mono text-[11px] font-bold text-[#FF5A4E] uppercase tracking-wider">
+              <span className="font-mono text-[11px] font-bold text-[#FF7A00] uppercase tracking-wider">
                 STEP 01 // IDENTIFICATION
               </span>
-              <h2 className="text-2xl font-black font-display text-[#1B3B2B] mt-0.5">
+              <h2 className="text-2xl font-black font-display text-[#1E1B4B] mt-0.5">
                 Who Needs Our Help?
               </h2>
-              <p className="text-xs text-[#1B3B2B]/70 mt-1 font-sans">
+              <p className="text-xs text-[#1E1B4B]/70 mt-1 font-sans">
                 Select the species and upload a photo so our field rescuers know what to expect.
               </p>
             </div>
@@ -341,14 +559,14 @@ export default function IntakeWizard() {
                   onClick={() => setSpecies(item.value)}
                   onPointerMove={(e) => handleCardPointerMove(e, 6)}
                   onPointerLeave={handleCardPointerLeave}
-                  className={`rounded-[18px] border-[2px] border-[#1B3B2B] p-3 text-left transition-all ${
+                  className={`rounded-[20px] border-[3px] border-[#1E1B4B] p-3.5 text-left transition-all ${
                     species === item.value
-                      ? "bg-[#FFB703] shadow-bento scale-[1.02]"
-                      : "bg-[#FFFBF5] hover:bg-[#F5EFE6]"
+                      ? "bg-[#FFB703] shadow-pixar scale-[1.02]"
+                      : "bg-[#FFF9F0] hover:bg-[#FFF1DC]"
                   }`}
                 >
                   <span className="text-2xl block mb-1">{item.emoji}</span>
-                  <span className="font-display text-xs font-bold text-[#1B3B2B] block">
+                  <span className="font-display text-xs font-bold text-[#1E1B4B] block">
                     {item.label}
                   </span>
                 </button>
@@ -357,30 +575,30 @@ export default function IntakeWizard() {
 
             {/* Photo Upload Area */}
             <div>
-              <label className="font-display text-xs font-bold text-[#1B3B2B] block mb-2">
+              <label className="font-display text-xs font-bold text-[#1E1B4B] block mb-2">
                 Snap or Upload Photo Evidence
               </label>
-              <div className="rounded-[20px] border-[2px] border-dashed border-[#1B3B2B] bg-[#FFFBF5] p-5 text-center flex flex-col items-center justify-center">
+              <div className="rounded-[22px] border-[3px] border-dashed border-[#1E1B4B] bg-[#FFF9F0] p-6 text-center flex flex-col items-center justify-center">
                 {photoPreview ? (
-                  <div className="relative h-44 w-full rounded-[16px] overflow-hidden border-[2px] border-[#1B3B2B]">
+                  <div className="relative h-44 w-full rounded-[18px] overflow-hidden border-[3px] border-[#1E1B4B]">
                     <img src={photoPreview} alt="Preview" className="h-full w-full object-cover" />
                     <button
                       type="button"
                       onClick={() => setPhotoPreview(null)}
-                      className="bento-btn absolute top-2 right-2 rounded-[12px] bg-[#FF5A4E] px-2.5 py-1 text-[11px] text-white"
+                      className="pixar-btn absolute top-2 right-2 rounded-[12px] bg-[#EF4444] px-3 py-1 text-[11px] text-white shadow-pixar-sm"
                     >
                       Change Photo
                     </button>
                   </div>
                 ) : (
                   <label className="cursor-pointer flex flex-col items-center gap-2">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-[16px] border-[2px] border-[#1B3B2B] bg-[#2EC4B6] text-white shadow-bento-sm">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-[18px] border-[3px] border-[#1E1B4B] bg-[#10B981] text-white shadow-pixar-sm">
                       <Camera className="w-6 h-6" />
                     </div>
-                    <span className="font-display text-xs font-bold text-[#1B3B2B]">
+                    <span className="font-display text-xs font-bold text-[#1E1B4B]">
                       Take photo or select from gallery
                     </span>
-                    <span className="font-mono text-[10px] text-[#1B3B2B]/60">
+                    <span className="font-mono text-[10px] text-[#1E1B4B]/60">
                       JPG, PNG, WEBP (Instant WebP compression)
                     </span>
                     <input
@@ -396,7 +614,7 @@ export default function IntakeWizard() {
 
             {/* Condition Description */}
             <div>
-              <label className="font-display text-xs font-bold text-[#1B3B2B] block mb-1.5">
+              <label className="font-display text-xs font-bold text-[#1E1B4B] block mb-1.5">
                 Visible Symptoms & Condition
               </label>
               <textarea
@@ -404,7 +622,7 @@ export default function IntakeWizard() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="E.g., Limping severely on rear left leg, hiding under auto-rickshaw, whimpering..."
-                className="w-full rounded-[16px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-3 text-xs font-sans text-[#1B3B2B] focus:outline-none focus:ring-2 focus:ring-[#FF5A4E]"
+                className="w-full rounded-[18px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-3.5 text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
 
@@ -412,7 +630,7 @@ export default function IntakeWizard() {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="bento-btn flex items-center gap-2 rounded-[18px] bg-[#FF5A4E] px-6 py-3 text-sm text-white"
+                className="pixar-btn flex items-center gap-2 rounded-[20px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] px-6 py-3 text-sm text-white shadow-pixar font-bold"
               >
                 <span>Pin Location Next</span>
                 <ArrowRight className="w-4 h-4" />
@@ -426,10 +644,10 @@ export default function IntakeWizard() {
           <div className="space-y-5 animate-in fade-in duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <span className="font-mono text-[11px] font-bold text-[#2EC4B6] uppercase tracking-wider">
+                <span className="font-mono text-[11px] font-bold text-[#10B981] uppercase tracking-wider">
                   STEP 02 // GEOLOCATION
                 </span>
-                <h2 className="text-2xl font-black font-display text-[#1B3B2B]">
+                <h2 className="text-2xl font-black font-display text-[#1E1B4B]">
                   Where is the Animal?
                 </h2>
               </div>
@@ -438,31 +656,31 @@ export default function IntakeWizard() {
                 type="button"
                 onClick={handleUseMyGPS}
                 disabled={isLocating}
-                className="bento-btn flex items-center gap-1.5 rounded-[14px] bg-[#2EC4B6] px-3.5 py-2 text-xs text-white"
+                className="pixar-btn flex items-center gap-1.5 rounded-[16px] bg-[#10B981] px-4 py-2 text-xs text-white shadow-pixar-sm font-bold"
               >
                 <Navigation className={`w-3.5 h-3.5 ${isLocating ? "animate-spin" : ""}`} />
                 <span>{isLocating ? "Locating..." : "Use My GPS"}</span>
               </button>
             </div>
 
-            <p className="text-xs text-[#1B3B2B]/75 leading-tight">
-              Click anywhere on the map or drag the paw pin to mark the exact rescue location.
+            <p className="text-xs text-[#1E1B4B]/75 leading-tight">
+              Click anywhere on the map or drag the glowing paw pin to mark the exact rescue location.
             </p>
 
             {/* Strict Client Leaflet Map Container with min-height */}
-            <div className="rounded-[20px] border-[2px] border-[#1B3B2B] overflow-hidden min-h-[380px] h-[380px] w-full relative z-0 shadow-bento-sm">
+            <div className="rounded-[24px] border-[3px] border-[#1E1B4B] overflow-hidden min-h-[380px] h-[380px] w-full relative z-0 shadow-pixar-sm bg-[#FFF9F0]">
               <div ref={mapContainerRef} className="h-full w-full min-h-[380px] relative z-0" />
             </div>
 
             {/* Address bar */}
-            <div className="rounded-[16px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-3 flex items-center gap-2.5">
-              <MapPin className="w-4 h-4 text-[#FF5A4E] flex-shrink-0" />
+            <div className="rounded-[18px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-3 flex items-center gap-2.5 shadow-pixar-sm">
+              <MapPin className="w-4 h-4 text-[#FF7A00] flex-shrink-0" />
               <input
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Incident address or landmark"
-                className="w-full bg-transparent font-sans text-xs text-[#1B3B2B] focus:outline-none"
+                className="w-full bg-transparent font-sans text-xs text-[#1E1B4B] focus:outline-none"
               />
             </div>
 
@@ -470,7 +688,7 @@ export default function IntakeWizard() {
               <button
                 type="button"
                 onClick={() => setStep(0)}
-                className="bento-btn flex items-center gap-1.5 rounded-[16px] bg-[#FFFBF5] px-4 py-2.5 text-xs text-[#1B3B2B]"
+                className="pixar-btn flex items-center gap-1.5 rounded-[18px] bg-[#FFF9F0] px-5 py-2.5 text-xs text-[#1E1B4B] shadow-pixar-sm font-bold"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -479,7 +697,7 @@ export default function IntakeWizard() {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="bento-btn flex items-center gap-2 rounded-[18px] bg-[#FF5A4E] px-6 py-3 text-sm text-white"
+                className="pixar-btn flex items-center gap-2 rounded-[20px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] px-6 py-3 text-sm text-white shadow-pixar font-bold"
               >
                 <span>Set Severity Next</span>
                 <ArrowRight className="w-4 h-4" />
@@ -495,24 +713,24 @@ export default function IntakeWizard() {
               <span className="font-mono text-[11px] font-bold text-[#FFB703] uppercase tracking-wider">
                 STEP 03 // TACTILE PAW-PAD TRIAGE
               </span>
-              <h2 className="text-2xl font-black font-display text-[#1B3B2B]">
+              <h2 className="text-2xl font-black font-display text-[#1E1B4B]">
                 How Urgent is the Case?
               </h2>
-              <p className="text-xs text-[#1B3B2B]/75 mt-0.5">
-                Press each squishy paw bean to set triage severity.
+              <p className="text-xs text-[#1E1B4B]/75 mt-0.5">
+                Press each squishy paw bean to set triage severity. Notice the mascot reacts to your triage level!
               </p>
             </div>
 
             {/* Anatomical Paw Pad Selector Container */}
-            <div className="rounded-[24px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-6 shadow-bento flex flex-col items-center justify-center relative">
+            <div className="rounded-[28px] border-[3px] border-[#1E1B4B] bg-[#FFF1DC] p-6 shadow-pixar flex flex-col items-center justify-center relative">
               
               {/* 4 Toe Pads Row */}
-              <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="flex items-center justify-center gap-3.5 sm:gap-5 mb-5">
                 {[
-                  { id: "STABLE", label: "Stable", bg: "#2EC4B6" },
-                  { id: "ABANDONED", label: "Abandoned", bg: "#FFB703" },
-                  { id: "DEHYDRATED", label: "Dehydrated", bg: "#48CAE4" },
-                  { id: "INJURED", label: "Injured", bg: "#F77F00" },
+                  { id: "STABLE", label: "Stable", bg: "#10B981", shadow: "#059669" },
+                  { id: "ABANDONED", label: "Abandoned", bg: "#FFB703", shadow: "#D97706" },
+                  { id: "DEHYDRATED", label: "Dehydrated", bg: "#38BDF8", shadow: "#0284C7" },
+                  { id: "INJURED", label: "Injured", bg: "#F97316", shadow: "#C2410C" },
                 ].map((bean) => {
                   const isSelected = severity === bean.id;
                   return (
@@ -523,16 +741,24 @@ export default function IntakeWizard() {
                         animateToeBeanPress(e.currentTarget);
                         setSeverity(bean.id as any);
                       }}
-                      className={`h-16 w-14 rounded-[22px] border-[2px] border-[#1B3B2B] flex flex-col items-center justify-center transition-all ${
+                      className={`relative h-20 w-16 sm:h-22 sm:w-18 rounded-[24px] border-[3px] border-[#1E1B4B] flex flex-col items-center justify-center transition-all overflow-hidden ${
                         isSelected
-                          ? "shadow-bento scale-110 -translate-y-1"
-                          : "opacity-80 hover:opacity-100 hover:scale-105"
+                          ? "scale-110 -translate-y-1 shadow-pixar"
+                          : "opacity-80 hover:opacity-100 hover:scale-105 shadow-pixar-sm"
                       }`}
                       style={{ backgroundColor: bean.bg }}
                     >
-                      <span className="font-display text-[10px] font-bold text-[#1B3B2B] leading-none">
+                      {/* Glossy Top Reflection Highlight */}
+                      <div className="absolute top-1 left-2 right-2 h-4 rounded-full bg-white/40 pointer-events-none" />
+
+                      <span className="font-display text-[11px] font-black text-[#1E1B4B] leading-none z-10">
                         {bean.label}
                       </span>
+                      {isSelected && (
+                        <span className="text-[10px] mt-1 z-10 font-mono font-bold text-[#1E1B4B]">
+                          ● ACTIVE
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -545,41 +771,31 @@ export default function IntakeWizard() {
                   animateToeBeanPress(e.currentTarget);
                   setSeverity("CRITICAL");
                 }}
-                className={`h-24 w-40 rounded-[30px] border-[2px] border-[#1B3B2B] flex flex-col items-center justify-center transition-all ${
+                className={`relative h-24 w-44 sm:w-52 rounded-[32px] border-[3px] border-[#1E1B4B] flex flex-col items-center justify-center transition-all overflow-hidden ${
                   severity === "CRITICAL"
-                    ? "bg-[#FF5A4E] text-white shadow-bento scale-105 -translate-y-1"
-                    : "bg-[#FF5A4E]/40 text-[#1B3B2B] hover:bg-[#FF5A4E]/60 hover:scale-102"
+                    ? "bg-[#EF4444] text-white shadow-pixar scale-105 -translate-y-1 animate-pulse"
+                    : "bg-[#EF4444]/35 text-[#1E1B4B] hover:bg-[#EF4444]/60 hover:scale-102 shadow-pixar-sm"
                 }`}
               >
-                <span className="text-xl mb-0.5">🚨</span>
-                <span className="font-display text-sm font-black uppercase tracking-wider">
+                {/* Glossy Top Reflection Highlight */}
+                <div className="absolute top-1.5 left-4 right-4 h-5 rounded-full bg-white/35 pointer-events-none" />
+
+                <span className="text-xl mb-0.5 z-10">🚨</span>
+                <span className="font-display text-sm font-black uppercase tracking-wider z-10">
                   CRITICAL TRAUMA
                 </span>
-                <span className="font-mono text-[9px] uppercase">
+                <span className="font-mono text-[9px] uppercase z-10 font-bold">
                   (Immediate Siren SLA)
                 </span>
               </button>
 
             </div>
 
-            {/* Cute Reactive Animal Mood Badge */}
-            <div className="rounded-[20px] border-[2px] border-[#1B3B2B] bg-[#F5EFE6] p-4 flex items-center gap-3">
-              <span className="text-3xl animate-bounce">{mood.emoji}</span>
-              <div>
-                <p className="font-display text-xs font-bold text-[#1B3B2B]">
-                  {mood.title}
-                </p>
-                <p className="text-[11px] text-[#1B3B2B]/75 leading-tight font-sans">
-                  {mood.desc}
-                </p>
-              </div>
-            </div>
-
             <div className="flex items-center justify-between pt-2">
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="bento-btn flex items-center gap-1.5 rounded-[16px] bg-[#FFFBF5] px-4 py-2.5 text-xs text-[#1B3B2B]"
+                className="pixar-btn flex items-center gap-1.5 rounded-[18px] bg-[#FFF9F0] px-5 py-2.5 text-xs text-[#1E1B4B] shadow-pixar-sm font-bold"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -588,7 +804,7 @@ export default function IntakeWizard() {
               <button
                 type="button"
                 onClick={() => setStep(3)}
-                className="bento-btn flex items-center gap-2 rounded-[18px] bg-[#FF5A4E] px-6 py-3 text-sm text-white"
+                className="pixar-btn flex items-center gap-2 rounded-[20px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] px-6 py-3 text-sm text-white shadow-pixar font-bold"
               >
                 <span>Final Details</span>
                 <ArrowRight className="w-4 h-4" />
@@ -601,58 +817,58 @@ export default function IntakeWizard() {
         {step === 3 && (
           <div className="space-y-6 animate-in fade-in duration-300">
             <div>
-              <span className="font-mono text-[11px] font-bold text-[#FF5A4E] uppercase tracking-wider">
+              <span className="font-mono text-[11px] font-bold text-[#FF7A00] uppercase tracking-wider">
                 STEP 04 // DISPATCH CONFIRMATION
               </span>
-              <h2 className="text-2xl font-black font-display text-[#1B3B2B]">
+              <h2 className="text-2xl font-black font-display text-[#1E1B4B]">
                 Who Should We Update?
               </h2>
-              <p className="text-xs text-[#1B3B2B]/75 mt-0.5">
-                We will send live status alerts as rescuers arrive on scene.
+              <p className="text-xs text-[#1E1B4B]/75 mt-0.5">
+                We will send live status alerts and GPS tracking links as rescuers arrive on scene.
               </p>
             </div>
 
             <div className="space-y-3">
-              <div className="rounded-[16px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-3 flex items-center gap-2.5">
-                <User className="w-4 h-4 text-[#1B3B2B]/60" />
+              <div className="rounded-[18px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-3.5 flex items-center gap-2.5 shadow-pixar-sm">
+                <User className="w-4 h-4 text-[#1E1B4B]/60" />
                 <input
                   type="text"
                   value={reporterName}
                   onChange={(e) => setReporterName(e.target.value)}
                   placeholder="Your Full Name (Optional)"
-                  className="w-full bg-transparent text-xs font-sans text-[#1B3B2B] focus:outline-none"
+                  className="w-full bg-transparent text-xs font-sans text-[#1E1B4B] focus:outline-none"
                 />
               </div>
 
-              <div className="rounded-[16px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-3 flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-[#1B3B2B]/60" />
+              <div className="rounded-[18px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-3.5 flex items-center gap-2.5 shadow-pixar-sm">
+                <Phone className="w-4 h-4 text-[#1E1B4B]/60" />
                 <input
                   type="tel"
                   value={reporterPhone}
                   onChange={(e) => setReporterPhone(e.target.value)}
                   placeholder="Mobile Phone (for rescue ambulance driver)"
-                  className="w-full bg-transparent text-xs font-sans text-[#1B3B2B] focus:outline-none"
+                  className="w-full bg-transparent text-xs font-sans text-[#1E1B4B] focus:outline-none"
                 />
               </div>
 
-              <div className="rounded-[16px] border-[2px] border-[#1B3B2B] bg-[#FFFBF5] p-3 flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#1B3B2B]/60" />
+              <div className="rounded-[18px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-3.5 flex items-center gap-2.5 shadow-pixar-sm">
+                <Mail className="w-4 h-4 text-[#1E1B4B]/60" />
                 <input
                   type="email"
                   value={reporterEmail}
                   onChange={(e) => setReporterEmail(e.target.value)}
                   placeholder="Email Address (for live tracker link)"
-                  className="w-full bg-transparent text-xs font-sans text-[#1B3B2B] focus:outline-none"
+                  className="w-full bg-transparent text-xs font-sans text-[#1E1B4B] focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Summary Box */}
-            <div className="rounded-[18px] border-[2px] border-[#1B3B2B] bg-[#F5EFE6] p-4 font-mono text-xs space-y-1">
-              <p className="font-bold text-[#1B3B2B]">
+            <div className="rounded-[20px] border-[3px] border-[#1E1B4B] bg-[#FFF1DC] p-4 font-mono text-xs space-y-1.5 shadow-pixar-sm">
+              <p className="font-bold text-[#1E1B4B]">
                 SUMMARY: {species} // [{severity}]
               </p>
-              <p className="text-[11px] text-[#1B3B2B]/70 truncate">
+              <p className="text-[11px] text-[#1E1B4B]/75 truncate">
                 LOCATION: {address}
               </p>
             </div>
@@ -661,7 +877,7 @@ export default function IntakeWizard() {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="bento-btn flex items-center gap-1.5 rounded-[16px] bg-[#FFFBF5] px-4 py-2.5 text-xs text-[#1B3B2B]"
+                className="pixar-btn flex items-center gap-1.5 rounded-[18px] bg-[#FFF9F0] px-5 py-2.5 text-xs text-[#1E1B4B] shadow-pixar-sm font-bold"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -671,7 +887,7 @@ export default function IntakeWizard() {
                 type="button"
                 onClick={handleSubmitReport}
                 disabled={submitting}
-                className="bento-btn flex items-center gap-2 rounded-[18px] bg-[#FF5A4E] px-8 py-3.5 text-sm text-white disabled:opacity-50"
+                className="pixar-btn flex items-center gap-2 rounded-[20px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] px-8 py-3.5 text-sm text-white shadow-pixar font-bold disabled:opacity-50"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>{submitting ? "Broadcasting Alert..." : "Dispatch Rescue Team"}</span>
