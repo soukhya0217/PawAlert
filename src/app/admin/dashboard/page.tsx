@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
+import AdminMap from "@/components/admin-map";
 import {
   Shield,
   Users,
@@ -13,6 +14,7 @@ import {
   Clock,
   Sparkles,
   FileText,
+  Compass
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -57,111 +59,108 @@ export default function SuperAdminDashboardPage() {
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         <DashboardSidebar
           role="SUPER_ADMIN"
-          userName={currentUser?.fullName || "Super Administrator"}
+          userName={currentUser?.fullName || "Lead Commander"}
         />
 
         <div className="flex-1 space-y-8 w-full">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-red-100 via-peach-50 to-white p-8 rounded-3xl border border-red-200/80 shadow-soft flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          {/* Header Banner */}
+          <div className="bento-card p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <span className="text-[11px] font-black uppercase tracking-wider text-red-800 bg-red-200/70 px-3 py-1 rounded-full">
+              <span className="inline-block rounded-[12px] border-[2px] border-[#1B3B2B] bg-[#FF5A4E] px-3 py-1 font-display text-[11px] font-bold text-white shadow-bento-sm">
                 🛡️ Platform Root Authority
               </span>
-              <h1 className="text-2xl sm:text-3xl font-black text-foreground mt-2">
-                POWER ALERT System Overview
+              <h1 className="text-2xl sm:text-3xl font-black font-display text-[#1B3B2B] mt-2">
+                PawAlert Field Command Center
               </h1>
-              <p className="text-xs sm:text-sm text-foreground/75 mt-1">
+              <p className="text-xs sm:text-sm text-[#1B3B2B]/75 mt-1 font-sans">
                 Full-network oversight, SLA escalation watchdog, transactional email deliverability, and audit trails.
               </p>
             </div>
 
             <a
               href="/admin/audit-logs"
-              className="px-5 py-3 rounded-2xl bg-foreground text-white font-black text-xs shadow hover:bg-black transition-all flex items-center gap-2"
+              className="bento-btn inline-flex items-center gap-2 rounded-[14px] bg-[#1B3B2B] px-4 py-2.5 text-xs text-white"
             >
               <FileText className="w-4 h-4" />
-              <span>Inspect Email Delivery Logs</span>
+              <span>Inspect Audit Logs</span>
             </a>
           </div>
 
           {/* Platform KPIs */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white p-5 rounded-3xl border border-cream-200 shadow-soft">
-              <span className="text-xl">📢</span>
-              <p className="text-2xl font-black text-foreground mt-1">{incidents.length}</p>
-              <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">
+            <div className="bento-card-white p-5">
+              <span className="text-2xl">📢</span>
+              <p className="text-3xl font-black font-display text-[#FF5A4E] mt-1">{incidents.length}</p>
+              <h4 className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1B3B2B]/70 mt-0.5">
                 Total Emergencies
               </h4>
             </div>
 
-            <div className="bg-white p-5 rounded-3xl border border-cream-200 shadow-soft">
-              <span className="text-xl">🦸‍♂️</span>
-              <p className="text-2xl font-black text-primary-600 mt-1">{volunteers.length}</p>
-              <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">
+            <div className="bento-card-white p-5">
+              <span className="text-2xl">🦸‍♂️</span>
+              <p className="text-3xl font-black font-display text-[#2EC4B6] mt-1">{volunteers.length}</p>
+              <h4 className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1B3B2B]/70 mt-0.5">
                 Volunteer Guardians
               </h4>
             </div>
 
-            <div className="bg-white p-5 rounded-3xl border border-cream-200 shadow-soft">
-              <span className="text-xl">📧</span>
-              <p className="text-2xl font-black text-mint-600 mt-1">{emailLogs.length}</p>
-              <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">
-                Transactional Emails Sent
+            <div className="bento-card-white p-5">
+              <span className="text-2xl">📧</span>
+              <p className="text-3xl font-black font-display text-[#FFB703] mt-1">{emailLogs.length}</p>
+              <h4 className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1B3B2B]/70 mt-0.5">
+                Transactional Emails
               </h4>
             </div>
 
-            <div className="bg-white p-5 rounded-3xl border border-cream-200 shadow-soft">
-              <span className="text-xl">⚡</span>
-              <p className="text-2xl font-black text-lavender-600 mt-1">99.9%</p>
-              <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">
-                System SLA Uptime
+            <div className="bento-card-white p-5">
+              <span className="text-2xl">⚡</span>
+              <p className="text-3xl font-black font-display text-[#1B3B2B] mt-1">100%</p>
+              <h4 className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#1B3B2B]/70 mt-0.5">
+                Audit Integrity
               </h4>
             </div>
           </div>
 
+          {/* Live Admin Command Map */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-display text-sm font-bold text-[#1B3B2B]">
+                <Compass className="w-4 h-4 text-[#2EC4B6]" />
+                <span>Geographical Field Command Radar</span>
+              </div>
+              <span className="font-mono text-[10px] text-[#1B3B2B]/60">
+                ACTIVE INCIDENTS: {incidents.length}
+              </span>
+            </div>
+            <AdminMap incidents={incidents} initialZoom={13} className="min-h-[440px]" />
+          </div>
+
           {/* Email Delivery Monitor */}
-          <div className="bg-white rounded-3xl p-6 border border-cream-200 shadow-soft space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-cream-100">
-              <h3 className="text-base font-black text-foreground flex items-center gap-2">
-                <Mail className="w-4 h-4 text-primary-500" />
-                Live Transactional Email Deliveries (Resend Provider)
+          <div className="bento-card-white p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b-[2px] border-[#1B3B2B]/10">
+              <h3 className="text-sm font-bold font-display text-[#1B3B2B] flex items-center gap-2">
+                <Mail className="w-4 h-4 text-[#FF5A4E]" />
+                <span>Live Transactional Email Deliveries (Resend Provider)</span>
               </h3>
-              <span className="text-xs font-bold text-mint-700 bg-mint-50 px-3 py-1 rounded-full border border-mint-200">
+              <span className="rounded-[8px] bg-[#2EC4B6]/20 px-2.5 py-0.5 font-mono text-[10px] font-bold text-[#1B3B2B]">
                 Resend API Integrated
               </span>
             </div>
 
-            {loading ? (
-              <div className="py-12 text-center text-xs text-muted-foreground">Checking delivery logs...</div>
-            ) : emailLogs.length === 0 ? (
-              <div className="py-12 text-center text-xs text-muted-foreground">
-                No email delivery records logged yet.
+            {emailLogs.length === 0 ? (
+              <div className="py-8 text-center text-xs text-[#1B3B2B]/60 font-sans">
+                No outbound transactional emails triggered yet. Email events will be logged here in real time.
               </div>
             ) : (
-              <div className="divide-y divide-cream-100">
-                {emailLogs.slice(0, 6).map((log) => (
-                  <div key={log._id} className="py-3 flex items-center justify-between text-xs">
+              <div className="divide-y-[1px] divide-[#1B3B2B]/10">
+                {emailLogs.slice(0, 5).map((log: any) => (
+                  <div key={log._id} className="py-3 flex items-center justify-between text-xs font-mono">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-foreground">{log.recipientEmail}</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-cream-100 text-foreground">
-                          {log.templateName}
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                            log.status === "SENT" || log.status === "MOCKED"
-                              ? "bg-mint-100 text-mint-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {log.status}
-                        </span>
-                      </div>
-                      <p className="text-muted-foreground mt-0.5 text-[11px]">{log.subject}</p>
+                      <p className="font-bold text-[#1B3B2B]">{log.subject}</p>
+                      <p className="text-[10px] text-[#1B3B2B]/60 font-sans">To: {log.recipientEmail}</p>
                     </div>
-
-                    <span className="text-muted-foreground font-semibold text-[11px] flex-shrink-0">
-                      {formatDate(log.sentAt || log.createdAt)}
+                    <span className="rounded-[8px] bg-[#2EC4B6] text-white px-2 py-0.5 text-[10px] font-bold">
+                      {log.status}
                     </span>
                   </div>
                 ))}

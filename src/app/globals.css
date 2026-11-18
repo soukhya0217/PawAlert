@@ -1,134 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 228 35% 4%; /* #05070d - Deep Cyber Void */
-    --foreground: 210 40% 98%;
+    --background: 36 100% 98%; /* #FFFBF5 - Warm Cream Canvas */
+    --foreground: 152 37% 17%; /* #1B3B2B - Deep Forest Pine ink */
 
-    --card: 225 28% 7%; /* #0a0e17 */
-    --card-foreground: 210 40% 98%;
+    --card: 36 43% 93%; /* #F5EFE6 - Soft Sand */
+    --card-foreground: 152 37% 17%;
 
-    --popover: 225 28% 7%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 152 37% 17%;
 
-    --primary: 76 100% 61%; /* #d4ff3a - Electric Volt Lime */
-    --primary-foreground: 228 35% 4%;
+    --primary: 4 100% 65%; /* #FF5A4E - Warm Terracotta / Emergency Coral */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 22% 14%;
-    --secondary-foreground: 210 40% 95%;
+    --secondary: 42 100% 51%; /* #FFB703 - Honey Amber */
+    --secondary-foreground: 152 37% 17%;
 
-    --muted: 220 20% 12%;
-    --muted-foreground: 215 16% 65%;
+    --muted: 36 25% 91%;
+    --muted-foreground: 152 20% 35%;
 
-    --accent: 76 100% 61%;
-    --accent-foreground: 228 35% 4%;
+    --accent: 174 62% 47%; /* #2EC4B6 - Mint Leaf */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 356 100% 59%; /* #ff3b30 - High Voltage Emergency Crimson */
+    --destructive: 4 100% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 14%;
-    --input: 220 20% 14%;
-    --ring: 76 100% 61%;
+    --border: 152 37% 17%;
+    --input: 152 37% 17%;
+    --ring: 4 100% 65%;
 
-    --radius: 0.75rem;
+    --radius: 1.5rem;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: #1B3B2B;
   }
   body {
-    background-color: #05070d;
-    color: #f8fafc;
+    background-color: #FFFBF5;
+    color: #1B3B2B;
+    font-family: 'DM Sans', system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Fredoka', 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
   }
 }
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #05070d;
+  background: #FFFBF5;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1b2438;
+  background: #1B3B2B;
   border-radius: 9999px;
+  border: 2px solid #FFFBF5;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4ff3a;
+  background: #FF5A4E;
 }
 
-/* Overrank Background Grid & Scanlines */
-.grid-lines {
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
+/* Tactile Bento Card Utility */
+.bento-card {
+  background: #F5EFE6;
+  border: 2px solid #1B3B2B;
+  border-radius: 24px;
+  box-shadow: 4px 4px 0px #1B3B2B;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.floor-run {
-  background-image: 
-    linear-gradient(to right, rgba(212, 255, 58, 0.15) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(212, 255, 58, 0.15) 1px, transparent 1px);
-  background-size: 56px 56px;
+.bento-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px #1B3B2B;
 }
 
-/* Glowing Neon Elements */
-.glow-lime {
-  box-shadow: 0 0 24px -4px rgba(212, 255, 58, 0.35);
+.bento-card-white {
+  background: #FFFFFF;
+  border: 2px solid #1B3B2B;
+  border-radius: 24px;
+  box-shadow: 4px 4px 0px #1B3B2B;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.glow-crimson {
-  box-shadow: 0 0 24px -4px rgba(255, 59, 48, 0.45);
+.bento-card-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px #1B3B2B;
 }
 
-.hud-panel {
-  background: rgba(10, 14, 23, 0.75);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Tactile Button with Physical Depress */
+.bento-btn {
+  border: 2px solid #1B3B2B;
+  border-radius: 16px;
+  box-shadow: 3px 3px 0px #1B3B2B;
+  font-family: 'Fredoka', 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.hud-panel:hover {
-  border-color: rgba(212, 255, 58, 0.3);
+.bento-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px #1B3B2B;
 }
 
-/* Leaflet Dark Satellite / Tactical Cartography Filter */
-/* No API key needed! Applies high-tech tactical styling over standard OpenStreetMap tiles */
-.leaflet-tactical-container .leaflet-tile {
-  filter: brightness(0.6) invert(1) contrast(2.6) hue-rotate(200deg) saturate(0.2) !important;
+.bento-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #1B3B2B;
 }
 
-.leaflet-tactical-container {
-  background: #060911 !important;
+/* Leaflet Container Strict Height & Layer Protection */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 380px !important;
+  border-radius: 20px;
+  z-index: 10 !important;
+  font-family: 'DM Sans', sans-serif !important;
 }
 
-/* Radar rotation */
-@keyframes radarSpin {
+/* Prevent Leaflet Panes from Overlapping Modals / Sticky Header */
+.leaflet-pane {
+  z-index: 10 !important;
+}
+.leaflet-top, .leaflet-bottom {
+  z-index: 20 !important;
+}
+
+/* Warm Friendly Map Marker Styling */
+.paw-marker-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.paw-marker-pin {
+  width: 40px;
+  height: 40px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid #1B3B2B;
+  box-shadow: 2px 2px 0px #1B3B2B;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.paw-marker-pin:hover {
+  transform: rotate(-45deg) scale(1.15);
+}
+
+.paw-marker-icon {
+  transform: rotate(45deg);
+  font-size: 16px;
+}
+
+/* Gentle Floating Animation */
+@keyframes pawFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(3deg);
+  }
+}
+
+.animate-paw-float {
+  animation: pawFloat 4s ease-in-out infinite;
+}
+
+/* Confetti Stamp Animation */
+@keyframes stampDrop {
   0% {
-    transform: rotate(0deg);
+    transform: scale(2) rotate(-15deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(0.95) rotate(-3deg);
+    opacity: 1;
   }
   100% {
-    transform: rotate(360deg);
+    transform: scale(1) rotate(-4deg);
+    opacity: 1;
   }
 }
 
-.animate-radar-spin {
-  animation: radarSpin 4s linear infinite;
-}
-
-/* Scanline Overlay */
-.scanlines {
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0px,
-    transparent 2px,
-    rgba(255, 255, 255, 0.02) 2px,
-    rgba(255, 255, 255, 0.02) 4px
-  );
+.stamp-rescued {
+  animation: stampDrop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }

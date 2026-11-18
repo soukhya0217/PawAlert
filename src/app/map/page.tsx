@@ -1,73 +1,76 @@
 "use client";
 
 import React from "react";
-import RescueMap from "@/components/map/RescueMap";
-import { AlertTriangle, Crosshair, Radio, ShieldCheck } from "lucide-react";
+import AdminMap from "@/components/admin-map";
+import { useRecentIncidents } from "@/lib/use-recent-incidents";
+import { AlertTriangle, Compass, Heart, Shield } from "lucide-react";
 
 export default function ExploreMapPage() {
+  const { incidents, loading } = useRecentIncidents();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-[2px] border-[#1B3B2B] pb-5">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-xs uppercase tracking-wider text-[#d4ff3a] mb-2">
-            <Radio className="w-3.5 h-3.5 animate-pulse" />
-            <span>Tactical Radar Intelligence</span>
+          <div className="inline-flex items-center gap-1.5 rounded-[12px] border-[2px] border-[#1B3B2B] bg-[#FFB703] px-3 py-1 font-display text-xs font-bold text-[#1B3B2B] shadow-bento-sm mb-2">
+            <Compass className="w-3.5 h-3.5 text-[#1B3B2B]" />
+            <span>Field Command Grid</span>
           </div>
-          <h1 className="text-3xl font-black font-sans text-white tracking-tight">
-            Geospatial Emergency Rescue Grid
+          <h1 className="text-3xl font-black font-display text-[#1B3B2B] tracking-tight">
+            Geospatial Animal Rescue Map
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 font-sans">
-            Real-time geospatial visualization indexing animal distress alerts, feeding points, and volunteer dispatch sectors. Zero simulated records.
+          <p className="text-xs sm:text-sm text-[#1B3B2B]/75 mt-1 font-sans">
+            Real-time map visualizing authentic animal distress cases and volunteer dispatch perimeters. Zero mock records.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <a
             href="/report"
-            className="rounded-md bg-[#ff3b30] px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-white shadow-[0_0_18px_rgba(255,59,48,0.45)] border border-red-400/40 hover:bg-[#ff4d4d] transition-all flex items-center gap-2"
+            className="bento-btn inline-flex items-center gap-2 rounded-[16px] bg-[#FF5A4E] px-4 py-2.5 text-xs text-white"
           >
             <AlertTriangle className="w-4 h-4" />
-            <span>Report Animal in Distress</span>
+            <span>Drop Emergency Pin</span>
           </a>
         </div>
       </div>
 
-      {/* Main Tactical Map */}
-      <RescueMap initialZoom={13} />
+      {/* Main Admin Map Component */}
+      <AdminMap incidents={incidents} initialZoom={13} className="min-h-[500px]" />
 
-      {/* Map Protocol Specs & Legend */}
-      <div className="p-4 rounded-xl border border-white/10 bg-[#0a0e17] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
+      {/* Map Protocol & Legend */}
+      <div className="p-5 rounded-[22px] border-[2px] border-[#1B3B2B] bg-[#F5EFE6] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-display shadow-bento-sm">
         <div className="flex items-center gap-2.5">
-          <span className="w-3.5 h-3.5 rounded-full bg-[#ff3b30] flex-shrink-0 animate-ping"></span>
+          <span className="w-4 h-4 rounded-full bg-[#FF5A4E] border-[1.5px] border-[#1B3B2B] flex-shrink-0 animate-ping"></span>
           <div>
-            <p className="font-bold text-white uppercase">Critical Trauma</p>
-            <p className="text-[10px] text-slate-400">Road accident, severe injury</p>
+            <p className="font-bold text-[#1B3B2B]">🚨 Critical Trauma</p>
+            <p className="text-[11px] text-[#1B3B2B]/70 font-sans">Accident, severe laceration</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5">
-          <span className="w-3.5 h-3.5 rounded-full bg-[#d4ff3a] flex-shrink-0"></span>
+          <span className="w-4 h-4 rounded-full bg-[#FFB703] border-[1.5px] border-[#1B3B2B] flex-shrink-0"></span>
           <div>
-            <p className="font-bold text-white uppercase">Verified Alert</p>
-            <p className="text-[10px] text-slate-400">Distress report awaiting assignment</p>
+            <p className="font-bold text-[#1B3B2B]">🐾 Verified Alert</p>
+            <p className="text-[11px] text-[#1B3B2B]/70 font-sans">Distress report awaiting assignment</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5">
-          <span className="w-3.5 h-3.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
+          <span className="w-4 h-4 rounded-full bg-[#2EC4B6] border-[1.5px] border-[#1B3B2B] flex-shrink-0"></span>
           <div>
-            <p className="font-bold text-white uppercase">Feeding Point</p>
-            <p className="text-[10px] text-slate-400">Community water and nutrition</p>
+            <p className="font-bold text-[#1B3B2B]">🥣 Feeding Basin</p>
+            <p className="text-[11px] text-[#1B3B2B]/70 font-sans">Community food & fresh water point</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5">
-          <span className="w-3.5 h-3.5 rounded-full bg-cyan-400 flex-shrink-0"></span>
+          <span className="w-4 h-4 rounded-full bg-[#48CAE4] border-[1.5px] border-[#1B3B2B] flex-shrink-0"></span>
           <div>
-            <p className="font-bold text-white uppercase">Resolved Mission</p>
-            <p className="text-[10px] text-slate-400">Successfully rehabilitated / adopted</p>
+            <p className="font-bold text-[#1B3B2B]">✅ Healed & Rescued</p>
+            <p className="text-[11px] text-[#1B3B2B]/70 font-sans">Rehabilitated / sheltered / adopted</p>
           </div>
         </div>
       </div>

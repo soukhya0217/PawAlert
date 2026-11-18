@@ -12,17 +12,12 @@ const config: Config = {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        cyber: {
-          bg: "#05070d",
-          panel: "#0a0e17",
-          card: "#0f1422",
-          border: "rgba(255, 255, 255, 0.08)",
-          line: "rgba(212, 255, 58, 0.2)",
-          lime: "#d4ff3a",
-          neon: "#d4ff3a",
-          emergency: "#ff3b30",
-          cyan: "#00f0ff",
-        },
+        canvas: "#FFFBF5",
+        sand: "#F5EFE6",
+        pine: "#1B3B2B",
+        coral: "#FF5A4E",
+        amber: "#FFB703",
+        leaf: "#2EC4B6",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -121,9 +116,13 @@ const config: Config = {
         "4xl": "2.25rem",
       },
       boxShadow: {
-        soft: "0 10px 30px -10px rgba(224, 90, 54, 0.08), 0 4px 12px -4px rgba(0, 0, 0, 0.04)",
-        card: "0 14px 34px -10px rgba(100, 110, 140, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03)",
-        magical: "0 20px 40px -15px rgba(134, 86, 223, 0.15), 0 8px 16px -6px rgba(246, 101, 62, 0.12)",
+        bento: "4px 4px 0px #1B3B2B",
+        "bento-sm": "2px 2px 0px #1B3B2B",
+        "bento-lg": "6px 6px 0px #1B3B2B",
+        "bento-press": "1px 1px 0px #1B3B2B",
+        soft: "0 10px 30px -10px rgba(27, 59, 43, 0.08)",
+        card: "4px 4px 0px #1B3B2B",
+        magical: "0 20px 40px -15px rgba(255, 90, 78, 0.2)",
       },
       keyframes: {
         float: {

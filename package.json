@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "seed": "ts-node --project tsconfig.scripts.json scripts/seed.ts"
   },
   "dependencies": {
+    "@types/three": "^0.187.0",
     "animejs": "^3.2.2",
     "bcryptjs": "^2.4.3",
     "canvas-confetti": "^1.9.3",
@@ -26,6 +28,7 @@
     "resend": "^4.0.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.187.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

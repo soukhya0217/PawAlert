@@ -96,15 +96,15 @@ export default function DashboardSidebar({ role, userName }: SidebarProps) {
   const navItems = getNavItems();
 
   return (
-    <aside className="w-full lg:w-64 bg-white rounded-3xl p-5 border border-cream-200 shadow-soft h-fit sticky top-24">
+    <aside className="w-full lg:w-64 bento-card-white p-5 space-y-6 flex-shrink-0 h-fit sticky top-24">
       {/* Profile Card Snippet */}
-      <div className="pb-5 mb-5 border-b border-cream-100 flex items-center gap-3">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-peach-200 to-primary-100 flex items-center justify-center text-primary-700 font-black text-lg border border-peach-200 shadow-sm">
+      <div className="pb-4 border-b-[2px] border-[#1B3B2B]/10 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-[14px] border-[2px] border-[#1B3B2B] bg-[#FFB703] flex items-center justify-center font-display font-bold text-sm text-[#1B3B2B] shadow-bento-sm">
           {userName.charAt(0) || "U"}
         </div>
         <div>
-          <h4 className="text-sm font-black text-foreground truncate max-w-[140px]">{userName}</h4>
-          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-peach-100 text-primary-700 mt-0.5">
+          <h4 className="text-xs font-bold font-display text-[#1B3B2B] truncate max-w-[140px]">{userName}</h4>
+          <span className="inline-block px-2 py-0.5 rounded-[8px] bg-[#2EC4B6]/20 text-[#1B3B2B] font-mono font-bold text-[9px] mt-0.5">
             {role.replace("_", " ")}
           </span>
         </div>
@@ -118,10 +118,10 @@ export default function DashboardSidebar({ role, userName }: SidebarProps) {
             <a
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-[14px] font-display text-xs font-bold transition-all ${
                 isActive
-                  ? "bg-primary-500 text-white shadow-md shadow-primary-500/25"
-                  : "text-foreground/80 hover:bg-peach-50 hover:text-primary-700"
+                  ? "bg-[#1B3B2B] text-white border-[2px] border-[#1B3B2B] shadow-bento-sm"
+                  : "text-[#1B3B2B] hover:bg-[#F5EFE6]"
               }`}
             >
               {item.icon}
@@ -132,10 +132,10 @@ export default function DashboardSidebar({ role, userName }: SidebarProps) {
       </nav>
 
       {/* Sign Out Button */}
-      <div className="mt-8 pt-4 border-t border-cream-100">
+      <div className="pt-4 border-t-[2px] border-[#1B3B2B]/10">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-2xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors"
+          className="bento-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-[14px] bg-[#FFFBF5] text-[#FF5A4E] text-xs font-bold font-display"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign Out</span>
