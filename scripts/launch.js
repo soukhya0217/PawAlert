@@ -4,31 +4,53 @@ const net = require('net');
 const path = require('path');
 const { spawn, exec } = require('child_process');
 
-// Determine candidate ports (try 3000 first; fallback to 3001-3005)
+// Determine candidate ports (try 3000 first; automatically failover if occupied)
 const CANDIDATE_PORTS = [3000, 3001, 3002, 3003, 3004, 3005, 8080];
 
-function checkPortAvailable(port) {
+function checkSocketBinding(port, host) {
   return new Promise((resolve) => {
     const server = net.createServer();
-    server.once('error', (err) => {
-      resolve(false);
-    });
+    server.once('error', () => resolve(false));
     server.once('listening', () => {
       server.close(() => resolve(true));
     });
-    // Specifically test IPv4 127.0.0.1
-    server.listen(port, '127.0.0.1');
+    try {
+      server.listen(port, host);
+    } catch {
+      resolve(false);
+    }
   });
 }
 
-async function findAvailablePort() {
-  for (const port of CANDIDATE_PORTS) {
-    const isAvail = await checkPortAvailable(port);
-    if (isAvail) {
-      return port;
-    }
-  }
-  return 3001; // Default fallback
+function probeHttpPort(port) {
+  return new Promise((resolve) => {
+    const req = http.get(`http://127.0.0.1:${port}`, () => {
+      // Something responded! Port is occupied.
+      resolve(false);
+    });
+    req.once('error', () => {
+      // Nothing responded, port is free to bind
+      resolve(true);
+    });
+    req.setTimeout(250, () => {
+      req.destroy();
+      resolve(true);
+    });
+  });
+}
+
+async function isPortFree(port) {
+  // Test both IPv4 localhost and IPv6 all-interfaces
+  const free127 = await checkSocketBinding(port, '127.0.0.1');
+  if (!free127) return false;
+
+  const free0 = await checkSocketBinding(port, '0.0.0.0');
+  if (!free0) return false;
+
+  const freeHttp = await probeHttpPort(port);
+  if (!freeHttp) return false;
+
+  return true;
 }
 
 function openBrowser(url) {
@@ -44,56 +66,49 @@ function openBrowser(url) {
   exec(command, (err) => {
     if (err) {
       console.warn(`[WARN] Could not auto-launch browser: ${err.message}`);
-      console.log(`[INFO] Please open this URL manually in your browser: ${url}`);
+      console.log(`[INFO] Please open this URL in your browser: ${url}`);
     }
   });
 }
 
-function waitForServer(port, maxWaitMs = 45000) {
-  const startTime = Date.now();
-  return new Promise((resolve, reject) => {
-    const interval = setInterval(() => {
-      if (Date.now() - startTime > maxWaitMs) {
-        clearInterval(interval);
-        reject(new Error(`Server startup timed out after ${maxWaitMs / 1000} seconds.`));
-        return;
-      }
+let activeChild = null;
 
-      const req = http.get(`http://127.0.0.1:${port}`, (res) => {
-        clearInterval(interval);
-        resolve(true);
-      });
-
-      req.on('error', () => {
-        // Still starting, wait for next tick
-      });
-      req.setTimeout(800, () => {
-        req.destroy();
-      });
-    }, 300);
-  });
+function killChild(child) {
+  if (!child || child.killed) return;
+  try {
+    if (process.platform === 'win32') {
+      exec(`taskkill /pid ${child.pid} /T /F`, () => {});
+    } else {
+      child.kill('SIGINT');
+    }
+  } catch {
+    // ignore
+  }
 }
 
-async function main() {
-  console.log('==============================================================');
-  console.log('  POWER ALERT: Animal Rescue Platform');
-  console.log('  "Every Life Matters. Every Alert Counts."');
-  console.log('==============================================================\n');
-
-  console.log('[1/3] Detecting available network port...');
-  const port = await findAvailablePort();
-  const url = `http://localhost:${port}`;
-  console.log(`[INFO] Selected Port: ${port}`);
-  if (port !== 3000) {
-    console.log(`[NOTE] Port 3000 was busy or reserved by Windows. Using port ${port}.`);
+async function launchOnPortIndex(portIndex) {
+  if (portIndex >= CANDIDATE_PORTS.length) {
+    console.error('\n[FATAL ERROR] All candidate ports (3000-3005, 8080) are occupied or restricted.');
+    process.exit(1);
   }
+
+  const port = CANDIDATE_PORTS[portIndex];
+  const url = `http://localhost:${port}`;
+
+  // Pre-check port availability
+  const available = await isPortFree(port);
+  if (!available) {
+    console.log(`[INFO] Port ${port} is currently busy or reserved. Checking port ${CANDIDATE_PORTS[portIndex + 1]}...`);
+    return launchOnPortIndex(portIndex + 1);
+  }
+
+  console.log(`[2/3] Starting Next.js server at ${url} (port ${port}) ...`);
 
   const nextBin = require.resolve('next/dist/bin/next');
   const projectRoot = path.resolve(__dirname, '..');
 
-  console.log(`\n[2/3] Starting Next.js server at ${url} ...`);
-
-  const child = spawn(process.execPath, [nextBin, 'dev', '-p', String(port)], {
+  // Explicitly specify -H 127.0.0.1 to avoid Windows IPv6 :::3000 collision bugs
+  const child = spawn(process.execPath, [nextBin, 'dev', '-H', '127.0.0.1', '-p', String(port)], {
     cwd: projectRoot,
     env: {
       ...process.env,
@@ -102,11 +117,14 @@ async function main() {
     stdio: ['inherit', 'pipe', 'pipe'],
   });
 
-  let browserOpened = false;
+  activeChild = child;
+  let hasTriggeredBrowser = false;
+  let hasEncounteredEaddrinuse = false;
+  let isServerReady = false;
 
   const triggerBrowser = () => {
-    if (browserOpened) return;
-    browserOpened = true;
+    if (hasTriggeredBrowser || hasEncounteredEaddrinuse) return;
+    hasTriggeredBrowser = true;
 
     console.log('\n==============================================================');
     console.log('>>> SUCCESS: POWER ALERT is now LIVE and READY!');
@@ -124,61 +142,85 @@ async function main() {
     const text = chunk.toString();
     process.stdout.write(text);
 
-    // Only trigger once Next.js signals it is ready or compiled
+    // Only trigger once Next.js signals ready
     if (text.includes('Ready in') || text.includes('ready in') || text.includes('Compiled')) {
+      isServerReady = true;
       setTimeout(triggerBrowser, 300);
     }
   });
 
   child.stderr.on('data', (chunk) => {
-    process.stderr.write(chunk.toString());
+    const text = chunk.toString();
+    process.stderr.write(text);
+
+    if (text.includes('EADDRINUSE') || text.includes('address already in use')) {
+      hasEncounteredEaddrinuse = true;
+    }
   });
 
-  // Background HTTP health check polling ensures browser opens even if stdout parsing misses
-  waitForServer(port)
-    .then(() => {
-      triggerBrowser();
-    })
-    .catch((err) => {
-      if (!browserOpened) {
-        console.warn(`[WARN] Polling notice: ${err.message}`);
+  // Background health check polling as a secondary trigger only after 1.5s
+  const pollInterval = setInterval(() => {
+    if (hasTriggeredBrowser || hasEncounteredEaddrinuse) {
+      clearInterval(pollInterval);
+      return;
+    }
+
+    const req = http.get(`http://127.0.0.1:${port}`, (res) => {
+      // Only trigger if server responded and is ready
+      if (res.statusCode && res.statusCode < 500) {
+        clearInterval(pollInterval);
+        isServerReady = true;
+        triggerBrowser();
       }
     });
 
-  const cleanup = () => {
-    if (child && !child.killed) {
-      try {
-        if (process.platform === 'win32') {
-          exec(`taskkill /pid ${child.pid} /T /F`, () => {});
-        } else {
-          child.kill('SIGINT');
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-  };
-
-  process.on('SIGINT', () => {
-    console.log('\n[INFO] Shutting down POWER ALERT...');
-    cleanup();
-    process.exit(0);
-  });
-
-  process.on('SIGTERM', () => {
-    cleanup();
-    process.exit(0);
-  });
+    req.once('error', () => {
+      // Still spinning up
+    });
+    req.setTimeout(500, () => {
+      req.destroy();
+    });
+  }, 1000);
 
   child.on('exit', (code) => {
+    clearInterval(pollInterval);
+    activeChild = null;
+
+    if (hasEncounteredEaddrinuse || (!isServerReady && code !== 0)) {
+      console.log(`\n[WARN] Port ${port} encountered a conflict (code ${code}). Auto-switching to next port...`);
+      killChild(child);
+      return launchOnPortIndex(portIndex + 1);
+    }
+
     if (code !== 0 && code !== null) {
-      console.error(`\n[ERROR] Next.js exited unexpectedly with code ${code}.`);
+      console.error(`\n[ERROR] Next.js exited with code ${code}.`);
     } else {
       console.log('\n[INFO] Next.js server has stopped.');
     }
     process.exit(code || 0);
   });
 }
+
+async function main() {
+  console.log('==============================================================');
+  console.log('  POWER ALERT: Animal Rescue Platform');
+  console.log('  "Every Life Matters. Every Alert Counts."');
+  console.log('==============================================================\n');
+
+  console.log('[1/3] Detecting available network port...');
+  await launchOnPortIndex(0);
+}
+
+process.on('SIGINT', () => {
+  console.log('\n[INFO] Shutting down POWER ALERT...');
+  killChild(activeChild);
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  killChild(activeChild);
+  process.exit(0);
+});
 
 main().catch((err) => {
   console.error('[FATAL ERROR]', err);
