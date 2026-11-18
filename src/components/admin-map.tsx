@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Navigation, Heart, AlertTriangle, Compass, Sparkles } from "lucide-react";
+import "leaflet/dist/leaflet.css";
+import { Navigation, Heart, AlertTriangle, Compass, Sparkles, RefreshCw, Trash2 } from "lucide-react";
 import { IncidentData } from "@/lib/use-recent-incidents";
 
 interface AdminMapProps {
@@ -27,7 +28,9 @@ export default function AdminMap({
   const [selectedIncident, setSelectedIncident] = useState<IncidentData | null>(null);
   const [filterPriority, setFilterPriority] = useState<string>("ALL");
   const [mapReady, setMapReady] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
+  // Initialize Leaflet Map cleanly with robust CSS & dimensions
   useEffect(() => {
     if (typeof window === "undefined" || !containerRef.current) return;
 
@@ -37,13 +40,12 @@ export default function AdminMap({
     import("leaflet").then((L) => {
       if (!isMounted || !containerRef.current) return;
 
-      const rect = containerRef.current.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-
       if (mapRef.current) {
         try {
           mapRef.current.remove();
-        } catch (e) {}
+        } catch (e) {
+          // ignore
+        }
         mapRef.current = null;
       }
 
@@ -73,17 +75,19 @@ export default function AdminMap({
       mapRef.current = leafletInstance;
       setMapReady(true);
 
-      setTimeout(() => {
+      // Force size invalidation across frames so grey tiles never persist
+      const invalidate = () => {
         if (mapRef.current) {
           mapRef.current.invalidateSize();
         }
-      }, 250);
+      };
+      setTimeout(invalidate, 100);
+      setTimeout(invalidate, 300);
+      setTimeout(invalidate, 800);
 
       if (containerRef.current && window.ResizeObserver) {
         resizeObserverRef.current = new ResizeObserver(() => {
-          if (mapRef.current) {
-            mapRef.current.invalidateSize();
-          }
+          invalidate();
         });
         resizeObserverRef.current.observe(containerRef.current);
       }
@@ -97,17 +101,20 @@ export default function AdminMap({
       if (mapRef.current) {
         try {
           mapRef.current.remove();
-        } catch (e) {}
+        } catch (e) {
+          // ignore
+        }
         mapRef.current = null;
       }
     };
   }, [initialCenter, initialZoom]);
 
-  // Update Markers
+  // Update Markers when incidents change
   useEffect(() => {
     if (!mapRef.current || !markersGroupRef.current) return;
 
     import("leaflet").then((L) => {
+      if (!markersGroupRef.current) return;
       markersGroupRef.current.clearLayers();
 
       const filtered = incidents.filter((inc) => {
@@ -121,7 +128,7 @@ export default function AdminMap({
         if (typeof lat !== "number" || typeof lon !== "number") return;
 
         const isCritical = inc.priority === "CRITICAL";
-        const pinBg = isCritical ? "#EF4444" : "#FBBF24";
+        const pinBg = isCritical ? "#EF4444" : "#FF7A00";
         const emoji = isCritical ? "🚨" : "🐾";
 
         const customIcon = L.divIcon({
@@ -160,6 +167,33 @@ export default function AdminMap({
     );
   };
 
+  // 1-Click Load Sample Rescue Alerts
+  const handleLoadSampleAlerts = async () => {
+    setSeeding(true);
+    try {
+      await fetch("/api/seed", { method: "POST" });
+      window.location.reload();
+    } catch (e) {
+      console.error("Error loading sample alerts:", e);
+    } finally {
+      setSeeding(false);
+    }
+  };
+
+  // 1-Click Clear Database to Zero Empty State
+  const handleClearAllAlerts = async () => {
+    if (!confirm("Clear all active alerts to test empty sanctuary state?")) return;
+    setSeeding(true);
+    try {
+      await fetch("/api/seed", { method: "DELETE" });
+      window.location.reload();
+    } catch (e) {
+      console.error("Error clearing alerts:", e);
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   return (
     <div className={`relative w-full rounded-[32px] border-[4px] border-[#1E1B4B] bg-[#FFF9F0] overflow-hidden shadow-pixar ${className}`}>
       
@@ -193,17 +227,40 @@ export default function AdminMap({
         {/* GPS Locate Me Button */}
         <button
           onClick={handleFlyToMyLocation}
-          className="pixar-btn bg-[#FFB703] text-[#1E1B4B] px-3.5 py-2 text-xs shadow-pixar-sm flex items-center gap-1.5"
+          className="pixar-btn bg-[#FFB703] text-[#1E1B4B] px-3.5 py-2 text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold"
           title="Locate Me (GPS)"
         >
           <Navigation className="w-3.5 h-3.5" />
           <span>Locate Me (GPS)</span>
         </button>
+
+        {/* Quick Demo Cases Seed Button */}
+        {incidents.length === 0 ? (
+          <button
+            onClick={handleLoadSampleAlerts}
+            disabled={seeding}
+            className="pixar-btn bg-[#10B981] text-white px-3.5 py-2 text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold disabled:opacity-50"
+            title="Load Sample Live Rescue Alerts"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{seeding ? "Loading..." : "⚡ Load Sample Alerts"}</span>
+          </button>
+        ) : (
+          <button
+            onClick={handleClearAllAlerts}
+            disabled={seeding}
+            className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] px-3 py-2 text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold hover:bg-[#EF4444] hover:text-white transition-all disabled:opacity-50"
+            title="Clear Alerts (Test Empty State)"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Clear</span>
+          </button>
+        )}
       </div>
 
-      {/* Map Canvas with min-h-[400px] explicit height */}
-      <div className="min-h-[420px] sm:min-h-[460px] h-full w-full relative z-0">
-        <div ref={containerRef} className="h-full w-full min-h-[420px] sm:min-h-[460px] relative z-0" />
+      {/* Map Canvas with explicit height */}
+      <div className="w-full h-[520px] sm:h-[560px] relative z-0">
+        <div ref={containerRef} className="w-full h-[520px] sm:h-[560px] relative z-0" />
       </div>
 
       {/* Heartwarming Empty State Card (When 0 active incidents in MongoDB) */}
@@ -225,14 +282,22 @@ export default function AdminMap({
               <p className="text-xs text-[#1E1B4B]/75 leading-tight font-sans">
                 Zero active distress cases logged. All rescue squads and ambulances are resting on standby.
               </p>
-              <div className="pt-2">
+              <div className="pt-2 flex flex-wrap items-center gap-2">
                 <a
                   href="/report"
-                  className="pixar-btn bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white px-3.5 py-1.5 text-xs shadow-pixar-sm inline-flex items-center gap-1.5"
+                  className="pixar-btn bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white px-3.5 py-1.5 text-xs shadow-pixar-sm inline-flex items-center gap-1.5 font-bold"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Spot an Animal in Need? Be Their Voice</span>
+                  <span>Report Animal in Need</span>
                 </a>
+
+                <button
+                  onClick={handleLoadSampleAlerts}
+                  disabled={seeding}
+                  className="pixar-btn bg-[#10B981] text-white px-3 py-1.5 text-xs shadow-pixar-sm inline-flex items-center gap-1 font-bold disabled:opacity-50"
+                >
+                  <span>⚡ Load Demo Cases</span>
+                </button>
               </div>
             </div>
           </div>
@@ -241,31 +306,41 @@ export default function AdminMap({
 
       {/* Selected Incident Drawer */}
       {selectedIncident && (
-        <div className="absolute bottom-5 right-5 z-20 w-80 max-w-[90%] rounded-[24px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-5 shadow-pixar animate-in fade-in slide-in-from-right-4">
-          <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B] pb-2 mb-2">
-            <span className="font-mono text-[10px] font-bold text-[#FF7A00]">
+        <div className="absolute bottom-5 right-5 z-20 w-84 max-w-[90%] rounded-[26px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-5 shadow-pixar animate-in fade-in slide-in-from-right-4">
+          <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B] pb-2 mb-2.5">
+            <span className="font-mono text-[11px] font-black text-[#FF7A00]">
               {selectedIncident.incidentId}
             </span>
-            <button
-              onClick={() => setSelectedIncident(null)}
-              className="text-xs font-bold text-[#1E1B4B] hover:text-[#EF4444]"
-            >
-              ✕
-            </button>
+            <span className={`px-2 py-0.5 rounded-[10px] text-[10px] font-bold font-display ${
+              selectedIncident.priority === "CRITICAL" ? "bg-[#EF4444] text-white" : "bg-[#FFB703] text-[#1E1B4B]"
+            }`}>
+              {selectedIncident.priority}
+            </span>
           </div>
+
           <p className="font-display text-base font-bold text-[#1E1B4B]">
             {selectedIncident.animalCategory}
           </p>
-          <p className="text-xs text-[#1E1B4B]/75 line-clamp-2 mt-1 font-sans">
+          <p className="text-xs text-[#1E1B4B]/80 line-clamp-2 mt-1 font-sans">
             {selectedIncident.conditionDescription}
           </p>
-          <div className="mt-3">
+          <p className="text-[11px] text-[#1E1B4B]/60 font-mono mt-1.5 truncate">
+            📍 {selectedIncident.location?.address || "Bangalore Location"}
+          </p>
+
+          <div className="mt-3.5 flex items-center gap-2">
             <a
               href={`/track/${selectedIncident.incidentId}`}
-              className="pixar-btn w-full bg-[#FF7A00] text-white py-2 text-center text-xs shadow-pixar-sm"
+              className="pixar-btn flex-1 bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white py-2 text-center text-xs shadow-pixar-sm font-bold"
             >
               Track Live Rescue
             </a>
+            <button
+              onClick={() => setSelectedIncident(null)}
+              className="pixar-btn px-3 py-2 bg-[#FFF1DC] text-[#1E1B4B] text-xs font-bold shadow-pixar-sm"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

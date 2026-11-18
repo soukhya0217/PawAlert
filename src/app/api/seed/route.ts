@@ -22,11 +22,11 @@ export async function POST() {
   try {
     await connectDB();
 
-    // Check if already seeded
-    const userCount = await User.countDocuments();
-    if (userCount > 0) {
+    // Check if incidents already seeded
+    const incidentCount = await Incident.countDocuments();
+    if (incidentCount > 0) {
       return NextResponse.json({
-        message: "Database already contains users. Existing data preserved.",
+        message: "Database already contains active incidents.",
         status: "ALREADY_SEEDED",
       });
     }

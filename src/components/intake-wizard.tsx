@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import "leaflet/dist/leaflet.css";
 import { useRouter } from "next/navigation";
 import { 
   Camera, 

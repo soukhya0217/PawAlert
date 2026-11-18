@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { analyzeIncidentDescription, detectDuplicateIncidents } from "@/lib/ai/triage";
 import { broadcastEmergencyToVolunteers } from "@/lib/services/matchingService";
 import { sendEmail } from "@/lib/email/mailer";
+import { bootstrapAdminOnly } from "@/db/bootstrap";
 
 function generateIncidentId(): string {
   const year = new Date().getFullYear();
@@ -16,6 +17,7 @@ function generateIncidentId(): string {
 export async function GET(req: Request) {
   try {
     await connectDB();
+    await bootstrapAdminOnly();
     const { searchParams } = new URL(req.url);
 
     const status = searchParams.get("status");
