@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
-@import "leaflet/dist/leaflet.css";
 
 @tailwind base;
 @tailwind components;
@@ -101,25 +100,51 @@
   }
 }
 
-/* Leaflet Map Robust Layer Fixes */
+/* Leaflet Map Robust Layer Fixes & Tailwind CSS Preflight Overrides */
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
-  min-height: 420px;
-  background-color: #e2e8f0 !important;
-  font-family: inherit;
+  min-height: 460px;
+  background-color: transparent !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
   position: relative !important;
-  z-index: 1 !important;
+  border-radius: 24px;
 }
 
-/* Ensure tiles are rendered crisply without opacity issues */
-.leaflet-tile {
+/* Crucial: Prevent Tailwind Preflight (img { max-width: 100% }) from collapsing Leaflet tiles */
+.leaflet-container img.leaflet-tile {
+  max-width: none !important;
+  max-height: none !important;
+  width: 256px !important;
+  height: 256px !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   filter: saturate(1.05) brightness(0.98);
 }
 
 .leaflet-tile-container {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
   pointer-events: auto !important;
 }
+
+/* Leaflet Internal Pane Layering Hierarchy */
+.leaflet-pane {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+}
+.leaflet-tile-pane    { z-index: 200 !important; }
+.leaflet-overlay-pane { z-index: 400 !important; }
+.leaflet-shadow-pane  { z-index: 500 !important; }
+.leaflet-marker-pane  { z-index: 600 !important; }
+.leaflet-tooltip-pane { z-index: 650 !important; }
+.leaflet-popup-pane   { z-index: 700 !important; }
+.leaflet-top, .leaflet-bottom { z-index: 800 !important; }
 
 .paw-pin-marker {
   display: flex !important;
@@ -287,24 +312,6 @@
 
 .twilight-glow-sunset {
   background: radial-gradient(circle, rgba(249, 115, 22, 0.45) 0%, rgba(251, 191, 36, 0.2) 50%, transparent 70%);
-}
-
-/* Leaflet Container Strict Height & Layer Protection */
-.leaflet-container {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 400px !important;
-  border-radius: 24px;
-  z-index: 10 !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-}
-
-/* Prevent Leaflet Panes from Overlapping Modals / Sticky Header */
-.leaflet-pane {
-  z-index: 10 !important;
-}
-.leaflet-top, .leaflet-bottom {
-  z-index: 20 !important;
 }
 
 /* Storybook Glowing Paw Marker */
