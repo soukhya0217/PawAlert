@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
+import anime from "animejs";
 import { Navigation, Heart, AlertTriangle, Compass, Sparkles, RefreshCw, Trash2 } from "lucide-react";
 import { IncidentData } from "@/lib/use-recent-incidents";
 
@@ -163,14 +164,18 @@ export default function AdminMap({
         if (typeof lat !== "number" || typeof lon !== "number") return;
 
         const isCritical = inc.priority === "CRITICAL";
-        const pinBg = isCritical ? "#EF4444" : "#FF7A00";
+        const pinBg = isCritical ? "#FF5A4E" : "#FFB703";
+        const pulseColor = isCritical ? "rgba(255, 90, 78, 0.4)" : "rgba(255, 183, 3, 0.4)";
         const emoji = isCritical ? "🚨" : "🐾";
 
         const customIcon = L.divIcon({
           className: "paw-pin-marker",
           html: `
-            <div class="paw-pin-body" style="background-color: ${pinBg};">
-              <span class="paw-pin-emoji">${emoji}</span>
+            <div style="position: relative; width: 44px; height: 44px; cursor: pointer;">
+              <div style="position: absolute; inset: -4px; border-radius: 50%; background: ${pulseColor}; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+              <div class="paw-pin-body" style="background-color: ${pinBg};">
+                <span class="paw-pin-emoji">${emoji}</span>
+              </div>
             </div>
           `,
           iconSize: [44, 44],
@@ -268,37 +273,14 @@ export default function AdminMap({
           <Navigation className="w-3.5 h-3.5" />
           <span>Locate Me</span>
         </button>
-
-        {/* Quick Demo Cases Seed Button */}
-        {incidents.length === 0 ? (
-          <button
-            onClick={handleLoadSampleAlerts}
-            disabled={seeding}
-            className="pixar-btn bg-[#10B981] text-white px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold disabled:opacity-50"
-            title="Load Sample Live Rescue Alerts"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{seeding ? "Loading..." : "⚡ Sample Alerts"}</span>
-          </button>
-        ) : (
-          <button
-            onClick={handleClearAllAlerts}
-            disabled={seeding}
-            className="pixar-btn bg-[#FFF9F0] text-[#1E1B4B] px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs shadow-pixar-sm flex items-center gap-1 font-bold hover:bg-[#EF4444] hover:text-white transition-all disabled:opacity-50"
-            title="Clear Alerts (Test Empty State)"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Clear</span>
-          </button>
-        )}
       </div>
 
       {/* Map Canvas with explicit height */}
-      <div className="w-full h-[440px] sm:h-[560px] relative z-0">
+      <div className="w-full h-[420px] relative z-0">
         <div 
           ref={containerRef} 
-          style={{ width: "100%", height: "100%", minHeight: "440px", position: "relative" }}
-          className="w-full h-[440px] sm:h-[560px] relative z-0" 
+          style={{ width: "100%", height: "420px", position: "relative" }}
+          className="w-full h-[420px] relative z-0" 
         />
       </div>
 
@@ -306,11 +288,26 @@ export default function AdminMap({
       {incidents.length === 0 && (
         <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-auto z-20 max-w-md rounded-[22px] sm:rounded-[26px] border-[2px] sm:border-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 p-4 sm:p-5 shadow-pixar backdrop-blur-md">
           <div className="flex items-center gap-4">
-            {/* Cute Sleeping Puppy & Kitten SVG Illustration with Zzz bubbles */}
-            <div className="relative flex-shrink-0 w-14 h-14 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] flex items-center justify-center text-2xl shadow-pixar-sm">
-              <span>🐶</span>
-              <span className="absolute -top-3 -right-2 font-display text-xs font-black text-[#FF7A00] animate-bounce">
+            {/* Cute Sleeping Puppy SVG with floating Zzz animated via Anime.js */}
+            <div className="relative flex-shrink-0 w-14 h-14 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] flex items-center justify-center shadow-pixar-sm overflow-visible">
+              <svg viewBox="0 0 40 40" className="w-9 h-9">
+                <circle cx="20" cy="22" r="12" fill="#FBBF24" stroke="#1E1B4B" strokeWidth="2.5" />
+                {/* Closed sleeping eyes */}
+                <path d="M 14 20 Q 17 23 20 20" fill="none" stroke="#1E1B4B" strokeWidth="2" strokeLinecap="round" />
+                <path d="M 21 20 Q 24 23 27 20" fill="none" stroke="#1E1B4B" strokeWidth="2" strokeLinecap="round" />
+                {/* Floppy sleeping ears */}
+                <path d="M 10 16 C 6 22, 10 26, 12 20" fill="#F59E0B" stroke="#1E1B4B" strokeWidth="2" />
+                <path d="M 30 16 C 34 22, 30 26, 28 20" fill="#F59E0B" stroke="#1E1B4B" strokeWidth="2" />
+                {/* Nose & Snout */}
+                <ellipse cx="20.5" cy="24.5" rx="4" ry="2.8" fill="#FFF9F0" stroke="#1E1B4B" strokeWidth="1.5" />
+                <polygon points="19.5,23.5 21.5,23.5 20.5,25" fill="#1E1B4B" />
+              </svg>
+              {/* Floating Zzz bubbles */}
+              <span className="absolute -top-3.5 -right-2 font-display text-xs font-black text-[#FF7A00] animate-bounce">
                 Zzz
+              </span>
+              <span className="absolute -top-6 -right-4 font-display text-[10px] font-bold text-[#F59E0B] animate-pulse">
+                z
               </span>
             </div>
 
@@ -327,16 +324,8 @@ export default function AdminMap({
                   className="pixar-btn bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white px-3.5 py-1.5 text-xs shadow-pixar-sm inline-flex items-center gap-1.5 font-bold"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Report Animal in Need</span>
+                  <span>Spot an Animal in Need? Be Their Voice</span>
                 </a>
-
-                <button
-                  onClick={handleLoadSampleAlerts}
-                  disabled={seeding}
-                  className="pixar-btn bg-[#10B981] text-white px-3 py-1.5 text-xs shadow-pixar-sm inline-flex items-center gap-1 font-bold disabled:opacity-50"
-                >
-                  <span>⚡ Load Demo Cases</span>
-                </button>
               </div>
             </div>
           </div>

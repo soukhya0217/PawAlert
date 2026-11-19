@@ -376,11 +376,17 @@ export default function IntakeWizard() {
       osmLayer.addTo(map);
 
       // Custom SVG Glowing Paw Marker with Twilight Border
+      const isCritical = severity === "CRITICAL" || severity === "INJURED";
+      const pinColor = isCritical ? "#FF5A4E" : "#FFB703";
+
       const pawPinIcon = L.divIcon({
         className: "paw-marker-container",
         html: `
-          <div style="width:44px;height:44px;border-radius:22px;border:3px solid #1E1B4B;background:#FF7A00;box-shadow:0 6px 0 #1E1B4B;display:flex;align-items:center;justify-content:center;font-size:20px;color:#FFFFFF;cursor:pointer;">
-            <span>🐾</span>
+          <div style="position: relative; width: 44px; height: 44px; cursor: pointer;">
+            <div style="position: absolute; inset: -4px; border-radius: 50%; background: ${pinColor}; opacity: 0.35; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+            <div style="position: relative; width: 44px; height: 44px; border-radius: 22px; border: 3px solid #1E1B4B; background: ${pinColor}; box-shadow: 0 5px 0 #1E1B4B; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #FFFFFF;">
+              <span>🐾</span>
+            </div>
           </div>
         `,
         iconSize: [44, 44],
@@ -413,7 +419,7 @@ export default function IntakeWizard() {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.invalidateSize();
         }
-      }, 250);
+      }, 150);
 
       if (mapContainerRef.current && window.ResizeObserver) {
         resizeObserverRef.current = new ResizeObserver(() => {
@@ -689,9 +695,13 @@ export default function IntakeWizard() {
               Click anywhere on the map or drag the glowing paw pin to mark the exact rescue location.
             </p>
 
-            {/* Strict Client Leaflet Map Container with min-height */}
-            <div className="rounded-[24px] border-[3px] border-[#1E1B4B] overflow-hidden min-h-[380px] h-[380px] w-full relative z-0 shadow-pixar-sm bg-[#FFF9F0]">
-              <div ref={mapContainerRef} className="h-full w-full min-h-[380px] relative z-0" />
+            {/* Strict Client Leaflet Map Container with explicit 420px height */}
+            <div className="rounded-[24px] border-[3px] border-[#1E1B4B] overflow-hidden min-h-[420px] h-[420px] w-full relative z-0 shadow-pixar-sm bg-[#FFF9F0]">
+              <div 
+                ref={mapContainerRef} 
+                style={{ height: "420px", width: "100%" }} 
+                className="h-[420px] w-full relative z-0" 
+              />
             </div>
 
             {/* Address bar */}

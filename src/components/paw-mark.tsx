@@ -53,8 +53,8 @@ export default function PawMark({
       anime.remove(pawIconRef.current);
       anime({
         targets: pawIconRef.current,
-        scaleY: [0.85, 1.15, 1],
-        scaleX: [1.15, 0.9, 1],
+        scaleX: [1, 1.18, 0.94, 1],
+        scaleY: [1, 0.86, 1.1, 1],
         duration: 450,
         easing: "easeOutElastic(1.4, 0.5)",
       });

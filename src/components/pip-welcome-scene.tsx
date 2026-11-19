@@ -378,6 +378,17 @@ export default function PipWelcomeScene({ isInputFocused = false }: PipWelcomeSc
     const halo = new THREE.Mesh(haloGeo, haloMat);
     logoGroup.add(halo);
 
+    // Orbiting Golden Paw Sparkle Spheres around the 3D Logo
+    const orbitGroup = new THREE.Group();
+    const sparkleMat = new THREE.MeshBasicMaterial({ color: 0xffe066 });
+    for (let s = 0; s < 4; s++) {
+      const angle = (s / 4) * Math.PI * 2;
+      const sparkleMesh = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), sparkleMat);
+      sparkleMesh.position.set(Math.cos(angle) * 1.1, Math.sin(angle) * 1.1, 0);
+      orbitGroup.add(sparkleMesh);
+    }
+    logoGroup.add(orbitGroup);
+
     scene.add(logoGroup);
 
     // Store references
@@ -505,9 +516,10 @@ export default function PipWelcomeScene({ isInputFocused = false }: PipWelcomeSc
         }
       }
 
-      // Rotate 3D Logo Halo & Drift Sunbeams
+      // Rotate 3D Logo Halo, Orbiting Sparkles & Drift Sunbeams
       logoGroup.rotation.y = Math.sin(elapsed * 0.8) * 0.15;
       halo.rotation.z = elapsed * 0.6;
+      orbitGroup.rotation.z = -elapsed * 1.2;
       sunbeams.rotation.y = Math.sin(elapsed * 0.4) * 0.08;
 
       // Drift dust mote particles upward

@@ -12,12 +12,12 @@ import {
   Coins, 
   User, 
   LogOut, 
-  Bell, 
   Menu, 
   X, 
   Sparkles,
   ShieldCheck,
-  Compass
+  Compass,
+  Radio
 } from "lucide-react";
 
 interface NavUser {
@@ -32,7 +32,6 @@ export default function SiteHeader() {
   const router = useRouter();
 
   const [currentUser, setCurrentUser] = useState<NavUser | null>(null);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
@@ -50,19 +49,8 @@ export default function SiteHeader() {
     }
   };
 
-  const fetchNotificationsCount = async () => {
-    try {
-      const res = await fetch("/api/notifications");
-      const data = await res.json();
-      if (data.unreadCount !== undefined) {
-        setUnreadCount(data.unreadCount);
-      }
-    } catch {}
-  };
-
   useEffect(() => {
     fetchUser();
-    fetchNotificationsCount();
   }, [pathname]);
 
   const handleLogout = async () => {
@@ -76,38 +64,45 @@ export default function SiteHeader() {
     }
   };
 
+  // Crisp navigation links as requested
   const navLinks = [
-    { label: "Sanctuary Map", href: "/map", icon: Compass },
+    { label: "Report Emergency", href: "/report", icon: AlertTriangle, highlight: true },
+    { label: "Track Case", href: "/track/live", icon: Radio },
+    { label: "Command Center", href: "/map", icon: Compass },
     { label: "Adoptions", href: "/adoption", icon: Heart },
-    { label: "Missing Pets", href: "/missing", icon: Search },
-    { label: "Rescue Protocol", href: "/how-it-works", icon: Info },
-    { label: "Fund Rescues", href: "/donate", icon: Coins },
   ];
 
   return (
     <header className="sticky top-0 z-40 border-b-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 backdrop-blur-md">
-      {/* Top Mission Sub-Pill Announcement Bar */}
-      <div className="bg-[#1E1B4B] text-[#FFF9F0] py-1.5 px-4 text-center border-b border-[#1E1B4B]">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-[11px] sm:text-xs font-display font-bold">
-          <span className="text-[#FFB703]">✨</span>
-          <span className="tracking-wide">
-            THEY CAN&apos;T SPEAK. YOU CAN. • Every Paw Matters
-          </span>
-          <span className="hidden sm:inline-block text-[#FF7A00] font-mono text-[10px]">
-            [24/7 Rapid Rescue Dispatch]
-          </span>
+      {/* Top Warm Twilight-to-Sunset Mission Banner with Tagline Pill */}
+      <div className="bg-gradient-to-r from-[#1E1B4B] via-[#3B286D] to-[#FF7A00] text-[#FFF9F0] py-1.5 px-4 text-center border-b-[2px] border-[#1E1B4B]">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 text-[11px] sm:text-xs font-display font-bold">
+          <div className="hidden sm:flex items-center gap-1.5 text-[#FBBF24]">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>24/7 Community Animal Rescue & Wildlife Radar</span>
+          </div>
+
+          {/* Tagline Pill: "Every Paw Matters" */}
+          <div className="mx-auto sm:mx-0 inline-flex items-center gap-1.5 rounded-[12px] bg-[#FFB703] px-3 py-0.5 text-[10px] sm:text-[11px] font-black text-[#1E1B4B] border border-[#1E1B4B] shadow-pixar-sm">
+            <span>🐾</span>
+            <span className="uppercase tracking-wider">Every Paw Matters</span>
+          </div>
+
+          <div className="hidden md:inline-flex items-center gap-1 text-[11px] font-mono text-white/90">
+            <span>THEY CAN&apos;T SPEAK. YOU CAN.</span>
+          </div>
         </div>
       </div>
 
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        {/* Global Brand Logo with PawMark */}
-        <a href="/" aria-label="PawAlert Home" className="transition-transform hover:scale-102">
+        {/* Glossy 3D-Extruded PAWALERT Brand Logo */}
+        <a href="/" aria-label="PawAlert Home" className="transition-transform hover:scale-105">
           <PawMark size="md" showTagline={true} />
         </a>
 
-        {/* Center Desktop Navigation */}
+        {/* Crisp Desktop Navigation */}
         <nav aria-label="Primary" className="hidden lg:block">
-          <ul className="flex items-center gap-1.5">
+          <ul className="flex items-center gap-2">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const Icon = link.icon;
@@ -116,7 +111,9 @@ export default function SiteHeader() {
                   <a
                     href={link.href}
                     className={`inline-flex h-10 items-center gap-1.5 rounded-[16px] px-3.5 text-xs font-bold font-display transition-all ${
-                      isActive
+                      link.highlight
+                        ? "bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white shadow-pixar-sm hover:scale-105"
+                        : isActive
                         ? "bg-[#1E1B4B] text-white shadow-pixar-sm"
                         : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
                     }`}
@@ -130,20 +127,8 @@ export default function SiteHeader() {
           </ul>
         </nav>
 
-        {/* Right CTA Actions */}
+        {/* Right CTA Actions: Sign In / User Profile */}
         <div className="flex items-center gap-2.5">
-          {/* Report Animal Pill */}
-          <a
-            href="/report"
-            className="pixar-btn relative inline-flex items-center gap-1.5 rounded-[18px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] px-4 py-2 text-xs font-bold text-white shadow-pixar"
-          >
-            <span className="h-2 w-2 rounded-full bg-white animate-ping" />
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Report Animal</span>
-            <span className="sm:hidden">Report</span>
-          </a>
-
-          {/* User Auth Pill */}
           {currentUser ? (
             <div className="relative">
               <button
@@ -172,7 +157,7 @@ export default function SiteHeader() {
                       className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] hover:bg-[#FFF1DC] rounded-[12px]"
                     >
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Dashboard</span>
+                      <span>Command Dashboard</span>
                     </a>
                     <button
                       onClick={handleLogout}
@@ -189,15 +174,9 @@ export default function SiteHeader() {
             <div className="flex items-center gap-1.5">
               <a
                 href="/login"
-                className="pixar-btn rounded-[16px] bg-[#FFF9F0] border-[2px] border-[#1E1B4B] px-3 py-1.5 text-xs font-bold text-[#1E1B4B] shadow-pixar-sm hover:bg-[#FFF1DC]"
+                className="pixar-btn rounded-[16px] bg-[#1E1B4B] text-white border-[2px] border-[#1E1B4B] px-4 py-2 text-xs font-bold shadow-pixar-sm hover:bg-[#2D1B69]"
               >
                 Sign In
-              </a>
-              <a
-                href="/register"
-                className="pixar-btn hidden sm:inline-flex rounded-[16px] bg-[#FFB703] border-[2px] border-[#1E1B4B] px-3 py-1.5 text-xs font-bold text-[#1E1B4B] shadow-pixar-sm hover:bg-[#F59E0B]"
-              >
-                Join
               </a>
             </div>
           )}

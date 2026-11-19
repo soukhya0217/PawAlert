@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   Lock, 
@@ -42,6 +42,17 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Animate card entrance with spring physics on mount
+  useEffect(() => {
+    anime({
+      targets: ".auth-portal-card",
+      translateY: [30, 0],
+      opacity: [0, 1],
+      duration: 650,
+      easing: "easeOutElastic(1, 0.75)",
+    });
+  }, []);
 
   // Tab change animation
   const handleTabChange = (targetMode: "LOGIN" | "REGISTER") => {
@@ -172,7 +183,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
 
   return (
     <div
-      className={`pixar-card p-6 sm:p-8 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] rounded-[28px] shadow-pixar ${className}`}
+      className={`auth-portal-card pixar-card p-6 sm:p-8 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] rounded-[28px] shadow-pixar ${className}`}
     >
       {/* Tab Switcher: Sign In vs Join Guardian */}
       <div className="flex items-center gap-1.5 p-1.5 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] mb-6 shadow-pixar-sm">
