@@ -112,10 +112,10 @@ export default function DioramaHero() {
             </svg>
 
             <span className="font-display text-xs font-bold text-[#1E1B4B]">
-              BE THEIR VOICE
+              THEY CAN&apos;T SPEAK. YOU CAN.
             </span>
             <span className="font-mono text-[10px] text-[#FF7A00] font-black uppercase">
-              ● REAL DISPATCH
+              ● Every Paw Matters
             </span>
           </div>
 

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import NotificationDrawer from "../notifications/NotificationDrawer";
 import { animateMascotPerk } from "@/lib/animations";
+import PawMark from "../paw-mark";
 
 interface NavUser {
   id: string;
@@ -101,49 +102,29 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 backdrop-blur-md">
+        {/* Mission Sub-Pill Announcement Bar */}
+        <div className="bg-[#1E1B4B] text-[#FFF9F0] py-1.5 px-4 text-center border-b border-[#1E1B4B]">
+          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-[11px] sm:text-xs font-display font-bold">
+            <span className="text-[#FFB703]">✨</span>
+            <span className="tracking-wide">
+              THEY CAN&apos;T SPEAK. YOU CAN. • Every Paw Matters
+            </span>
+            <span className="hidden sm:inline-block text-[#FF7A00] font-mono text-[10px]">
+              [24/7 Rapid Sanctuary Dispatch]
+            </span>
+          </div>
+        </div>
+
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           
-          {/* Brand Logo & Mascot with Golden Paw Stamp */}
+          {/* Brand Logo with 3D Glowing PawMark */}
           <div className="flex items-center gap-3">
             <a 
               href="/" 
-              onMouseEnter={handleMascotHover}
               className="inline-flex items-center gap-3 transition-transform hover:scale-105"
               aria-label="PawAlert Home"
             >
-              {/* Interactive 3D Glowing Mascot Box */}
-              <div className="h-12 w-12 rounded-[18px] border-[3px] border-[#1E1B4B] bg-gradient-to-tr from-[#FBBF24] to-[#FF7A00] flex items-center justify-center shadow-pixar-sm">
-                <svg width="34" height="34" viewBox="0 0 40 40" className="overflow-visible">
-                  <g ref={tailRef} style={{ transformOrigin: "10px 30px" }}>
-                    <path d="M10 28 C5 24, 3 16, 7 12" stroke="#1E1B4B" strokeWidth="3.2" strokeLinecap="round" fill="none" />
-                  </g>
-                  <g ref={earLeftRef} style={{ transformOrigin: "15px 14px" }}>
-                    <path d="M14 14 C12 5, 7 5, 11 16" fill="#FFF9F0" stroke="#1E1B4B" strokeWidth="2.5" />
-                  </g>
-                  <g ref={earRightRef} style={{ transformOrigin: "26px 14px" }}>
-                    <path d="M26 14 C28 5, 33 5, 29 16" fill="#FFF9F0" stroke="#1E1B4B" strokeWidth="2.5" />
-                  </g>
-                  <circle cx="20" cy="22" r="11.5" fill="#FBBF24" stroke="#1E1B4B" strokeWidth="2.8" />
-                  <circle cx="16" cy="20" r="2.2" fill="#1E1B4B" />
-                  <circle cx="24" cy="20" r="2.2" fill="#1E1B4B" />
-                  <circle cx="17.2" cy="19.2" r="0.7" fill="#FFFFFF" />
-                  <circle cx="25.2" cy="19.2" r="0.7" fill="#FFFFFF" />
-                  <ellipse cx="20" cy="24.8" rx="4.8" ry="3.2" fill="#FFF9F0" stroke="#1E1B4B" strokeWidth="1.8" />
-                  <polygon points="18.5,23.8 21.5,23.8 20,25.8" fill="#1E1B4B" />
-                </svg>
-              </div>
-
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1">
-                  <span className="font-display text-2xl font-black tracking-tight text-[#1E1B4B]">
-                    Paw<span className="text-[#FF7A00]">Alert</span>
-                  </span>
-                  <span className="text-sm">🐾</span>
-                </div>
-                <span className="font-mono text-[9px] uppercase tracking-widest text-[#D97706] font-bold">
-                  Because every paw matters
-                </span>
-              </div>
+              <PawMark size="md" showTagline={true} />
             </a>
           </div>
 
