@@ -92,6 +92,102 @@
     border-color: #3B286D;
   }
 
+  /* CRITICAL: Force high contrast readability on all text in dark theme */
+  [data-theme="dark"] .text-\[\#1E1B4B\],
+  .dark .text-\[\#1E1B4B\] {
+    color: #FFF9F0 !important;
+  }
+
+  [data-theme="dark"] [class*="text-\[\#1E1B4B\]\/"],
+  .dark [class*="text-\[\#1E1B4B\]\/"] {
+    color: rgba(255, 249, 240, 0.85) !important;
+  }
+
+  [data-theme="dark"] .border-\[\#1E1B4B\],
+  .dark .border-\[\#1E1B4B\] {
+    border-color: #3B286D !important;
+  }
+
+  [data-theme="dark"] [class*="border-\[\#1E1B4B\]\/"],
+  .dark [class*="border-\[\#1E1B4B\]\/"] {
+    border-color: rgba(59, 40, 109, 0.6) !important;
+  }
+
+  [data-theme="dark"] .bg-\[\#FFF1DC\],
+  .dark .bg-\[\#FFF1DC\] {
+    background-color: #1E1B4B !important;
+    color: #FFF9F0 !important;
+    border-color: #3B286D !important;
+  }
+
+  [data-theme="dark"] .bg-\[\#FFF9F0\],
+  .dark .bg-\[\#FFF9F0\] {
+    background-color: #17153B !important;
+  }
+
+  [data-theme="dark"] .pixar-card,
+  .dark .pixar-card {
+    background-color: #17153B !important;
+    border-color: #3B286D !important;
+    color: #FFF9F0 !important;
+  }
+
+  [data-theme="dark"] .pixar-card h1,
+  [data-theme="dark"] .pixar-card h2,
+  [data-theme="dark"] .pixar-card h3,
+  [data-theme="dark"] .pixar-card h4,
+  .dark .pixar-card h1,
+  .dark .pixar-card h2,
+  .dark .pixar-card h3,
+  .dark .pixar-card h4 {
+    color: #FFF9F0 !important;
+  }
+
+  [data-theme="dark"] .pixar-card p,
+  .dark .pixar-card p {
+    color: rgba(255, 249, 240, 0.85) !important;
+  }
+
+  /* Form Inputs in Dark Theme */
+  [data-theme="dark"] input,
+  [data-theme="dark"] select,
+  [data-theme="dark"] textarea,
+  .dark input,
+  .dark select,
+  .dark textarea {
+    background-color: #1E1B4B !important;
+    color: #FFF9F0 !important;
+    border-color: #3B286D !important;
+  }
+
+  [data-theme="dark"] input::placeholder,
+  [data-theme="dark"] textarea::placeholder,
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: rgba(255, 249, 240, 0.45) !important;
+  }
+
+  /* Dark Theme Support for Legacy Bento classes */
+  [data-theme="dark"] .text-\[\#1B3B2B\],
+  .dark .text-\[\#1B3B2B\] {
+    color: #FFF9F0 !important;
+  }
+
+  [data-theme="dark"] [class*="text-\[\#1B3B2B\]\/"],
+  .dark [class*="text-\[\#1B3B2B\]\/"] {
+    color: rgba(255, 249, 240, 0.85) !important;
+  }
+
+  [data-theme="dark"] .border-\[\#1B3B2B\],
+  .dark .border-\[\#1B3B2B\] {
+    border-color: #3B286D !important;
+  }
+
+  [data-theme="dark"] .bg-\[\#F5EFE6\],
+  .dark .bg-\[\#F5EFE6\] {
+    background-color: #17153B !important;
+  }
+
   h1, h2, h3, h4, h5, h6, .font-display {
     font-family: 'Fredoka', 'Plus Jakarta Sans', system-ui, sans-serif;
   }

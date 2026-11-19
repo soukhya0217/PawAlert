@@ -130,22 +130,21 @@ export default function RescueMap({
         // Add custom zoom control at bottom-right
         L.control.zoom({ position: "bottomright" }).addTo(map);
 
-        // Reliable CartoDB Voyager & OpenStreetMap Tiles (No CORS issues!)
-        const tileLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-          attribution: '&copy; CARTO &copy; OpenStreetMap',
-          maxZoom: 19,
-          subdomains: ["a", "b", "c", "d"],
-        });
-
-        const osmFallback = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; OpenStreetMap',
+        // 100% Free OpenStreetMap & Esri Tiles (Zero API Key / Zero Watermarks)
+        const tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           maxZoom: 19,
           subdomains: ["a", "b", "c"],
         });
 
+        const fallbackLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+          attribution: '&copy; Esri',
+          maxZoom: 19,
+        });
+
         tileLayer.on("tileerror", () => {
-          if (map && !map.hasLayer(osmFallback)) {
-            osmFallback.addTo(map);
+          if (map && !map.hasLayer(fallbackLayer)) {
+            fallbackLayer.addTo(map);
           }
         });
 

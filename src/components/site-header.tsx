@@ -115,8 +115,8 @@ export default function SiteHeader() {
                       link.highlight
                         ? "bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white shadow-pixar-sm hover:scale-105"
                         : isActive
-                        ? "bg-[#1E1B4B] text-white shadow-pixar-sm"
-                        : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
+                        ? "bg-[#1E1B4B] dark:bg-[#3B286D] text-white dark:text-[#FBBF24] shadow-pixar-sm border border-transparent dark:border-[#FBBF24]/30"
+                        : "text-[#1E1B4B] dark:text-[#FFF9F0] hover:bg-[#FFF1DC] dark:hover:bg-[#28235C]"
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -137,7 +137,7 @@ export default function SiteHeader() {
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="pixar-btn inline-flex items-center gap-2 rounded-[16px] bg-[#FFF1DC] px-3 py-2 text-xs font-bold text-[#1E1B4B] shadow-pixar-sm border-[2px] border-[#1E1B4B]"
+                className="pixar-btn inline-flex items-center gap-2 rounded-[16px] bg-[#FFF1DC] dark:bg-[#1E1B4B] px-3 py-2 text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] shadow-pixar-sm border-[2px] border-[#1E1B4B] dark:border-[#3B286D]"
               >
                 <div className="w-5 h-5 rounded-full bg-[#FFB703] flex items-center justify-center text-[10px]">
                   🐾
@@ -146,19 +146,19 @@ export default function SiteHeader() {
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-52 rounded-[20px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-2 shadow-pixar z-50">
-                  <div className="px-3 py-2 border-b-[2px] border-[#1E1B4B]/10">
-                    <p className="text-xs font-bold font-display text-[#1E1B4B] truncate">
+                <div className="absolute right-0 mt-2 w-52 rounded-[20px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#17153B] p-2 shadow-pixar z-50">
+                  <div className="px-3 py-2 border-b-[2px] border-[#1E1B4B]/10 dark:border-white/10">
+                    <p className="text-xs font-bold font-display text-[#1E1B4B] dark:text-[#FFF9F0] truncate">
                       {currentUser.fullName}
                     </p>
-                    <p className="text-[10px] font-mono text-[#D97706] truncate">
+                    <p className="text-[10px] font-mono text-[#D97706] dark:text-[#FBBF24] truncate">
                       {currentUser.email}
                     </p>
                   </div>
                   <div className="py-1">
                     <a
                       href={currentUser.role === "SUPER_ADMIN" ? "/admin/dashboard" : "/user/dashboard"}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] hover:bg-[#FFF1DC] rounded-[12px]"
+                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] dark:text-[#FFF9F0] hover:bg-[#FFF1DC] dark:hover:bg-[#28235C] rounded-[12px]"
                     >
                       <ShieldCheck className="w-3.5 h-3.5" />
                       <span>Command Dashboard</span>
@@ -178,7 +178,7 @@ export default function SiteHeader() {
             <div className="flex items-center gap-1.5">
               <a
                 href="/login"
-                className="pixar-btn rounded-[16px] bg-[#1E1B4B] text-white border-[2px] border-[#1E1B4B] px-4 py-2 text-xs font-bold shadow-pixar-sm hover:bg-[#2D1B69]"
+                className="pixar-btn rounded-[16px] bg-[#1E1B4B] text-white border-[2px] border-[#1E1B4B] dark:border-[#3B286D] px-4 py-2 text-xs font-bold shadow-pixar-sm hover:bg-[#2D1B69]"
               >
                 Sign In
               </a>
@@ -188,7 +188,7 @@ export default function SiteHeader() {
           {/* Mobile Menu Hamburger */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden pixar-btn rounded-[14px] bg-[#FFF1DC] p-2 text-[#1E1B4B] border-[2px] border-[#1E1B4B]"
+            className="lg:hidden pixar-btn rounded-[14px] bg-[#FFF1DC] dark:bg-[#1E1B4B] p-2 text-[#1E1B4B] dark:text-[#FFF9F0] border-[2px] border-[#1E1B4B] dark:border-[#3B286D]"
             aria-label="Toggle navigation menu"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -198,9 +198,9 @@ export default function SiteHeader() {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-[#1E1B4B]/20">
-            <span className="text-xs font-display font-bold text-[#1E1B4B]">Appearance Mode</span>
+        <div className="lg:hidden border-t-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#17153B] p-4 space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-[#1E1B4B]/20 dark:border-white/10">
+            <span className="text-xs font-display font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">Appearance Mode</span>
             <ThemeToggle showLabel={true} />
           </div>
 
@@ -210,7 +210,7 @@ export default function SiteHeader() {
               <a
                 key={link.href}
                 href={link.href}
-                className="flex items-center gap-2.5 rounded-[16px] p-2.5 text-xs font-bold font-display text-[#1E1B4B] hover:bg-[#FFF1DC]"
+                className="flex items-center gap-2.5 rounded-[16px] p-2.5 text-xs font-bold font-display text-[#1E1B4B] dark:text-[#FFF9F0] hover:bg-[#FFF1DC] dark:hover:bg-[#28235C]"
               >
                 <Icon className="w-4 h-4 text-[#FF7A00]" />
                 <span>{link.label}</span>

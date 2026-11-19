@@ -27,7 +27,7 @@ interface AdminMapProps {
   className?: string;
 }
 
-type MapTileStyle = "osm" | "voyager" | "dark" | "satellite";
+type MapTileStyle = "osm" | "dark" | "warm" | "satellite";
 
 const TILE_SERVERS: Record<MapTileStyle, { name: string; url: string; subdomains?: string[]; attribution: string; maxZoom: number }> = {
   osm: {
@@ -37,23 +37,22 @@ const TILE_SERVERS: Record<MapTileStyle, { name: string; url: string; subdomains
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
   },
-  voyager: {
-    name: "Storybook Warm (CARTO)",
-    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png",
-    subdomains: ["a", "b", "c", "d"],
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 19,
-  },
   dark: {
-    name: "Twilight Night (CARTO)",
-    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-    subdomains: ["a", "b", "c", "d"],
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    name: "Twilight Night (Esri Dark)",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    attribution: '&copy; <a href="https://www.esri.com/">Esri</a>',
+    maxZoom: 16,
+  },
+  warm: {
+    name: "Storybook Warm (OSM HOT)",
+    url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+    subdomains: ["a", "b", "c"],
+    attribution: '&copy; <a href="https://www.hotosm.org/">Humanitarian OSM</a> &copy; OpenStreetMap',
     maxZoom: 19,
   },
   satellite: {
     name: "Satellite Streets (Esri)",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: '&copy; <a href="https://www.esri.com/">Esri</a>',
     maxZoom: 19,
   },
