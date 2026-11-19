@@ -42,20 +42,42 @@ export default function LocationPicker({
 
     let isMounted = true;
 
-    import("leaflet").then((L) => {
+    import("leaflet").then((importedLeaflet) => {
       if (!isMounted || !mapContainerRef.current) return;
+      const L = (importedLeaflet as any).default || importedLeaflet;
 
       if (!mapRef.current) {
+        if (mapContainerRef.current) {
+          (mapContainerRef.current as any)._leaflet_id = null;
+        }
+
         const map = L.map(mapContainerRef.current, {
           center: [coords[1], coords[0]],
           zoom: 14,
           zoomControl: false,
         });
 
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        const osmLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution: '&copy; OpenStreetMap',
           maxZoom: 19,
-        }).addTo(map);
+          crossOrigin: true,
+        });
+
+        const esriLayer = L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution: '&copy; Esri',
+            maxZoom: 19,
+          }
+        );
+
+        osmLayer.on("tileerror", () => {
+          if (map && !map.hasLayer(esriLayer)) {
+            esriLayer.addTo(map);
+          }
+        });
+
+        osmLayer.addTo(map);
 
         const customIcon = L.divIcon({
           className: "picker-icon",

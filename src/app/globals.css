@@ -65,15 +65,17 @@
   min-height: 420px;
   background-color: #e2e8f0 !important;
   font-family: inherit;
-  z-index: 10;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
-.leaflet-pane {
-  z-index: 10 !important;
-}
-
+/* Ensure tiles are rendered crisply without opacity issues */
 .leaflet-tile {
   filter: saturate(1.05) brightness(0.98);
+}
+
+.leaflet-tile-container {
+  pointer-events: auto !important;
 }
 
 .paw-pin-marker {

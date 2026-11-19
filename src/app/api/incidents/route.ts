@@ -5,7 +5,7 @@ import AuditLog from "@/lib/db/models/AuditLog";
 import { getCurrentUser } from "@/lib/auth/session";
 import { analyzeIncidentDescription, detectDuplicateIncidents } from "@/lib/ai/triage";
 import { broadcastEmergencyToVolunteers } from "@/lib/services/matchingService";
-import { sendEmail } from "@/lib/email/mailer";
+import { sendEmail, sendReportSubmittedEmail, sendAdminNewReportNotification } from "@/lib/email/mailer";
 import { bootstrapAdminOnly } from "@/db/bootstrap";
 
 function generateIncidentId(): string {
@@ -164,22 +164,38 @@ export async function POST(req: Request) {
       details: `New emergency report created for ${animalCategory}`,
     });
 
-    // Send confirmation email to reporter
+    const submissionDateFormatted = now.toLocaleString("en-US", {
+      dateStyle: "full",
+      timeStyle: "short",
+    });
+
+    // 1. Send confirmation email to reporter (if email provided or logged-in user)
     const notifyEmail = reporterEmail || user?.email;
     if (notifyEmail) {
-      sendEmail({
+      sendReportSubmittedEmail({
         to: notifyEmail,
-        recipientName: newIncident.reporterName,
-        template: "INCIDENT_REPORTED",
-        data: {
-          recipientName: newIncident.reporterName,
-          incidentId: newIncident.incidentId,
-          animalCategory: newIncident.animalCategory,
-          locationAddress: newIncident.location.address,
-          actionUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/user/incident/${newIncident._id}`,
-        },
-      }).catch((e) => console.error("Report confirmation email error:", e));
+        reporterName: newIncident.reporterName,
+        incidentId: newIncident.incidentId,
+        animalCategory: newIncident.animalCategory,
+        conditionDescription: newIncident.conditionDescription,
+        locationAddress: newIncident.location.address,
+        submissionDate: submissionDateFormatted,
+        reportStatus: newIncident.status,
+      }).catch((e) => console.error("[Incidents] Reporter confirmation email error:", e));
     }
+
+    // 2. Automatically notify the administrator (ADMIN_EMAIL)
+    sendAdminNewReportNotification({
+      incidentId: newIncident.incidentId,
+      animalCategory: newIncident.animalCategory,
+      conditionDescription: newIncident.conditionDescription,
+      locationAddress: newIncident.location.address,
+      priority: newIncident.priority,
+      reporterName: newIncident.reporterName,
+      reporterEmail: notifyEmail,
+      reporterPhone: newIncident.reporterPhone,
+      submissionDate: submissionDateFormatted,
+    }).catch((e) => console.error("[Incidents] Admin alert email error:", e));
 
     // Broadcast in background to nearby volunteers
     broadcastEmergencyToVolunteers(newIncident).catch((e) =>

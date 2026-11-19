@@ -4,7 +4,7 @@ import connectDB from "@/lib/db/connect";
 import User from "@/lib/db/models/User";
 import { signJwt } from "@/lib/auth/jwt";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/session";
-import { sendEmail } from "@/lib/email/mailer";
+import { sendWelcomeEmail } from "@/lib/email/mailer";
 
 export async function POST(req: Request) {
   try {
@@ -58,16 +58,10 @@ export async function POST(req: Request) {
       isEmailVerified: false,
     });
 
-    // Send Welcome Email
-    sendEmail({
-      to: newUser.email,
-      recipientName: newUser.fullName,
-      template: "WELCOME",
-      data: {
-        recipientName: newUser.fullName,
-        actionUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/user/dashboard`,
-      },
-    }).catch((err) => console.error("Welcome email trigger error:", err));
+    // Send Welcome Email (Non-blocking Nodemailer Gmail SMTP)
+    sendWelcomeEmail(newUser.email, newUser.fullName).catch((err) =>
+      console.error("[Register] Welcome email trigger error:", err)
+    );
 
     // Sign JWT
     const token = signJwt({

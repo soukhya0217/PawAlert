@@ -47,8 +47,8 @@ async function runTestSuite() {
     assert(mediumTriage.recommendedPriority === "MEDIUM", "3. AI Triage: Moderate Priority Injury Detection");
 
     // Test 3: Transactional Email Template Generation
-    const welcomeEmail = generateEmailHtml("WELCOME", { recipientName: "Ananya", actionUrl: "https://poweralert.org" });
-    assert(welcomeEmail.subject.includes("Welcome") && welcomeEmail.html.includes("POWER ALERT"), "4. Email Template: Welcome Notification Responsive HTML");
+    const welcomeEmail = generateEmailHtml("WELCOME", { recipientName: "Ananya", actionUrl: "https://pawalert.org" });
+    assert(welcomeEmail.subject.includes("Welcome") && (welcomeEmail.html.includes("PawAlert") || welcomeEmail.html.includes("Paw")), "4. Email Template: Welcome Notification Responsive HTML");
 
     const rescueEmail = generateEmailHtml("VOLUNTEER_ASSIGNED", { recipientName: "Priya", incidentId: "PA-2026-99999", volunteerName: "Rohan" });
     assert(rescueEmail.html.includes("Rohan") && rescueEmail.html.includes("PA-2026-99999"), "5. Email Template: Volunteer Assignment Notification");

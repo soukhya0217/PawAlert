@@ -127,11 +127,11 @@ async function launchOnPortIndex(portIndex) {
     hasTriggeredBrowser = true;
 
     console.log('\n==============================================================');
-    console.log('>>> SUCCESS: POWER ALERT is now LIVE and READY!');
+    console.log('>>> SUCCESS: PAWALERT is now LIVE and READY!');
     console.log(`>>> Active URL: ${url}`);
     console.log('>>> Opening in your default web browser...');
     console.log('==============================================================');
-    console.log('Keep this window open while using POWER ALERT.');
+    console.log('Keep this window open while using PAWALERT.');
     console.log('To stop the platform safely, press Ctrl+C in this window.');
     console.log('==============================================================\n');
 
@@ -203,8 +203,8 @@ async function launchOnPortIndex(portIndex) {
 
 async function main() {
   console.log('==============================================================');
-  console.log('  POWER ALERT: Animal Rescue Platform');
-  console.log('  "Every Life Matters. Every Alert Counts."');
+  console.log('  PAWALERT: Animal Rescue Platform');
+  console.log('  "Because Every Paw Matters. Every Alert Counts."');
   console.log('==============================================================\n');
 
   console.log('[1/3] Detecting available network port...');

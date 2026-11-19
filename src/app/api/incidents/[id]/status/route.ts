@@ -4,7 +4,7 @@ import Incident, { IncidentStatus } from "@/lib/db/models/Incident";
 import AuditLog from "@/lib/db/models/AuditLog";
 import Notification from "@/lib/db/models/Notification";
 import { getCurrentUser } from "@/lib/auth/session";
-import { sendEmail } from "@/lib/email/mailer";
+import { sendEmail, sendStatusUpdateNotification } from "@/lib/email/mailer";
 
 export async function POST(
   req: Request,
@@ -68,32 +68,18 @@ export async function POST(
       details: notes,
     });
 
-    // Notify Reporter of major milestones
+    // Notify Reporter of status update (Non-blocking Nodemailer)
     const reporterEmail = incident.reporterEmail;
     if (reporterEmail) {
-      if (status === "ANIMAL_RESCUED") {
-        sendEmail({
-          to: reporterEmail,
-          recipientName: incident.reporterName,
-          template: "ANIMAL_RESCUED",
-          data: {
-            recipientName: incident.reporterName,
-            incidentId: incident.incidentId,
-            actionUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/user/incident/${incident._id}`,
-          },
-        }).catch((e) => console.error("Rescue email error:", e));
-      } else if (status === "RESOLVED") {
-        sendEmail({
-          to: reporterEmail,
-          recipientName: incident.reporterName,
-          template: "CASE_RESOLVED",
-          data: {
-            recipientName: incident.reporterName,
-            incidentId: incident.incidentId,
-            actionUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/user/incident/${incident._id}`,
-          },
-        }).catch((e) => console.error("Resolved email error:", e));
-      }
+      sendStatusUpdateNotification({
+        to: reporterEmail,
+        recipientName: incident.reporterName,
+        incidentId: incident.incidentId,
+        animalCategory: incident.animalCategory,
+        previousStatus: previousStatus,
+        newStatus: status,
+        adminRemarks: notes,
+      }).catch((e) => console.error("[Status Update] Email notification error:", e));
     }
 
     if (incident.reporterId) {

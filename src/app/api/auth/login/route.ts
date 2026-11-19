@@ -5,6 +5,7 @@ import User from "@/lib/db/models/User";
 import VolunteerProfile from "@/lib/db/models/VolunteerProfile";
 import { signJwt } from "@/lib/auth/jwt";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/session";
+import { sendLoginEmail } from "@/lib/email/mailer";
 
 export async function POST(req: Request) {
   try {
@@ -52,6 +53,11 @@ export async function POST(req: Request) {
       ngoId: user.ngoId?.toString(),
       volunteerProfileId: volProfileId,
     });
+
+    // Send Login Notification Email (debounced to avoid duplicates, non-blocking)
+    sendLoginEmail(user.email, user.fullName).catch((err) =>
+      console.error("[Login] Email notification error:", err)
+    );
 
     const response = NextResponse.json({
       message: "Login successful",

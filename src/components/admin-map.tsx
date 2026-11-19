@@ -30,6 +30,9 @@ export default function AdminMap({
   const [mapReady, setMapReady] = useState(false);
   const [seeding, setSeeding] = useState(false);
 
+  const centerLat = initialCenter[0] || 12.9716;
+  const centerLon = initialCenter[1] || 77.5946;
+
   // Initialize Leaflet Map cleanly with robust CSS & dimensions
   useEffect(() => {
     if (typeof window === "undefined" || !containerRef.current) return;
@@ -37,9 +40,11 @@ export default function AdminMap({
     let isMounted = true;
     let leafletInstance: any = null;
 
-    import("leaflet").then((L) => {
+    import("leaflet").then((importedLeaflet) => {
       if (!isMounted || !containerRef.current) return;
+      const L = (importedLeaflet as any).default || importedLeaflet;
 
+      // Ensure prior instance is removed cleanly
       if (mapRef.current) {
         try {
           mapRef.current.remove();
@@ -49,6 +54,12 @@ export default function AdminMap({
         mapRef.current = null;
       }
 
+      // Reset Leaflet internal container tracking ID to avoid "Map container is already initialized"
+      if (containerRef.current) {
+        (containerRef.current as any)._leaflet_id = null;
+        containerRef.current.innerHTML = "";
+      }
+
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -56,41 +67,65 @@ export default function AdminMap({
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
 
-      leafletInstance = L.map(containerRef.current, {
-        center: initialCenter,
-        zoom: initialZoom,
-        zoomControl: false,
-      });
-
-      L.control.zoom({ position: "topright" }).addTo(leafletInstance);
-
-      // Fast, reliable OpenStreetMap raster tiles
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
-        subdomains: ["a", "b", "c"],
-      }).addTo(leafletInstance);
-
-      markersGroupRef.current = L.layerGroup().addTo(leafletInstance);
-      mapRef.current = leafletInstance;
-      setMapReady(true);
-
-      // Force size invalidation across frames so grey tiles never persist
-      const invalidate = () => {
-        if (mapRef.current) {
-          mapRef.current.invalidateSize();
-        }
-      };
-      setTimeout(invalidate, 100);
-      setTimeout(invalidate, 300);
-      setTimeout(invalidate, 800);
-
-      if (containerRef.current && window.ResizeObserver) {
-        resizeObserverRef.current = new ResizeObserver(() => {
-          invalidate();
+      try {
+        leafletInstance = L.map(containerRef.current, {
+          center: [centerLat, centerLon],
+          zoom: initialZoom,
+          zoomControl: false,
         });
-        resizeObserverRef.current.observe(containerRef.current);
+
+        L.control.zoom({ position: "topright" }).addTo(leafletInstance);
+
+        // Reliable OpenStreetMap Standard Tiles (No API key needed)
+        const osmLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19,
+          crossOrigin: true,
+        });
+
+        // Esri StreetMap Fallback Layer
+        const esriLayer = L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution: '&copy; <a href="https://www.esri.com/">Esri</a>',
+            maxZoom: 19,
+          }
+        );
+
+        osmLayer.on("tileerror", () => {
+          if (leafletInstance && !leafletInstance.hasLayer(esriLayer)) {
+            esriLayer.addTo(leafletInstance);
+          }
+        });
+
+        osmLayer.addTo(leafletInstance);
+
+        markersGroupRef.current = L.layerGroup().addTo(leafletInstance);
+        mapRef.current = leafletInstance;
+        setMapReady(true);
+
+        // Force size invalidation across multiple frames to eliminate grey tiles
+        const invalidate = () => {
+          if (mapRef.current) {
+            mapRef.current.invalidateSize();
+          }
+        };
+        setTimeout(invalidate, 100);
+        setTimeout(invalidate, 300);
+        setTimeout(invalidate, 600);
+        setTimeout(invalidate, 1200);
+
+        if (containerRef.current && window.ResizeObserver) {
+          resizeObserverRef.current = new ResizeObserver(() => {
+            invalidate();
+          });
+          resizeObserverRef.current.observe(containerRef.current);
+        }
+      } catch (initErr) {
+        console.error("[AdminMap] Failed to initialize Leaflet map:", initErr);
       }
+    }).catch((err) => {
+      console.error("[AdminMap] Could not import Leaflet:", err);
     });
 
     return () => {
@@ -107,7 +142,7 @@ export default function AdminMap({
         mapRef.current = null;
       }
     };
-  }, [initialCenter, initialZoom]);
+  }, [centerLat, centerLon, initialZoom]);
 
   // Update Markers when incidents change
   useEffect(() => {
@@ -260,7 +295,11 @@ export default function AdminMap({
 
       {/* Map Canvas with explicit height */}
       <div className="w-full h-[440px] sm:h-[560px] relative z-0">
-        <div ref={containerRef} className="w-full h-[440px] sm:h-[560px] relative z-0" />
+        <div 
+          ref={containerRef} 
+          style={{ width: "100%", height: "100%", minHeight: "440px", position: "relative" }}
+          className="w-full h-[440px] sm:h-[560px] relative z-0" 
+        />
       </div>
 
       {/* Heartwarming Empty State Card (When 0 active incidents in MongoDB) */}

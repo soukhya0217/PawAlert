@@ -319,8 +319,9 @@ export default function IntakeWizard() {
     let isMounted = true;
     let map: any = null;
 
-    import("leaflet").then((L) => {
+    import("leaflet").then((importedLeaflet) => {
       if (!isMounted || !mapContainerRef.current) return;
+      const L = (importedLeaflet as any).default || importedLeaflet;
 
       const [lon, lat] = coords;
 
@@ -339,6 +340,10 @@ export default function IntakeWizard() {
         mapInstanceRef.current = null;
       }
 
+      if (mapContainerRef.current) {
+        (mapContainerRef.current as any)._leaflet_id = null;
+      }
+
       map = L.map(mapContainerRef.current, {
         center: [lat, lon],
         zoom: 15,
@@ -348,11 +353,27 @@ export default function IntakeWizard() {
       L.control.zoom({ position: "bottomright" }).addTo(map);
 
       // Fast, reliable OpenStreetMap raster tiles (Zero API Key errors!)
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      const osmLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
-        subdomains: ["a", "b", "c"],
-      }).addTo(map);
+        crossOrigin: true,
+      });
+
+      const esriLayer = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution: '&copy; Esri',
+          maxZoom: 19,
+        }
+      );
+
+      osmLayer.on("tileerror", () => {
+        if (map && !map.hasLayer(esriLayer)) {
+          esriLayer.addTo(map);
+        }
+      });
+
+      osmLayer.addTo(map);
 
       // Custom SVG Glowing Paw Marker with Twilight Border
       const pawPinIcon = L.divIcon({
