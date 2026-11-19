@@ -34,10 +34,29 @@ export default function TrackingPage() {
 
   const stampRef = useRef<HTMLDivElement>(null);
 
+  const [customSearchId, setCustomSearchId] = useState("");
+
   useEffect(() => {
     const fetchIncident = async () => {
       try {
         setLoading(true);
+        setError(null);
+
+        // Special handling if user clicked "Track Case" in navbar (/track/live)
+        if (trackingId === "live") {
+          const recentRes = await fetch("/api/incidents?limit=1");
+          const recentData = await recentRes.json();
+          if (recentData.incidents && recentData.incidents.length > 0) {
+            setIncident(recentData.incidents[0]);
+            setLoading(false);
+            return;
+          }
+          // If no active cases in DB, show empty tracker search UI gracefully
+          setIncident(null);
+          setLoading(false);
+          return;
+        }
+
         // Search by incidentId or _id
         const res = await fetch(`/api/incidents?search=${encodeURIComponent(trackingId)}`);
         const data = await res.json();
@@ -50,7 +69,7 @@ export default function TrackingPage() {
             const directData = await directRes.json();
             setIncident(directData.incident || null);
           } else {
-            setError("Incident not found. Please verify the tracking code.");
+            setError(`No distress case found matching "${trackingId}".`);
           }
         }
       } catch (err: any) {
@@ -109,20 +128,75 @@ export default function TrackingPage() {
 
   if (error || !incident) {
     return (
-      <div className="max-w-md mx-auto my-16 p-6 bento-card text-center space-y-4">
-        <AlertTriangle className="w-10 h-10 text-[#FF5A4E] mx-auto" />
-        <h2 className="text-xl font-black font-display text-[#1B3B2B]">
-          Case Not Found
-        </h2>
-        <p className="text-xs text-[#1B3B2B]/75">
-          {error || `No active case matching "${trackingId}".`}
-        </p>
-        <button
-          onClick={() => router.push("/")}
-          className="bento-btn rounded-[14px] bg-[#1B3B2B] px-4 py-2 text-xs text-white"
-        >
-          Return to Headquarters
-        </button>
+      <div className="max-w-lg mx-auto my-12 px-4 space-y-6">
+        <div className="pixar-card p-6 sm:p-8 text-center space-y-5">
+          {/* Sleeping Puppy SVG Mascot */}
+          <div className="relative mx-auto w-16 h-16 rounded-[22px] border-[3px] border-[#1E1B4B] bg-[#FFF1DC] flex items-center justify-center shadow-pixar-sm">
+            <svg viewBox="0 0 40 40" className="w-10 h-10">
+              <circle cx="20" cy="22" r="12" fill="#FBBF24" stroke="#1E1B4B" strokeWidth="2.5" />
+              <path d="M 14 20 Q 17 23 20 20" fill="none" stroke="#1E1B4B" strokeWidth="2" strokeLinecap="round" />
+              <path d="M 21 20 Q 24 23 27 20" fill="none" stroke="#1E1B4B" strokeWidth="2" strokeLinecap="round" />
+              <path d="M 10 16 C 6 22, 10 26, 12 20" fill="#F59E0B" stroke="#1E1B4B" strokeWidth="2" />
+              <path d="M 30 16 C 34 22, 30 26, 28 20" fill="#F59E0B" stroke="#1E1B4B" strokeWidth="2" />
+              <ellipse cx="20.5" cy="24.5" rx="4" ry="2.8" fill="#FFF9F0" stroke="#1E1B4B" strokeWidth="1.5" />
+              <polygon points="19.5,23.5 21.5,23.5 20.5,25" fill="#1E1B4B" />
+            </svg>
+            <span className="absolute -top-3 -right-2 font-display text-xs font-black text-[#FF7A00] animate-bounce">
+              Zzz
+            </span>
+          </div>
+
+          <div className="space-y-1.5">
+            <h2 className="text-2xl font-black font-display text-[#1E1B4B]">
+              {trackingId === "live" ? "Sanctuary Radar is Quiet" : "Rescue Case Lookup"}
+            </h2>
+            <p className="text-xs text-[#1E1B4B]/75 max-w-sm mx-auto font-sans">
+              {trackingId === "live"
+                ? "Zero active distress emergencies in flight. Enter a specific tracking number below or submit a new rescue."
+                : (error || `No active rescue found matching "${trackingId}".`)}
+            </p>
+          </div>
+
+          {/* Quick Tracking Search Form */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (customSearchId.trim()) {
+                router.push(`/track/${customSearchId.trim().toUpperCase()}`);
+              }
+            }}
+            className="flex items-center gap-2 max-w-sm mx-auto pt-2"
+          >
+            <input
+              type="text"
+              placeholder="e.g. PAW-20261118-8842"
+              value={customSearchId}
+              onChange={(e) => setCustomSearchId(e.target.value)}
+              className="flex-1 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] px-3.5 py-2.5 text-xs font-mono font-bold text-[#1E1B4B] placeholder:text-[#1E1B4B]/40 focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+            />
+            <button
+              type="submit"
+              className="pixar-btn bg-[#FF7A00] text-white px-4 py-2.5 text-xs font-bold shadow-pixar-sm"
+            >
+              Lookup
+            </button>
+          </form>
+
+          <div className="pt-3 border-t-[2px] border-[#1E1B4B]/10 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a
+              href="/report"
+              className="pixar-btn w-full sm:w-auto bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white px-5 py-2.5 text-xs shadow-pixar-sm font-bold"
+            >
+              🚨 Report Animal in Need
+            </a>
+            <a
+              href="/map"
+              className="pixar-btn w-full sm:w-auto bg-[#FFF1DC] text-[#1E1B4B] px-5 py-2.5 text-xs shadow-pixar-sm font-bold"
+            >
+              🧭 Command Center Map
+            </a>
+          </div>
+        </div>
       </div>
     );
   }

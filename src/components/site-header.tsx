@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import PawMark from "./paw-mark";
+import ThemeToggle from "./theme-toggle";
 import { 
   AlertTriangle, 
   MapPin, 
@@ -127,8 +128,11 @@ export default function SiteHeader() {
           </ul>
         </nav>
 
-        {/* Right CTA Actions: Sign In / User Profile */}
-        <div className="flex items-center gap-2.5">
+        {/* Right CTA Actions: Theme Switcher, Sign In / User Profile */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Theme Change Option (Storybook Sunlit vs Twilight Sanctuary) */}
+          <ThemeToggle />
+
           {currentUser ? (
             <div className="relative">
               <button
@@ -194,7 +198,12 @@ export default function SiteHeader() {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-2">
+        <div className="lg:hidden border-t-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-[#1E1B4B]/20">
+            <span className="text-xs font-display font-bold text-[#1E1B4B]">Appearance Mode</span>
+            <ThemeToggle showLabel={true} />
+          </div>
+
           {navLinks.map((link) => {
             const Icon = link.icon;
             return (

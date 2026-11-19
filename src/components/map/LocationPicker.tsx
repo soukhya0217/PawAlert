@@ -57,27 +57,25 @@ export default function LocationPicker({
           zoomControl: false,
         });
 
-        const osmLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        const tileLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+          attribution: '&copy; CARTO &copy; OpenStreetMap',
+          maxZoom: 19,
+          subdomains: ["a", "b", "c", "d"],
+        });
+
+        const osmFallback = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution: '&copy; OpenStreetMap',
           maxZoom: 19,
-          crossOrigin: true,
+          subdomains: ["a", "b", "c"],
         });
 
-        const esriLayer = L.tileLayer(
-          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-          {
-            attribution: '&copy; Esri',
-            maxZoom: 19,
-          }
-        );
-
-        osmLayer.on("tileerror", () => {
-          if (map && !map.hasLayer(esriLayer)) {
-            esriLayer.addTo(map);
+        tileLayer.on("tileerror", () => {
+          if (map && !map.hasLayer(osmFallback)) {
+            osmFallback.addTo(map);
           }
         });
 
-        osmLayer.addTo(map);
+        tileLayer.addTo(map);
 
         const customIcon = L.divIcon({
           className: "picker-icon",

@@ -37,6 +37,37 @@
 
     --radius: 1.75rem;
   }
+
+  /* Twilight Dark Mode Sanctuary */
+  :root[data-theme="dark"], .dark {
+    --background: 243 47% 7%; /* #0F0E26 - Deep Midnight Indigo */
+    --foreground: 38 100% 97%; /* #FFF9F0 - Warm Sunlit Cream */
+
+    --card: 243 47% 14%; /* #1E1B4B - Deep Twilight Velvet */
+    --card-foreground: 38 100% 97%;
+
+    --popover: 243 47% 12%;
+    --popover-foreground: 38 100% 97%;
+
+    --primary: 24 100% 54%; /* #FF8C2A - Luminous Tangerine */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 43 100% 51%; /* #FFB703 - Golden Honey */
+    --secondary-foreground: 243 47% 10%;
+
+    --muted: 243 30% 20%;
+    --muted-foreground: 38 30% 75%;
+
+    --accent: 160 84% 45%; /* #10B981 */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%; /* #EF4444 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 243 35% 32%; /* #3B286D */
+    --input: 243 35% 32%;
+    --ring: 43 100% 51%;
+  }
 }
 
 @layer base {
@@ -49,7 +80,19 @@
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
+
+  /* Twilight Dark Mode Overrides */
+  [data-theme="dark"] body, .dark body {
+    background-color: #0F0E26;
+    color: #FFF9F0;
+  }
+
+  [data-theme="dark"] *, .dark * {
+    border-color: #3B286D;
+  }
+
   h1, h2, h3, h4, h5, h6, .font-display {
     font-family: 'Fredoka', 'Plus Jakarta Sans', system-ui, sans-serif;
   }
@@ -111,13 +154,24 @@
 ::-webkit-scrollbar-track {
   background: #FFF9F0;
 }
+[data-theme="dark"] ::-webkit-scrollbar-track, .dark ::-webkit-scrollbar-track {
+  background: #0F0E26;
+}
 ::-webkit-scrollbar-thumb {
   background: #FF7A00;
   border-radius: 9999px;
   border: 2px solid #1E1B4B;
 }
+[data-theme="dark"] ::-webkit-scrollbar-thumb, .dark ::-webkit-scrollbar-thumb {
+  border-color: #3B286D;
+}
 ::-webkit-scrollbar-thumb:hover {
   background: #F97316;
+}
+
+[data-theme="dark"] header, .dark header {
+  background-color: rgba(15, 14, 38, 0.95) !important;
+  border-bottom-color: #3B286D !important;
 }
 
 /* Pixar Storybook Chunky 3D Text Extrusions */
@@ -143,7 +197,14 @@
   border: 3px solid #1E1B4B;
   border-radius: 28px;
   box-shadow: 0 8px 0 #1E1B4B;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+}
+
+[data-theme="dark"] .pixar-card, .dark .pixar-card {
+  background: #17153B;
+  border: 3px solid #3B286D;
+  box-shadow: 0 8px 0 #0A091A;
+  color: #FFF9F0;
 }
 
 .pixar-card:hover {
@@ -151,17 +212,32 @@
   box-shadow: 0 10px 0 #1E1B4B;
 }
 
+[data-theme="dark"] .pixar-card:hover, .dark .pixar-card:hover {
+  box-shadow: 0 10px 0 #0A091A;
+}
+
 .pixar-card-gold {
   background: #FFF1DC;
   border: 3px solid #1E1B4B;
   border-radius: 28px;
   box-shadow: 0 8px 0 #1E1B4B;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+}
+
+[data-theme="dark"] .pixar-card-gold, .dark .pixar-card-gold {
+  background: #1E1B4B;
+  border: 3px solid #FBBF24;
+  box-shadow: 0 8px 0 #0A091A;
+  color: #FFF9F0;
 }
 
 .pixar-card-gold:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 0 #1E1B4B;
+}
+
+[data-theme="dark"] .pixar-card-gold:hover, .dark .pixar-card-gold:hover {
+  box-shadow: 0 10px 0 #0A091A;
 }
 
 /* Tactile Chunky 3D Buttons with Physical Depress */
@@ -179,14 +255,27 @@
   user-select: none;
 }
 
+[data-theme="dark"] .pixar-btn, .dark .pixar-btn {
+  border-color: #3B286D;
+  box-shadow: 0 6px 0 #0A091A;
+}
+
 .pixar-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 0 #1E1B4B;
 }
 
+[data-theme="dark"] .pixar-btn:hover, .dark .pixar-btn:hover {
+  box-shadow: 0 8px 0 #0A091A;
+}
+
 .pixar-btn:active {
   transform: translateY(4px);
   box-shadow: 0 2px 0 #1E1B4B;
+}
+
+[data-theme="dark"] .pixar-btn:active, .dark .pixar-btn:active {
+  box-shadow: 0 2px 0 #0A091A;
 }
 
 /* Twilight Dusk Hero Section Gradient */

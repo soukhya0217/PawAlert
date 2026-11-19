@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import "leaflet/dist/leaflet.css";
-import anime from "animejs";
-import { Navigation, Heart, AlertTriangle, Compass, Sparkles, RefreshCw, Trash2 } from "lucide-react";
+import { Navigation, Compass, Sparkles, Layers, Check, Shield, AlertTriangle } from "lucide-react";
 import { IncidentData } from "@/lib/use-recent-incidents";
 
 interface AdminMapProps {
@@ -14,6 +13,38 @@ interface AdminMapProps {
   className?: string;
 }
 
+type MapTileStyle = "voyager" | "dark" | "osm" | "satellite";
+
+const TILE_SERVERS: Record<MapTileStyle, { name: string; url: string; subdomains?: string[]; attribution: string; maxZoom: number }> = {
+  voyager: {
+    name: "Storybook Warm",
+    url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+    subdomains: ["a", "b", "c", "d"],
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19,
+  },
+  dark: {
+    name: "Twilight Night",
+    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    subdomains: ["a", "b", "c", "d"],
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19,
+  },
+  osm: {
+    name: "OpenStreetMap",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    subdomains: ["a", "b", "c"],
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  },
+  satellite: {
+    name: "Esri Satellite",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+    attribution: '&copy; <a href="https://www.esri.com/">Esri</a>',
+    maxZoom: 19,
+  },
+};
+
 export default function AdminMap({
   incidents = [],
   initialCenter = [12.9716, 77.5946], // Bangalore center
@@ -23,44 +54,100 @@ export default function AdminMap({
 }: AdminMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
+  const activeTileLayerRef = useRef<any>(null);
   const markersGroupRef = useRef<any>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   const [selectedIncident, setSelectedIncident] = useState<IncidentData | null>(null);
   const [filterPriority, setFilterPriority] = useState<string>("ALL");
+  const [currentStyle, setCurrentStyle] = useState<MapTileStyle>("voyager");
+  const [showStyleMenu, setShowStyleMenu] = useState(false);
   const [mapReady, setMapReady] = useState(false);
-  const [seeding, setSeeding] = useState(false);
+  const [activeTheme, setActiveTheme] = useState<"light" | "dark">("light");
 
   const centerLat = initialCenter[0] || 12.9716;
   const centerLon = initialCenter[1] || 77.5946;
 
-  // Initialize Leaflet Map cleanly with robust CSS & dimensions
+  // Listen to Global Theme Changes to adapt map tiles automatically
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const currentDocTheme = document.documentElement.getAttribute("data-theme") || "light";
+    setActiveTheme(currentDocTheme === "dark" ? "dark" : "light");
+    if (currentDocTheme === "dark") {
+      setCurrentStyle("dark");
+    }
+
+    const handleThemeChange = (e: any) => {
+      const isDark = e.detail?.theme === "dark";
+      setActiveTheme(isDark ? "dark" : "light");
+      switchTileLayer(isDark ? "dark" : "voyager");
+    };
+
+    window.addEventListener("pawalert-theme-change", handleThemeChange);
+    return () => window.removeEventListener("pawalert-theme-change", handleThemeChange);
+  }, []);
+
+  // Switch Active Tile Layer safely
+  const switchTileLayer = useCallback((styleKey: MapTileStyle) => {
+    setCurrentStyle(styleKey);
+    setShowStyleMenu(false);
+
+    if (!mapRef.current) return;
+
+    import("leaflet").then((importedLeaflet) => {
+      const L = (importedLeaflet as any).default || importedLeaflet;
+      const config = TILE_SERVERS[styleKey] || TILE_SERVERS.voyager;
+
+      if (activeTileLayerRef.current) {
+        try {
+          mapRef.current.removeLayer(activeTileLayerRef.current);
+        } catch {
+          // ignore
+        }
+      }
+
+      // Safe raster tile layer WITHOUT crossOrigin (fixes Chrome/Edge CORS tile drop!)
+      const newLayer = L.tileLayer(config.url, {
+        attribution: config.attribution,
+        maxZoom: config.maxZoom,
+        subdomains: config.subdomains || ["a", "b", "c"],
+      });
+
+      newLayer.addTo(mapRef.current);
+      activeTileLayerRef.current = newLayer;
+
+      // Bring markers back to top
+      if (markersGroupRef.current) {
+        markersGroupRef.current.bringToFront?.();
+      }
+    });
+  }, []);
+
+  // Initialize Leaflet Map cleanly
   useEffect(() => {
     if (typeof window === "undefined" || !containerRef.current) return;
 
     let isMounted = true;
-    let leafletInstance: any = null;
 
     import("leaflet").then((importedLeaflet) => {
       if (!isMounted || !containerRef.current) return;
       const L = (importedLeaflet as any).default || importedLeaflet;
 
-      // Ensure prior instance is removed cleanly
+      // Clean teardown if prior instance existed
       if (mapRef.current) {
         try {
           mapRef.current.remove();
-        } catch (e) {
-          // ignore
-        }
+        } catch {}
         mapRef.current = null;
       }
 
-      // Reset Leaflet internal container tracking ID to avoid "Map container is already initialized"
       if (containerRef.current) {
         (containerRef.current as any)._leaflet_id = null;
         containerRef.current.innerHTML = "";
       }
 
+      // Override Default Icons
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -69,50 +156,54 @@ export default function AdminMap({
       });
 
       try {
-        leafletInstance = L.map(containerRef.current, {
+        const initialStyleKey: MapTileStyle = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "voyager";
+        const config = TILE_SERVERS[initialStyleKey];
+
+        const leafletInstance = L.map(containerRef.current, {
           center: [centerLat, centerLon],
           zoom: initialZoom,
           zoomControl: false,
+          attributionControl: true,
         });
 
+        // Zoom Control
         L.control.zoom({ position: "topright" }).addTo(leafletInstance);
 
-        // Reliable OpenStreetMap Standard Tiles (No API key needed)
-        const osmLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          maxZoom: 19,
-          crossOrigin: true,
+        // Standard, fast raster tile layer (NO crossOrigin: true)
+        const tileLayer = L.tileLayer(config.url, {
+          attribution: config.attribution,
+          maxZoom: config.maxZoom,
+          subdomains: config.subdomains || ["a", "b", "c"],
         });
 
-        // Esri StreetMap Fallback Layer
-        const esriLayer = L.tileLayer(
-          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-          {
-            attribution: '&copy; <a href="https://www.esri.com/">Esri</a>',
-            maxZoom: 19,
-          }
-        );
-
-        osmLayer.on("tileerror", () => {
-          if (leafletInstance && !leafletInstance.hasLayer(esriLayer)) {
-            esriLayer.addTo(leafletInstance);
+        // Robust fallback if tile server errors
+        tileLayer.on("tileerror", () => {
+          if (leafletInstance && (initialStyleKey as MapTileStyle) !== "osm") {
+            const fallback = L.tileLayer(TILE_SERVERS.osm.url, {
+              attribution: TILE_SERVERS.osm.attribution,
+              maxZoom: 19,
+              subdomains: ["a", "b", "c"],
+            });
+            fallback.addTo(leafletInstance);
           }
         });
 
-        osmLayer.addTo(leafletInstance);
+        tileLayer.addTo(leafletInstance);
+        activeTileLayerRef.current = tileLayer;
 
+        // Group for incident markers
         markersGroupRef.current = L.layerGroup().addTo(leafletInstance);
         mapRef.current = leafletInstance;
         setMapReady(true);
 
-        // Force size invalidation across multiple frames to eliminate grey tiles
+        // Periodic invalidateSize to guarantee tiles render over dynamic containers
         const invalidate = () => {
           if (mapRef.current) {
             mapRef.current.invalidateSize();
           }
         };
-        setTimeout(invalidate, 100);
-        setTimeout(invalidate, 300);
+        setTimeout(invalidate, 60);
+        setTimeout(invalidate, 200);
         setTimeout(invalidate, 600);
         setTimeout(invalidate, 1200);
 
@@ -137,19 +228,18 @@ export default function AdminMap({
       if (mapRef.current) {
         try {
           mapRef.current.remove();
-        } catch (e) {
-          // ignore
-        }
+        } catch {}
         mapRef.current = null;
       }
     };
   }, [centerLat, centerLon, initialZoom]);
 
-  // Update Markers when incidents change
+  // Update Markers when incidents or filters change
   useEffect(() => {
     if (!mapRef.current || !markersGroupRef.current) return;
 
-    import("leaflet").then((L) => {
+    import("leaflet").then((importedLeaflet) => {
+      const L = (importedLeaflet as any).default || importedLeaflet;
       if (!markersGroupRef.current) return;
       markersGroupRef.current.clearLayers();
 
@@ -165,7 +255,7 @@ export default function AdminMap({
 
         const isCritical = inc.priority === "CRITICAL";
         const pinBg = isCritical ? "#FF5A4E" : "#FFB703";
-        const pulseColor = isCritical ? "rgba(255, 90, 78, 0.4)" : "rgba(255, 183, 3, 0.4)";
+        const pulseColor = isCritical ? "rgba(255, 90, 78, 0.45)" : "rgba(255, 183, 3, 0.45)";
         const emoji = isCritical ? "🚨" : "🐾";
 
         const customIcon = L.divIcon({
@@ -207,56 +297,31 @@ export default function AdminMap({
     );
   };
 
-  // 1-Click Load Sample Rescue Alerts
-  const handleLoadSampleAlerts = async () => {
-    setSeeding(true);
-    try {
-      await fetch("/api/seed", { method: "POST" });
-      window.location.reload();
-    } catch (e) {
-      console.error("Error loading sample alerts:", e);
-    } finally {
-      setSeeding(false);
-    }
-  };
-
-  // 1-Click Clear Database to Zero Empty State
-  const handleClearAllAlerts = async () => {
-    if (!confirm("Clear all active alerts to test empty sanctuary state?")) return;
-    setSeeding(true);
-    try {
-      await fetch("/api/seed", { method: "DELETE" });
-      window.location.reload();
-    } catch (e) {
-      console.error("Error clearing alerts:", e);
-    } finally {
-      setSeeding(false);
-    }
-  };
+  const isDarkMode = activeTheme === "dark";
 
   return (
-    <div className={`relative w-full rounded-[28px] sm:rounded-[32px] border-[3px] sm:border-[4px] border-[#1E1B4B] bg-[#FFF9F0] overflow-hidden shadow-pixar ${className}`}>
+    <div className={`relative w-full rounded-[28px] sm:rounded-[32px] border-[3px] sm:border-[4px] ${isDarkMode ? "border-[#3B286D] bg-[#17153B]" : "border-[#1E1B4B] bg-[#FFF9F0]"} overflow-hidden shadow-pixar transition-colors duration-300 ${className}`}>
       
       {/* Top Map HUD Controls */}
       <div className="absolute top-3 left-3 right-3 sm:top-4 sm:left-4 sm:right-auto z-20 flex flex-wrap items-center gap-2">
         {/* Status Pill */}
-        <div className="flex items-center gap-1.5 rounded-[16px] sm:rounded-[20px] border-[2px] sm:border-[3px] border-[#1E1B4B] bg-[#FFF9F0] px-3 py-1.5 sm:px-4 sm:py-2 shadow-pixar-sm">
+        <div className={`flex items-center gap-1.5 rounded-[16px] sm:rounded-[20px] border-[2px] sm:border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#1E1B4B]/90 text-[#FFF9F0]" : "border-[#1E1B4B] bg-[#FFF9F0] text-[#1E1B4B]"} px-3 py-1.5 sm:px-4 sm:py-2 shadow-pixar-sm backdrop-blur-md`}>
           <span className={`h-2.5 w-2.5 rounded-full ${incidents.length > 0 ? "bg-[#EF4444] animate-ping" : "bg-[#10B981]"}`} />
-          <span className="font-display text-[11px] sm:text-xs font-bold text-[#1E1B4B]">
+          <span className="font-display text-[11px] sm:text-xs font-bold">
             {incidents.length > 0 ? `${incidents.length} ACTIVE ALERTS` : "SANCTUARY ALL QUIET"}
           </span>
         </div>
 
         {/* Priority Filter */}
-        <div className="hidden sm:flex items-center gap-1 rounded-[18px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-1 shadow-pixar-sm">
+        <div className={`hidden sm:flex items-center gap-1 rounded-[18px] border-[2px] sm:border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#1E1B4B]/90" : "border-[#1E1B4B] bg-[#FFF9F0]"} p-1 shadow-pixar-sm backdrop-blur-md`}>
           {["ALL", "CRITICAL", "HIGH"].map((p) => (
             <button
               key={p}
               onClick={() => setFilterPriority(p)}
               className={`rounded-[14px] px-3 py-1.5 text-xs font-bold font-display transition-all ${
                 filterPriority === p
-                  ? "bg-[#1E1B4B] text-white"
-                  : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
+                  ? isDarkMode ? "bg-[#FBBF24] text-[#1E1B4B]" : "bg-[#1E1B4B] text-white"
+                  : isDarkMode ? "text-[#FFF9F0] hover:bg-[#2D1B69]" : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
               }`}
             >
               {p}
@@ -273,23 +338,96 @@ export default function AdminMap({
           <Navigation className="w-3.5 h-3.5" />
           <span>Locate Me</span>
         </button>
+
+        {/* Map Tile Style Switcher Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowStyleMenu(!showStyleMenu)}
+            className={`pixar-btn px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold ${
+              isDarkMode ? "bg-[#28235C] text-[#FFF9F0] border-[#3B286D]" : "bg-[#FFF1DC] text-[#1E1B4B] border-[#1E1B4B]"
+            }`}
+            title="Change Map Style"
+          >
+            <Layers className="w-3.5 h-3.5 text-[#FF7A00]" />
+            <span className="hidden md:inline">{TILE_SERVERS[currentStyle]?.name || "Map Style"}</span>
+          </button>
+
+          {showStyleMenu && (
+            <div className={`absolute left-0 mt-2 w-48 rounded-[20px] border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#1E1B4B]" : "border-[#1E1B4B] bg-[#FFF9F0]"} p-2 shadow-pixar z-50`}>
+              <div className="text-[10px] font-mono uppercase tracking-wider font-bold px-2 py-1 text-[#FF7A00]">
+                Select Map Theme
+              </div>
+              {(Object.keys(TILE_SERVERS) as MapTileStyle[]).map((key) => {
+                const s = TILE_SERVERS[key];
+                const isSelected = currentStyle === key;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => switchTileLayer(key)}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold font-display rounded-[12px] transition-colors ${
+                      isSelected
+                        ? isDarkMode ? "bg-[#3B286D] text-[#FBBF24]" : "bg-[#FFF1DC] text-[#FF7A00]"
+                        : isDarkMode ? "text-[#FFF9F0] hover:bg-[#28235C]" : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
+                    }`}
+                  >
+                    <span>{s.name}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-[#10B981]" />}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Map Canvas with explicit height */}
-      <div className="w-full h-[420px] relative z-0">
+      {/* Main Map Container with Animated Radar Background */}
+      <div className="w-full h-[460px] relative z-0 overflow-hidden">
+        
+        {/* Animated Geospatial Radar Screen SVG Background (Guarantees map is never a blank void) */}
+        <div className={`absolute inset-0 z-0 flex items-center justify-center pointer-events-none transition-colors duration-500 ${isDarkMode ? "bg-[#090817]" : "bg-[#FFF4E5]"}`}>
+          <svg className="w-full h-full opacity-35" viewBox="0 0 800 500" preserveAspectRatio="none">
+            <defs>
+              <radialGradient id="radarSweep" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#FF7A00" stopOpacity="0.25" />
+                <stop offset="70%" stopColor="#FBBF24" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="#1E1B4B" stopOpacity="0" />
+              </radialGradient>
+              <pattern id="radarGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke={isDarkMode ? "#3B286D" : "#F59E0B"} strokeWidth="0.75" strokeOpacity="0.4" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#radarGrid)" />
+            {/* Concentric distance perimeter circles */}
+            <circle cx="400" cy="250" r="80" fill="none" stroke={isDarkMode ? "#818CF8" : "#FF7A00"} strokeWidth="1.5" strokeDasharray="4 4" />
+            <circle cx="400" cy="250" r="160" fill="none" stroke={isDarkMode ? "#6366F1" : "#FFB703"} strokeWidth="1.5" strokeOpacity="0.6" />
+            <circle cx="400" cy="250" r="240" fill="none" stroke={isDarkMode ? "#4F46E5" : "#F59E0B"} strokeWidth="1.5" strokeOpacity="0.3" />
+            {/* Crosshairs */}
+            <line x1="400" y1="0" x2="400" y2="500" stroke={isDarkMode ? "#818CF8" : "#FF7A00"} strokeWidth="1" strokeOpacity="0.4" />
+            <line x1="0" y1="250" x2="800" y2="250" stroke={isDarkMode ? "#818CF8" : "#FF7A00"} strokeWidth="1" strokeOpacity="0.4" />
+            {/* Center Sanctuary Pulse */}
+            <circle cx="400" cy="250" r="12" fill="url(#radarSweep)" />
+            <circle cx="400" cy="250" r="6" fill="#FF7A00" />
+          </svg>
+          {/* Coordinates HUD telemetry label */}
+          <div className="absolute bottom-3 right-3 font-mono text-[10px] tracking-widest text-[#FF7A00]/80 bg-black/40 px-2 py-0.5 rounded-[8px] backdrop-blur-sm pointer-events-none">
+            RADAR: 12.9716° N, 77.5946° E • SANCTUARY LOCK
+          </div>
+        </div>
+
+        {/* Leaflet DOM Node */}
         <div 
           ref={containerRef} 
-          style={{ width: "100%", height: "420px", position: "relative" }}
-          className="w-full h-[420px] relative z-0" 
+          style={{ width: "100%", height: "460px", position: "relative" }}
+          className="w-full h-[460px] relative z-10" 
         />
       </div>
 
       {/* Heartwarming Empty State Card (When 0 active incidents in MongoDB) */}
       {incidents.length === 0 && (
-        <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-auto z-20 max-w-md rounded-[22px] sm:rounded-[26px] border-[2px] sm:border-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 p-4 sm:p-5 shadow-pixar backdrop-blur-md">
+        <div className={`absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-auto z-20 max-w-md rounded-[22px] sm:rounded-[26px] border-[2px] sm:border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#17153B]/95 text-[#FFF9F0]" : "border-[#1E1B4B] bg-[#FFF9F0]/95 text-[#1E1B4B]"} p-4 sm:p-5 shadow-pixar backdrop-blur-md transition-colors duration-300`}>
           <div className="flex items-center gap-4">
-            {/* Cute Sleeping Puppy SVG with floating Zzz animated via Anime.js */}
-            <div className="relative flex-shrink-0 w-14 h-14 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] flex items-center justify-center shadow-pixar-sm overflow-visible">
+            {/* Cute Sleeping Puppy SVG with floating Zzz */}
+            <div className={`relative flex-shrink-0 w-14 h-14 rounded-[20px] border-[2px] ${isDarkMode ? "border-[#3B286D] bg-[#1E1B4B]" : "border-[#1E1B4B] bg-[#FFF1DC]"} flex items-center justify-center shadow-pixar-sm overflow-visible`}>
               <svg viewBox="0 0 40 40" className="w-9 h-9">
                 <circle cx="20" cy="22" r="12" fill="#FBBF24" stroke="#1E1B4B" strokeWidth="2.5" />
                 {/* Closed sleeping eyes */}
@@ -312,10 +450,10 @@ export default function AdminMap({
             </div>
 
             <div className="space-y-1">
-              <h4 className="font-display text-sm font-bold text-[#1E1B4B]">
+              <h4 className="font-display text-sm font-bold">
                 All Quiet in the Neighborhood
               </h4>
-              <p className="text-xs text-[#1E1B4B]/75 leading-tight font-sans">
+              <p className={`text-xs ${isDarkMode ? "text-[#FFF9F0]/75" : "text-[#1E1B4B]/75"} leading-tight font-sans`}>
                 Zero active distress cases logged. All rescue squads and ambulances are resting on standby.
               </p>
               <div className="pt-2 flex flex-wrap items-center gap-2">
@@ -334,8 +472,8 @@ export default function AdminMap({
 
       {/* Selected Incident Drawer */}
       {selectedIncident && (
-        <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:right-5 sm:left-auto z-20 w-auto sm:w-84 max-w-full rounded-[24px] sm:rounded-[26px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-4 sm:p-5 shadow-pixar animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-right-4">
-          <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B] pb-2 mb-2.5">
+        <div className={`absolute bottom-3 left-3 right-3 sm:bottom-5 sm:right-5 sm:left-auto z-20 w-auto sm:w-84 max-w-full rounded-[24px] sm:rounded-[26px] border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#17153B] text-[#FFF9F0]" : "border-[#1E1B4B] bg-[#FFF9F0] text-[#1E1B4B]"} p-4 sm:p-5 shadow-pixar animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-right-4`}>
+          <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B]/20 pb-2 mb-2.5">
             <span className="font-mono text-[11px] font-black text-[#FF7A00]">
               {selectedIncident.incidentId}
             </span>
@@ -346,13 +484,13 @@ export default function AdminMap({
             </span>
           </div>
 
-          <p className="font-display text-base font-bold text-[#1E1B4B]">
+          <p className="font-display text-base font-bold">
             {selectedIncident.animalCategory}
           </p>
-          <p className="text-xs text-[#1E1B4B]/80 line-clamp-2 mt-1 font-sans">
+          <p className={`text-xs ${isDarkMode ? "text-[#FFF9F0]/80" : "text-[#1E1B4B]/80"} line-clamp-2 mt-1 font-sans`}>
             {selectedIncident.conditionDescription}
           </p>
-          <p className="text-[11px] text-[#1E1B4B]/60 font-mono mt-1.5 truncate">
+          <p className={`text-[11px] ${isDarkMode ? "text-[#FFF9F0]/60" : "text-[#1E1B4B]/60"} font-mono mt-1.5 truncate`}>
             📍 {selectedIncident.location?.address || "Bangalore Location"}
           </p>
 
@@ -365,7 +503,7 @@ export default function AdminMap({
             </a>
             <button
               onClick={() => setSelectedIncident(null)}
-              className="pixar-btn px-3 py-2 bg-[#FFF1DC] text-[#1E1B4B] text-xs font-bold shadow-pixar-sm"
+              className={`pixar-btn px-3 py-2 ${isDarkMode ? "bg-[#1E1B4B] text-[#FFF9F0]" : "bg-[#FFF1DC] text-[#1E1B4B]"} text-xs font-bold shadow-pixar-sm`}
             >
               Close
             </button>

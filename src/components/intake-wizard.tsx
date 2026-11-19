@@ -352,28 +352,26 @@ export default function IntakeWizard() {
 
       L.control.zoom({ position: "bottomright" }).addTo(map);
 
-      // Fast, reliable OpenStreetMap raster tiles (Zero API Key errors!)
-      const osmLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      // Fast, reliable CartoDB Voyager & OpenStreetMap raster tiles (Zero CORS / Zero API Key errors!)
+      const tileLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; CARTO &copy; OpenStreetMap',
         maxZoom: 19,
-        crossOrigin: true,
+        subdomains: ["a", "b", "c", "d"],
       });
 
-      const esriLayer = L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-        {
-          attribution: '&copy; Esri',
-          maxZoom: 19,
-        }
-      );
+      const osmFallback = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 19,
+        subdomains: ["a", "b", "c"],
+      });
 
-      osmLayer.on("tileerror", () => {
-        if (map && !map.hasLayer(esriLayer)) {
-          esriLayer.addTo(map);
+      tileLayer.on("tileerror", () => {
+        if (map && !map.hasLayer(osmFallback)) {
+          osmFallback.addTo(map);
         }
       });
 
-      osmLayer.addTo(map);
+      tileLayer.addTo(map);
 
       // Custom SVG Glowing Paw Marker with Twilight Border
       const isCritical = severity === "CRITICAL" || severity === "INJURED";
