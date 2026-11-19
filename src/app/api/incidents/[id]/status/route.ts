@@ -68,18 +68,22 @@ export async function POST(
       details: notes,
     });
 
-    // Notify Reporter of status update (Non-blocking Nodemailer)
+    // Notify Reporter of status update
     const reporterEmail = incident.reporterEmail;
     if (reporterEmail) {
-      sendStatusUpdateNotification({
-        to: reporterEmail,
-        recipientName: incident.reporterName,
-        incidentId: incident.incidentId,
-        animalCategory: incident.animalCategory,
-        previousStatus: previousStatus,
-        newStatus: status,
-        adminRemarks: notes,
-      }).catch((e) => console.error("[Status Update] Email notification error:", e));
+      try {
+        await sendStatusUpdateNotification({
+          to: reporterEmail,
+          recipientName: incident.reporterName,
+          incidentId: incident.incidentId,
+          animalCategory: incident.animalCategory,
+          previousStatus: previousStatus,
+          newStatus: status,
+          adminRemarks: notes,
+        });
+      } catch (e) {
+        console.error("[Status Update] Email notification error:", e);
+      }
     }
 
     if (incident.reporterId) {

@@ -54,10 +54,12 @@ export async function POST(req: Request) {
       volunteerProfileId: volProfileId,
     });
 
-    // Send Login Notification Email (debounced to avoid duplicates, non-blocking)
-    sendLoginEmail(user.email, user.fullName).catch((err) =>
-      console.error("[Login] Email notification error:", err)
-    );
+    // Send Login Notification Email (debounced to avoid duplicates)
+    try {
+      await sendLoginEmail(user.email, user.fullName);
+    } catch (err) {
+      console.error("[Login] Email notification error:", err);
+    }
 
     const response = NextResponse.json({
       message: "Login successful",

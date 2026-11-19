@@ -172,30 +172,38 @@ export async function POST(req: Request) {
     // 1. Send confirmation email to reporter (if email provided or logged-in user)
     const notifyEmail = reporterEmail || user?.email;
     if (notifyEmail) {
-      sendReportSubmittedEmail({
-        to: notifyEmail,
-        reporterName: newIncident.reporterName,
+      try {
+        await sendReportSubmittedEmail({
+          to: notifyEmail,
+          reporterName: newIncident.reporterName,
+          incidentId: newIncident.incidentId,
+          animalCategory: newIncident.animalCategory,
+          conditionDescription: newIncident.conditionDescription,
+          locationAddress: newIncident.location.address,
+          submissionDate: submissionDateFormatted,
+          reportStatus: newIncident.status,
+        });
+      } catch (e) {
+        console.error("[Incidents] Reporter confirmation email error:", e);
+      }
+    }
+
+    // 2. Automatically notify the administrator (ADMIN_EMAIL)
+    try {
+      await sendAdminNewReportNotification({
         incidentId: newIncident.incidentId,
         animalCategory: newIncident.animalCategory,
         conditionDescription: newIncident.conditionDescription,
         locationAddress: newIncident.location.address,
+        priority: newIncident.priority,
+        reporterName: newIncident.reporterName,
+        reporterEmail: notifyEmail,
+        reporterPhone: newIncident.reporterPhone,
         submissionDate: submissionDateFormatted,
-        reportStatus: newIncident.status,
-      }).catch((e) => console.error("[Incidents] Reporter confirmation email error:", e));
+      });
+    } catch (e) {
+      console.error("[Incidents] Admin alert email error:", e);
     }
-
-    // 2. Automatically notify the administrator (ADMIN_EMAIL)
-    sendAdminNewReportNotification({
-      incidentId: newIncident.incidentId,
-      animalCategory: newIncident.animalCategory,
-      conditionDescription: newIncident.conditionDescription,
-      locationAddress: newIncident.location.address,
-      priority: newIncident.priority,
-      reporterName: newIncident.reporterName,
-      reporterEmail: notifyEmail,
-      reporterPhone: newIncident.reporterPhone,
-      submissionDate: submissionDateFormatted,
-    }).catch((e) => console.error("[Incidents] Admin alert email error:", e));
 
     // Broadcast in background to nearby volunteers
     broadcastEmergencyToVolunteers(newIncident).catch((e) =>

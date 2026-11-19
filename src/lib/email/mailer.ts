@@ -16,13 +16,23 @@ const emailDebounceMap = new Map<string, number>();
 
 let cachedTransporter: Transporter | null = null;
 
+function sanitizeEmailUser(email?: string): string | undefined {
+  if (!email) return undefined;
+  let clean = email.trim();
+  if (clean.endsWith("gmail@gmail.com")) {
+    clean = clean.replace(/gmail@gmail\.com$/i, "@gmail.com");
+  }
+  return clean;
+}
+
 /**
  * Creates or retrieves the singleton Nodemailer Gmail SMTP transporter.
  */
 export function getMailTransporter(): Transporter | null {
   if (cachedTransporter) return cachedTransporter;
 
-  const emailUser = process.env.EMAIL_USER;
+  const rawUser = process.env.EMAIL_USER;
+  const emailUser = sanitizeEmailUser(rawUser);
   const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, "") : undefined;
 
   if (!emailUser || !emailPass) {
@@ -71,7 +81,8 @@ export async function sendEmail(options: SendEmailOptions) {
   let providerMessageId: string | undefined = undefined;
 
   const transporter = getMailTransporter();
-  const emailUser = process.env.EMAIL_USER;
+  const rawUser = process.env.EMAIL_USER;
+  const emailUser = sanitizeEmailUser(rawUser);
   const emailFrom = process.env.EMAIL_FROM || (emailUser ? `"PawAlert Dispatch" <${emailUser}>` : '"PawAlert Dispatch" <alerts@pawalert.org>');
 
   if (transporter && emailUser) {
@@ -216,7 +227,8 @@ export async function sendAdminNewReportNotification(params: {
   reporterPhone?: string;
   submissionDate?: string;
 }) {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER || "soukhyahegde02gmail@gmail.com";
+  const rawAdmin = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  const adminEmail = sanitizeEmailUser(rawAdmin) || "soukhyahegde02@gmail.com";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   return sendEmail({

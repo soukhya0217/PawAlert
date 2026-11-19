@@ -58,10 +58,12 @@ export async function POST(req: Request) {
       isEmailVerified: false,
     });
 
-    // Send Welcome Email (Non-blocking Nodemailer Gmail SMTP)
-    sendWelcomeEmail(newUser.email, newUser.fullName).catch((err) =>
-      console.error("[Register] Welcome email trigger error:", err)
-    );
+    // Send Welcome Email (Gracefully awaited with try/catch so SMTP completes reliably)
+    try {
+      await sendWelcomeEmail(newUser.email, newUser.fullName);
+    } catch (err) {
+      console.error("[Register] Welcome email trigger error:", err);
+    }
 
     // Sign JWT
     const token = signJwt({
