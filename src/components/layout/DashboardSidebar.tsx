@@ -19,6 +19,7 @@ import {
   Sparkles,
   ClipboardList,
   Activity,
+  Compass,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -38,7 +39,9 @@ export default function DashboardSidebar({ role, userName }: SidebarProps) {
   const getNavItems = () => {
     switch (role) {
       case "SUPER_ADMIN":
+      case "ADMIN":
         return [
+          { label: "Tactical Dispatch Map", href: "/admin", icon: <Compass className="w-4 h-4 text-orange-500" /> },
           { label: "Platform Overview", href: "/admin/dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
           { label: "Incident Watchdog", href: "/admin/incidents", icon: <AlertTriangle className="w-4 h-4 text-red-500" /> },
           { label: "User Management", href: "/admin/users", icon: <UserCheck className="w-4 h-4 text-primary-500" /> },

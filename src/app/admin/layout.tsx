@@ -2,6 +2,7 @@ import React from "react";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
 import { ShieldAlert, ArrowLeft, Home, UserCheck } from "lucide-react";
+import AdminNavBar from "@/components/admin-nav-bar";
 
 export const metadata = {
   title: "Admin Command Center | PawAlert",
@@ -67,6 +68,18 @@ export default async function AdminLayout({
     );
   }
 
-  // 3. User is verified Administrator
-  return <>{children}</>;
+  // 3. User is verified Administrator: Render Command Bar + Children
+  return (
+    <div className="min-h-screen bg-[#FFF9F0] flex flex-col">
+      <AdminNavBar
+        user={{
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role,
+          profileImage: user.profileImage,
+        }}
+      />
+      <main className="flex-1">{children}</main>
+    </div>
+  );
 }

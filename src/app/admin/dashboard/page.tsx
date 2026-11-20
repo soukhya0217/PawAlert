@@ -77,13 +77,22 @@ export default function SuperAdminDashboardPage() {
               </p>
             </div>
 
-            <a
-              href="/admin/audit-logs"
-              className="bento-btn inline-flex items-center gap-2 rounded-[14px] bg-[#1B3B2B] px-4 py-2.5 text-xs text-white"
-            >
-              <FileText className="w-4 h-4" />
-              <span>Inspect Audit Logs</span>
-            </a>
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href="/admin"
+                className="pixar-btn inline-flex items-center gap-2 rounded-[14px] bg-[#FF7A00] text-white px-4 py-2.5 text-xs font-bold shadow-pixar-sm hover:bg-[#EA580C]"
+              >
+                <Compass className="w-4 h-4" />
+                <span>Tactical Dispatch Map</span>
+              </a>
+              <a
+                href="/admin/audit-logs"
+                className="pixar-btn inline-flex items-center gap-2 rounded-[14px] bg-[#1E1B4B] text-white px-4 py-2.5 text-xs font-bold shadow-pixar-sm"
+              >
+                <FileText className="w-4 h-4 text-[#FFB703]" />
+                <span>Inspect Audit Logs</span>
+              </a>
+            </div>
           </div>
 
           {/* Platform KPIs */}

@@ -23,6 +23,21 @@ if (!global.mongooseCache) {
   global.mongooseCache = cached;
 }
 
+function cleanStaleLocks(dir: string) {
+  const lockFiles = ["mongod.lock", "WiredTiger.lock"];
+  for (const file of lockFiles) {
+    const fullPath = path.join(dir, file);
+    if (fs.existsSync(fullPath)) {
+      try {
+        fs.unlinkSync(fullPath);
+        console.log(`[MongoDB] Removed stale lockfile: ${file}`);
+      } catch {
+        // Ignored if actively locked
+      }
+    }
+  }
+}
+
 export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn && cached.conn.connection.readyState === 1) {
     return cached.conn;
@@ -46,7 +61,7 @@ export async function connectDB(): Promise<typeof mongoose> {
         return mongooseInstance;
       })
       .catch(async (err) => {
-        console.warn(`[MongoDB] Connection to ${uri} failed (${err.message}). Starting persistent local fallback...`);
+        console.warn(`[MongoDB] Direct connection to ${uri} failed (${err.message}). Starting persistent local fallback...`);
         try {
           const { MongoMemoryServer } = await import("mongodb-memory-server");
           if (!cached.memoryServer) {
@@ -54,15 +69,22 @@ export async function connectDB(): Promise<typeof mongoose> {
             if (!fs.existsSync(dataDir)) {
               fs.mkdirSync(dataDir, { recursive: true });
             }
-            cached.memoryServer = await MongoMemoryServer.create({
-              instance: {
-                dbPath: dataDir,
-                storageEngine: "wiredTiger",
-              },
-            });
+            cleanStaleLocks(dataDir);
+
+            try {
+              cached.memoryServer = await MongoMemoryServer.create({
+                instance: {
+                  dbPath: dataDir,
+                  storageEngine: "wiredTiger",
+                },
+              });
+            } catch (storageErr: any) {
+              console.warn("[MongoDB] Persistent storage failed. Starting memory instance:", storageErr.message);
+              cached.memoryServer = await MongoMemoryServer.create();
+            }
           }
           const memUri = cached.memoryServer.getUri();
-          console.log(`[MongoDB] Connected to persistent local fallback instance at ${memUri}`);
+          console.log(`[MongoDB] Connected to fallback instance at ${memUri}`);
           return await mongoose.connect(memUri, opts);
         } catch (memErr: any) {
           console.error("[MongoDB] Fallback initialization error:", memErr);
