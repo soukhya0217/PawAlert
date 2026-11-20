@@ -183,17 +183,17 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
 
   return (
     <div
-      className={`auth-portal-card pixar-card p-6 sm:p-8 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] rounded-[28px] shadow-pixar ${className}`}
+      className={`auth-portal-card pixar-card p-6 sm:p-8 bg-[#FFF9F0] dark:bg-[#17153B] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] rounded-[28px] shadow-pixar transition-colors duration-300 ${className}`}
     >
       {/* Tab Switcher: Sign In vs Join Guardian */}
-      <div className="flex items-center gap-1.5 p-1.5 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] mb-6 shadow-pixar-sm">
+      <div className="flex items-center gap-1.5 p-1.5 rounded-[20px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF1DC] dark:bg-[#12102E] mb-6 shadow-pixar-sm">
         <button
           type="button"
           onClick={() => handleTabChange("LOGIN")}
           className={`flex-1 py-2 text-xs sm:text-sm font-display font-black rounded-[14px] transition-all ${
             mode === "LOGIN"
-              ? "bg-[#1E1B4B] text-white shadow-pixar-sm"
-              : "text-[#1E1B4B] hover:bg-[#FFF9F0]"
+              ? "bg-[#1E1B4B] dark:bg-[#3B286D] text-white shadow-pixar-sm"
+              : "text-[#1E1B4B] dark:text-[#FFF9F0]/80 hover:bg-[#FFF9F0] dark:hover:bg-[#1E1B4B]"
           }`}
         >
           Sign In
@@ -205,7 +205,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
           className={`flex-1 py-2 text-xs sm:text-sm font-display font-black rounded-[14px] transition-all ${
             mode === "REGISTER"
               ? "bg-[#FF7A00] text-white shadow-pixar-sm"
-              : "text-[#1E1B4B] hover:bg-[#FFF9F0]"
+              : "text-[#1E1B4B] dark:text-[#FFF9F0]/80 hover:bg-[#FFF9F0] dark:hover:bg-[#1E1B4B]"
           }`}
         >
           Join as Guardian
@@ -231,11 +231,11 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
       {mode === "LOGIN" ? (
         <form onSubmit={handleLoginSubmit} className="auth-form-container space-y-4">
           <div>
-            <label className="block font-display text-xs font-bold text-[#1E1B4B] mb-1">
+            <label className="block font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] mb-1">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+              <Mail className="w-4 h-4 text-[#1E1B4B]/50 dark:text-[#FFF9F0]/50 absolute left-3.5 top-3.5" />
               <input
                 type="email"
                 required
@@ -244,14 +244,14 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onBlur={handleInputBlur}
                 onChange={(e) => setLoginEmail(e.target.value)}
                 placeholder="rescuer@pawalert.org"
-                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] text-xs font-sans text-[#1E1B4B] dark:text-[#FFF9F0] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="font-display text-xs font-bold text-[#1E1B4B]">
+              <label className="font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
                 Password
               </label>
               <a
@@ -262,7 +262,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
               </a>
             </div>
             <div className="relative">
-              <Lock className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+              <Lock className="w-4 h-4 text-[#1E1B4B]/50 dark:text-[#FFF9F0]/50 absolute left-3.5 top-3.5" />
               <input
                 type="password"
                 required
@@ -271,7 +271,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onBlur={handleInputBlur}
                 onChange={(e) => setLoginPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] text-xs font-sans text-[#1E1B4B] dark:text-[#FFF9F0] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
@@ -301,11 +301,11 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
         /* FORM: Join as Guardian / Register */
         <form onSubmit={handleRegisterSubmit} className="auth-form-container space-y-3">
           <div>
-            <label className="block font-display text-xs font-bold text-[#1E1B4B] mb-1">
+            <label className="block font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] mb-1">
               Full Name
             </label>
             <div className="relative">
-              <User className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+              <User className="w-4 h-4 text-[#1E1B4B]/50 dark:text-[#FFF9F0]/50 absolute left-3.5 top-3.5" />
               <input
                 type="text"
                 required
@@ -314,18 +314,18 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onBlur={handleInputBlur}
                 onChange={(e) => setRegFullName(e.target.value)}
                 placeholder="Maya Sharma"
-                className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] text-xs font-sans text-[#1E1B4B] dark:text-[#FFF9F0] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
-              <label className="block font-display text-xs font-bold text-[#1E1B4B] mb-1">
+              <label className="block font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] mb-1">
                 Email
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+                <Mail className="w-4 h-4 text-[#1E1B4B]/50 dark:text-[#FFF9F0]/50 absolute left-3.5 top-3.5" />
                 <input
                   type="email"
                   required
@@ -334,17 +334,17 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                   onBlur={handleInputBlur}
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="maya@example.com"
-                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] text-xs font-sans text-[#1E1B4B] dark:text-[#FFF9F0] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block font-display text-xs font-bold text-[#1E1B4B] mb-1">
+              <label className="block font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] mb-1">
                 Phone
               </label>
               <div className="relative">
-                <Phone className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+                <Phone className="w-4 h-4 text-[#1E1B4B]/50 dark:text-[#FFF9F0]/50 absolute left-3.5 top-3.5" />
                 <input
                   type="tel"
                   required
@@ -353,7 +353,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                   onBlur={handleInputBlur}
                   onChange={(e) => setRegMobile(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] text-xs font-sans text-[#1E1B4B] dark:text-[#FFF9F0] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                 />
               </div>
             </div>
@@ -361,11 +361,11 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
-              <label className="block font-display text-xs font-bold text-[#1E1B4B] mb-1">
+              <label className="block font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] mb-1">
                 City / Region
               </label>
               <div className="relative">
-                <MapPin className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+                <MapPin className="w-4 h-4 text-[#1E1B4B]/50 dark:text-[#FFF9F0]/50 absolute left-3.5 top-3.5" />
                 <input
                   type="text"
                   required
@@ -374,17 +374,17 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                   onBlur={handleInputBlur}
                   onChange={(e) => setRegCity(e.target.value)}
                   placeholder="Bangalore"
-                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] text-xs font-sans text-[#1E1B4B] dark:text-[#FFF9F0] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block font-display text-xs font-bold text-[#1E1B4B] mb-1">
+              <label className="block font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] mb-1">
                 Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+                <Lock className="w-4 h-4 text-[#1E1B4B]/50 dark:text-[#FFF9F0]/50 absolute left-3.5 top-3.5" />
                 <input
                   type="password"
                   required
@@ -393,7 +393,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                   onBlur={handleInputBlur}
                   onChange={(e) => setRegPassword(e.target.value)}
                   placeholder="At least 6 chars"
-                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] text-xs font-sans text-[#1E1B4B] dark:text-[#FFF9F0] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                 />
               </div>
             </div>
@@ -401,7 +401,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
 
           {/* Role selector: Citizen vs Field Rescuer */}
           <div>
-            <label className="block font-display text-xs font-bold text-[#1E1B4B] mb-1">
+            <label className="block font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] mb-1">
               Guardian Role
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -410,8 +410,8 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onClick={() => setRegRole("PUBLIC_USER")}
                 className={`p-2 rounded-[14px] border-[2px] text-xs font-bold font-display text-center transition-all ${
                   regRole === "PUBLIC_USER"
-                    ? "border-[#1E1B4B] bg-[#FFB703] text-[#1E1B4B] shadow-pixar-sm"
-                    : "border-[#1E1B4B]/20 bg-[#FFF1DC] text-[#1E1B4B]/70"
+                    ? "border-[#1E1B4B] dark:border-[#FBBF24] bg-[#FFB703] text-[#1E1B4B] shadow-pixar-sm"
+                    : "border-[#1E1B4B]/20 dark:border-[#3B286D] bg-[#FFF1DC] dark:bg-[#1E1B4B] text-[#1E1B4B]/70 dark:text-[#FFF9F0]/70"
                 }`}
               >
                 🐾 Citizen Reporter
@@ -421,8 +421,8 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onClick={() => setRegRole("RESCUE_VOLUNTEER")}
                 className={`p-2 rounded-[14px] border-[2px] text-xs font-bold font-display text-center transition-all ${
                   regRole === "RESCUE_VOLUNTEER"
-                    ? "border-[#1E1B4B] bg-[#10B981] text-white shadow-pixar-sm"
-                    : "border-[#1E1B4B]/20 bg-[#FFF1DC] text-[#1E1B4B]/70"
+                    ? "border-[#1E1B4B] dark:border-[#10B981] bg-[#10B981] text-white shadow-pixar-sm"
+                    : "border-[#1E1B4B]/20 dark:border-[#3B286D] bg-[#FFF1DC] dark:bg-[#1E1B4B] text-[#1E1B4B]/70 dark:text-[#FFF9F0]/70"
                 }`}
               >
                 🚑 Field Rescuer

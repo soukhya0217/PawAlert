@@ -44,15 +44,15 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-16">
+    <div className="max-w-md mx-auto px-4 py-16 transition-colors duration-300">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 rounded-[22px] border-[3px] border-[#1E1B4B] bg-[#FFB703] flex items-center justify-center text-3xl mx-auto shadow-pixar mb-3">
+        <div className="w-16 h-16 rounded-[22px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFB703] flex items-center justify-center text-3xl mx-auto shadow-pixar mb-3">
           🔑
         </div>
-        <h1 className="text-3xl font-black font-display text-[#1E1B4B] tracking-tight">
+        <h1 className="text-3xl font-black font-display text-[#1E1B4B] dark:text-[#FFF9F0] tracking-tight">
           Password Recovery
         </h1>
-        <p className="text-xs text-[#1E1B4B]/70 mt-1 font-sans">
+        <p className="text-xs text-[#1E1B4B]/70 dark:text-[#FFF9F0]/70 mt-1 font-sans">
           Enter your registered email and our dispatch mailer will send a secure reset link.
         </p>
       </div>
@@ -66,27 +66,27 @@ export default function ForgotPasswordPage() {
         )}
 
         {sent ? (
-          <div className="p-5 rounded-[20px] bg-[#10B981]/10 border-[2px] border-[#10B981] text-[#1E1B4B] text-xs font-medium space-y-4 text-center">
+          <div className="p-5 rounded-[20px] bg-[#10B981]/10 border-[2px] border-[#10B981] text-[#1E1B4B] dark:text-[#FFF9F0] text-xs font-medium space-y-4 text-center">
             <div className="w-12 h-12 rounded-full bg-[#10B981] text-white flex items-center justify-center mx-auto shadow-pixar-sm">
               <CheckCircle2 className="w-6 h-6" />
             </div>
             <div>
-              <p className="font-display text-sm font-bold text-[#1E1B4B]">
+              <p className="font-display text-sm font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
                 Recovery Instructions Dispatched!
               </p>
-              <p className="text-[11px] text-[#1E1B4B]/75 mt-1 font-sans">
+              <p className="text-[11px] text-[#1E1B4B]/75 dark:text-[#FFF9F0]/80 mt-1 font-sans">
                 Check your inbox at <strong className="text-[#FF7A00]">{email}</strong> for the secure password reset link.
               </p>
             </div>
 
             {previewUrl && (
-              <div className="p-3 rounded-[14px] bg-[#FFF9F0] border-[2px] border-[#1E1B4B] text-left">
+              <div className="p-3 rounded-[14px] bg-[#FFF9F0] dark:bg-[#1E1B4B] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] text-left">
                 <span className="font-mono text-[9px] font-bold text-[#FF7A00] block uppercase mb-1">
                   ⚡ Dev Mode Simulation Link:
                 </span>
                 <a
                   href={previewUrl}
-                  className="font-mono text-[10px] text-[#1D4ED8] underline break-all block"
+                  className="font-mono text-[10px] text-[#1D4ED8] dark:text-[#60A5FA] underline break-all block"
                 >
                   {previewUrl}
                 </a>
@@ -96,7 +96,7 @@ export default function ForgotPasswordPage() {
             <div className="pt-2">
               <a
                 href="/login"
-                className="pixar-btn inline-flex items-center justify-center gap-1.5 w-full bg-[#1E1B4B] text-white py-2.5 text-xs font-bold shadow-pixar-sm"
+                className="pixar-btn inline-flex items-center justify-center gap-1.5 w-full bg-[#1E1B4B] dark:bg-[#3B286D] text-white py-2.5 text-xs font-bold shadow-pixar-sm"
               >
                 <span>Back to Sign In</span>
               </a>
@@ -105,18 +105,18 @@ export default function ForgotPasswordPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="font-display text-xs font-bold text-[#1E1B4B] block mb-1">
+              <label className="font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] block mb-1">
                 Registered Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+                <Mail className="w-4 h-4 text-[#1E1B4B]/50 dark:text-[#FFF9F0]/50 absolute left-3.5 top-3.5" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="rescuer@pawalert.org"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] text-xs font-sans text-[#1E1B4B] dark:text-[#FFF9F0] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                 />
               </div>
             </div>

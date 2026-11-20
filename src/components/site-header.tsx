@@ -74,7 +74,7 @@ export default function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0]/95 dark:bg-[#0F0E26]/95 backdrop-blur-md transition-colors duration-300">
       {/* Top Warm Twilight-to-Sunset Mission Banner with Tagline Pill */}
       <div className="bg-gradient-to-r from-[#1E1B4B] via-[#3B286D] to-[#FF7A00] text-[#FFF9F0] py-1.5 px-4 text-center border-b-[2px] border-[#1E1B4B]">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 text-[11px] sm:text-xs font-display font-bold">

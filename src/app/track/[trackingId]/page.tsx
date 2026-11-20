@@ -131,7 +131,7 @@ export default function TrackingPage() {
       <div className="max-w-lg mx-auto my-12 px-4 space-y-6">
         <div className="pixar-card p-6 sm:p-8 text-center space-y-5">
           {/* Sleeping Puppy SVG Mascot */}
-          <div className="relative mx-auto w-16 h-16 rounded-[22px] border-[3px] border-[#1E1B4B] bg-[#FFF1DC] flex items-center justify-center shadow-pixar-sm">
+          <div className="relative mx-auto w-16 h-16 rounded-[22px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF1DC] dark:bg-[#1E1B4B] flex items-center justify-center shadow-pixar-sm">
             <svg viewBox="0 0 40 40" className="w-10 h-10">
               <circle cx="20" cy="22" r="12" fill="#FBBF24" stroke="#1E1B4B" strokeWidth="2.5" />
               <path d="M 14 20 Q 17 23 20 20" fill="none" stroke="#1E1B4B" strokeWidth="2" strokeLinecap="round" />
@@ -147,10 +147,10 @@ export default function TrackingPage() {
           </div>
 
           <div className="space-y-1.5">
-            <h2 className="text-2xl font-black font-display text-[#1E1B4B]">
+            <h2 className="text-2xl font-black font-display text-[#1E1B4B] dark:text-[#FFF9F0]">
               {trackingId === "live" ? "Sanctuary Radar is Quiet" : "Rescue Case Lookup"}
             </h2>
-            <p className="text-xs text-[#1E1B4B]/75 max-w-sm mx-auto font-sans">
+            <p className="text-xs text-[#1E1B4B]/75 dark:text-[#FFF9F0]/80 max-w-sm mx-auto font-sans">
               {trackingId === "live"
                 ? "Zero active distress emergencies in flight. Enter a specific tracking number below or submit a new rescue."
                 : (error || `No active rescue found matching "${trackingId}".`)}
@@ -172,7 +172,7 @@ export default function TrackingPage() {
               placeholder="e.g. PAW-20261118-8842"
               value={customSearchId}
               onChange={(e) => setCustomSearchId(e.target.value)}
-              className="flex-1 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] px-3.5 py-2.5 text-xs font-mono font-bold text-[#1E1B4B] placeholder:text-[#1E1B4B]/40 focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+              className="flex-1 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] px-3.5 py-2.5 text-xs font-mono font-bold text-[#1E1B4B] dark:text-[#FFF9F0] placeholder:text-[#1E1B4B]/40 dark:placeholder:text-[#FFF9F0]/40 focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
             />
             <button
               type="submit"
@@ -182,7 +182,7 @@ export default function TrackingPage() {
             </button>
           </form>
 
-          <div className="pt-3 border-t-[2px] border-[#1E1B4B]/10 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="pt-3 border-t-[2px] border-[#1E1B4B]/10 dark:border-white/10 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
               href="/report"
               className="pixar-btn w-full sm:w-auto bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white px-5 py-2.5 text-xs shadow-pixar-sm font-bold"
@@ -191,7 +191,7 @@ export default function TrackingPage() {
             </a>
             <a
               href="/map"
-              className="pixar-btn w-full sm:w-auto bg-[#FFF1DC] text-[#1E1B4B] px-5 py-2.5 text-xs shadow-pixar-sm font-bold"
+              className="pixar-btn w-full sm:w-auto bg-[#FFF1DC] dark:bg-[#1E1B4B] text-[#1E1B4B] dark:text-[#FFF9F0] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] px-5 py-2.5 text-xs shadow-pixar-sm font-bold"
             >
               🧭 Command Center Map
             </a>
@@ -205,20 +205,20 @@ export default function TrackingPage() {
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
       
       {/* Top Header & Tracking ID */}
-      <div className="flex items-center justify-between border-b-[3px] border-[#1E1B4B] pb-4">
+      <div className="flex items-center justify-between border-b-[3px] border-[#1E1B4B] dark:border-[#3B286D] pb-4">
         <button
           onClick={() => router.push("/")}
-          className="pixar-btn flex items-center gap-1.5 rounded-[16px] bg-[#FFF9F0] px-4 py-2 text-xs font-bold text-[#1E1B4B] shadow-pixar-sm"
+          className="pixar-btn flex items-center gap-1.5 rounded-[16px] bg-[#FFF9F0] dark:bg-[#1E1B4B] px-4 py-2 text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] shadow-pixar-sm"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Home</span>
         </button>
 
         <div className="text-right">
-          <span className="font-mono text-[10px] text-[#1E1B4B]/60 uppercase tracking-widest block font-bold">
+          <span className="font-mono text-[10px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60 uppercase tracking-widest block font-bold">
             LIVE TRACKER
           </span>
-          <span className="font-mono text-sm sm:text-base font-black text-[#FF7A00]">
+          <span className="font-mono text-sm sm:base font-black text-[#FF7A00]">
             {incident.incidentId || trackingId}
           </span>
         </div>
@@ -238,20 +238,20 @@ export default function TrackingPage() {
         )}
 
         <div>
-          <span className="inline-block rounded-[14px] border-[2px] border-[#1E1B4B] bg-[#FFB703] px-3.5 py-1 font-display text-xs font-bold text-[#1E1B4B] shadow-pixar-sm mb-2">
+          <span className="inline-block rounded-[14px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFB703] px-3.5 py-1 font-display text-xs font-bold text-[#1E1B4B] shadow-pixar-sm mb-2">
             {incident.animalCategory || "Animal in Distress"}
           </span>
-          <h1 className="text-3xl font-black font-display text-[#1E1B4B]">
+          <h1 className="text-3xl font-black font-display text-[#1E1B4B] dark:text-[#FFF9F0]">
             Rescue Mission Status
           </h1>
-          <p className="text-xs text-[#1E1B4B]/75 mt-1 font-sans">
+          <p className="text-xs text-[#1E1B4B]/75 dark:text-[#FFF9F0]/80 mt-1 font-sans">
             {incident.conditionDescription}
           </p>
         </div>
 
         {/* Animated Walking Paw-Trail Tracker */}
-        <div className="py-6 border-y-[3px] border-[#1E1B4B] space-y-4">
-          <span className="font-mono text-[11px] font-bold text-[#1E1B4B] uppercase tracking-wider block">
+        <div className="py-6 border-y-[3px] border-[#1E1B4B] dark:border-[#3B286D] space-y-4">
+          <span className="font-mono text-[11px] font-bold text-[#1E1B4B] dark:text-[#FFF9F0] uppercase tracking-wider block">
             4-STAGE RESCUE TRAIL
           </span>
 
@@ -263,12 +263,12 @@ export default function TrackingPage() {
               return (
                 <div
                   key={st.id}
-                  className={`walking-paw-step rounded-[20px] border-[3px] border-[#1E1B4B] p-3.5 transition-all flex flex-col justify-between ${
+                  className={`walking-paw-step rounded-[20px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] p-3.5 transition-all flex flex-col justify-between ${
                     isCurrent
                       ? "bg-[#FF7A00] text-white shadow-pixar scale-[1.02]"
                       : isPast
                       ? "bg-[#10B981] text-white shadow-pixar-sm"
-                      : "bg-[#FFF1DC] text-[#1E1B4B]/60"
+                      : "bg-[#FFF1DC] dark:bg-[#1E1B4B] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
@@ -297,32 +297,32 @@ export default function TrackingPage() {
         {/* Location & Volunteer Details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Location */}
-          <div className="rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-1 shadow-pixar-sm">
-            <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B]">
+          <div className="rounded-[20px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] p-4 space-y-1 shadow-pixar-sm">
+            <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
               <MapPin className="w-4 h-4 text-[#FF7A00]" />
               <span>Location Coordinates</span>
             </div>
-            <p className="text-xs text-[#1E1B4B]/80 font-sans truncate">
+            <p className="text-xs text-[#1E1B4B]/80 dark:text-[#FFF9F0]/80 font-sans truncate">
               {incident.location?.address || "Address logged"}
             </p>
             {incident.location?.coordinates && (
-              <p className="font-mono text-[10px] text-[#1E1B4B]/60">
+              <p className="font-mono text-[10px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60">
                 GPS: {incident.location.coordinates[1]?.toFixed(4)}° N, {incident.location.coordinates[0]?.toFixed(4)}° E
               </p>
             )}
           </div>
 
           {/* Assigned Volunteer Squad */}
-          <div className="rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-1 shadow-pixar-sm">
-            <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B]">
+          <div className="rounded-[20px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] p-4 space-y-1 shadow-pixar-sm">
+            <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
               <ShieldCheck className="w-4 h-4 text-[#10B981]" />
               <span>Assigned Volunteer Squad</span>
             </div>
-            <p className="text-xs text-[#1E1B4B]/80 font-sans">
+            <p className="text-xs text-[#1E1B4B]/80 dark:text-[#FFF9F0]/80 font-sans">
               {incident.assignedVolunteerId?.fullName || "First eligible responder locking case..."}
             </p>
             {incident.assignedVolunteerId?.mobile && (
-              <p className="font-mono text-[10px] text-[#1E1B4B]/60">
+              <p className="font-mono text-[10px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60">
                 Direct Contact: {incident.assignedVolunteerId.mobile}
               </p>
             )}
