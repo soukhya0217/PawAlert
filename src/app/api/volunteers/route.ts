@@ -6,6 +6,25 @@ import { getCurrentUser } from "@/lib/auth/session";
 
 export async function GET(req: Request) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized. Please sign in." }, { status: 401 });
+    }
+
+    const isAuthorized =
+      user.role === "SUPER_ADMIN" ||
+      user.role === "ADMIN" ||
+      user.role === "NGO_ADMIN" ||
+      user.role === "RESCUE_VOLUNTEER" ||
+      user.role === "VETERINARIAN";
+
+    if (!isAuthorized) {
+      return NextResponse.json(
+        { error: "Access denied. Volunteer roster is restricted to authorized personnel." },
+        { status: 403 }
+      );
+    }
+
     await connectDB();
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");

@@ -9,6 +9,7 @@ export type UserRole =
   | "SHELTER_VOLUNTEER"
   | "VETERINARIAN"
   | "NGO_ADMIN"
+  | "ADMIN"
   | "SUPER_ADMIN";
 
 export interface IUser extends Document {
@@ -69,6 +70,7 @@ const UserSchema = new Schema<IUser>(
         "SHELTER_VOLUNTEER",
         "VETERINARIAN",
         "NGO_ADMIN",
+        "ADMIN",
         "SUPER_ADMIN",
       ],
       default: "PUBLIC_USER",

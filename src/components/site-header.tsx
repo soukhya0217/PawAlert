@@ -70,7 +70,7 @@ export default function SiteHeader() {
   const navLinks = [
     { label: "Report Emergency", href: "/report", icon: AlertTriangle, highlight: true },
     { label: "Track Case", href: "/track/live", icon: Radio },
-    { label: "Command Center", href: "/map", icon: Compass },
+    { label: "Live Rescue Map", href: "/map", icon: Compass },
     { label: "Adoptions", href: "/adoption", icon: Heart },
   ];
 
@@ -158,13 +158,23 @@ export default function SiteHeader() {
                     </p>
                   </div>
                   <div className="py-1">
-                    <a
-                      href={currentUser.role === "SUPER_ADMIN" || currentUser.role === "ADMIN" ? "/admin" : "/user/dashboard"}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] hover:bg-[#FFF1DC] rounded-[12px]"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Command Dashboard</span>
-                    </a>
+                    {(currentUser.role === "SUPER_ADMIN" || currentUser.role === "ADMIN" || currentUser.role === "NGO_ADMIN") ? (
+                      <a
+                        href="/admin"
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#FF7A00] hover:bg-[#FFF1DC] rounded-[12px]"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#FF7A00]" />
+                        <span>Admin Command Center</span>
+                      </a>
+                    ) : (
+                      <a
+                        href="/user/dashboard"
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] hover:bg-[#FFF1DC] rounded-[12px]"
+                      >
+                        <User className="w-3.5 h-3.5 text-[#10B981]" />
+                        <span>Guardian Dashboard</span>
+                      </a>
+                    )}
                     <a
                       href="/user/profile"
                       className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] hover:bg-[#FFF1DC] rounded-[12px]"

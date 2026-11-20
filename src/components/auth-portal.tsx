@@ -13,7 +13,8 @@ import {
   AlertCircle, 
   Sparkles,
   HeartHandshake,
-  CheckCircle2
+  CheckCircle2,
+  ArrowLeft
 } from "lucide-react";
 import anime from "animejs";
 
@@ -22,12 +23,14 @@ interface AuthPortalProps {
   className?: string;
 }
 
+type AuthMode = "LOGIN" | "REGISTER" | "ADMIN_LOGIN";
+
 export default function AuthPortal({ onFocusChange, className = "" }: AuthPortalProps) {
   const router = useRouter();
 
-  const [mode, setMode] = useState<"LOGIN" | "REGISTER">("LOGIN");
+  const [mode, setMode] = useState<AuthMode>("LOGIN");
 
-  // Login form state
+  // Login form state (empty by default - zero credentials exposed)
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
@@ -52,10 +55,21 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
       duration: 650,
       easing: "easeOutElastic(1, 0.75)",
     });
+
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("mode") === "admin") {
+        setMode("ADMIN_LOGIN");
+      }
+      if (params.get("denied") === "1") {
+        setErrorMsg("Administrator authorization required. Please sign in with your verified admin credentials.");
+        setMode("ADMIN_LOGIN");
+      }
+    }
   }, []);
 
   // Tab change animation
-  const handleTabChange = (targetMode: "LOGIN" | "REGISTER") => {
+  const handleTabChange = (targetMode: AuthMode) => {
     if (mode === targetMode) return;
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -78,7 +92,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
     if (onFocusChange) onFocusChange(false);
   };
 
-  // 1. Real Login
+  // 1. Login Handler (Handles both normal login and admin login securely)
   const handleLoginSubmit = async (e?: React.FormEvent, customEmail?: string, customPass?: string) => {
     if (e) e.preventDefault();
     setErrorMsg(null);
@@ -103,13 +117,36 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
       const data = await res.json();
 
       if (res.ok) {
-        setSuccessMsg("Signed in successfully! Redirecting...");
         const role = data.user?.role;
+        const isAuthorizedAdmin =
+          role === "SUPER_ADMIN" || role === "ADMIN" || role === "NGO_ADMIN";
+
+        // If logging in via dedicated Admin Login mode
+        if (mode === "ADMIN_LOGIN") {
+          if (!isAuthorizedAdmin) {
+            setErrorMsg(
+              `Access Denied: This account (${data.user?.fullName || "User"}) does not possess administrator privileges. Normal users cannot access the Admin Command Center.`
+            );
+            return;
+          }
+          setSuccessMsg("Administrator identity verified! Launching Command Center...");
+          setTimeout(() => {
+            router.push("/admin");
+            router.refresh();
+          }, 600);
+          return;
+        }
+
+        // Standard Login mode
+        setSuccessMsg("Signed in successfully! Redirecting...");
         setTimeout(() => {
-          if (role === "SUPER_ADMIN" || role === "ADMIN") router.push("/admin");
-          else if (role === "NGO_ADMIN") router.push("/ngo/dashboard");
-          else if (role === "VETERINARIAN") router.push("/vet/dashboard");
-          else router.push("/");
+          if (isAuthorizedAdmin) {
+            router.push("/admin");
+          } else if (role === "VETERINARIAN") {
+            router.push("/vet/dashboard");
+          } else {
+            router.push("/user/dashboard");
+          }
           router.refresh();
         }, 500);
       } else {
@@ -158,7 +195,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
       if (res.ok) {
         setSuccessMsg("Account created! Welcome email dispatched. Redirecting...");
         setTimeout(() => {
-          router.push("/");
+          router.push("/user/dashboard");
           router.refresh();
         }, 800);
       } else {
@@ -171,45 +208,55 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
     }
   };
 
-  // 1-Click Bootstrap Admin Credential Fill
-  const handleFillAdmin = () => {
-    const adminEmail = "admin@pawalert.org";
-    const adminPass = "AdminPass2026!";
-    setLoginEmail(adminEmail);
-    setLoginPassword(adminPass);
-    handleLoginSubmit(undefined, adminEmail, adminPass);
-  };
-
   return (
     <div
       className={`auth-portal-card pixar-card p-6 sm:p-8 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] rounded-[28px] shadow-pixar transition-colors duration-300 ${className}`}
     >
-      {/* Tab Switcher: Sign In vs Join Guardian */}
-      <div className="flex items-center gap-1.5 p-1.5 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] mb-6 shadow-pixar-sm">
-        <button
-          type="button"
-          onClick={() => handleTabChange("LOGIN")}
-          className={`flex-1 py-2 text-xs sm:text-sm font-display font-black rounded-[14px] transition-all ${
-            mode === "LOGIN"
-              ? "bg-[#1E1B4B] text-white shadow-pixar-sm"
-              : "text-[#1E1B4B] hover:bg-[#FFF9F0]"
-          }`}
-        >
-          Sign In
-        </button>
+      {/* Tab Switcher: Sign In vs Join Guardian vs Admin Mode */}
+      {mode === "ADMIN_LOGIN" ? (
+        <div className="flex items-center justify-between p-2 rounded-[18px] border-[2px] border-[#1E1B4B] bg-[#1E1B4B] text-white mb-6 shadow-pixar-sm">
+          <div className="flex items-center gap-2 pl-2">
+            <ShieldCheck className="w-4 h-4 text-[#FFB703]" />
+            <span className="text-xs font-display font-black tracking-wide uppercase">
+              Admin Portal
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleTabChange("LOGIN")}
+            className="flex items-center gap-1 px-3 py-1 rounded-[12px] bg-[#FFF9F0] text-[#1E1B4B] text-xs font-bold hover:bg-[#FFB703] transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Normal Login</span>
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-1.5 p-1.5 rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] mb-6 shadow-pixar-sm">
+          <button
+            type="button"
+            onClick={() => handleTabChange("LOGIN")}
+            className={`flex-1 py-2 text-xs sm:text-sm font-display font-black rounded-[14px] transition-all ${
+              mode === "LOGIN"
+                ? "bg-[#1E1B4B] text-white shadow-pixar-sm"
+                : "text-[#1E1B4B] hover:bg-[#FFF9F0]"
+            }`}
+          >
+            Sign In
+          </button>
 
-        <button
-          type="button"
-          onClick={() => handleTabChange("REGISTER")}
-          className={`flex-1 py-2 text-xs sm:text-sm font-display font-black rounded-[14px] transition-all ${
-            mode === "REGISTER"
-              ? "bg-[#FF7A00] text-white shadow-pixar-sm"
-              : "text-[#1E1B4B] hover:bg-[#FFF9F0]"
-          }`}
-        >
-          Join as Guardian
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => handleTabChange("REGISTER")}
+            className={`flex-1 py-2 text-xs sm:text-sm font-display font-black rounded-[14px] transition-all ${
+              mode === "REGISTER"
+                ? "bg-[#FF7A00] text-white shadow-pixar-sm"
+                : "text-[#1E1B4B] hover:bg-[#FFF9F0]"
+            }`}
+          >
+            Join as Guardian
+          </button>
+        </div>
+      )}
 
       {/* Notifications */}
       {errorMsg && (
@@ -226,7 +273,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
         </div>
       )}
 
-      {/* FORM: Sign In */}
+      {/* FORM: Sign In (Regular users) */}
       {mode === "LOGIN" ? (
         <form onSubmit={handleLoginSubmit} className="auth-form-container space-y-4">
           <div>
@@ -284,15 +331,87 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          {/* Quick Admin Access Button */}
-          <div className="pt-3 border-t-[2px] border-[#1E1B4B]/10">
+          {/* Discreet Admin Login Option */}
+          <div className="pt-3 border-t-[2px] border-[#1E1B4B]/10 flex items-center justify-center">
             <button
               type="button"
-              onClick={handleFillAdmin}
-              className="pixar-btn w-full flex items-center justify-center gap-2 rounded-[16px] bg-[#FFB703] py-2 text-xs font-bold text-[#1E1B4B] shadow-pixar-sm"
+              onClick={() => handleTabChange("ADMIN_LOGIN")}
+              className="inline-flex items-center gap-1.5 text-xs font-display font-bold text-[#1E1B4B]/70 hover:text-[#FF7A00] transition-colors"
             >
-              <ShieldCheck className="w-4 h-4 text-[#1E1B4B]" />
-              <span>Fill Admin Credentials (1-Click)</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-[#FF7A00]" />
+              <span>Log in as Admin &rarr;</span>
+            </button>
+          </div>
+        </form>
+      ) : mode === "ADMIN_LOGIN" ? (
+        /* FORM: Dedicated Administrator Sign In */
+        <form onSubmit={handleLoginSubmit} className="auth-form-container space-y-4">
+          <div className="p-3 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] text-center shadow-pixar-sm">
+            <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#1E1B4B] text-[#FFB703] mb-1">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <h4 className="font-display text-xs font-black text-[#1E1B4B] uppercase tracking-wide">
+              Administrator Access
+            </h4>
+            <p className="font-sans text-[11px] text-[#1E1B4B]/70 mt-0.5">
+              Enter your administrator credentials to access the central dispatch console.
+            </p>
+          </div>
+
+          <div>
+            <label className="block font-display text-xs font-bold text-[#1E1B4B] mb-1">
+              Admin Email
+            </label>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+              <input
+                type="email"
+                required
+                value={loginEmail}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="admin@pawalert.org"
+                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block font-display text-xs font-bold text-[#1E1B4B] mb-1">
+              Admin Password
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-[#1E1B4B]/50 absolute left-3.5 top-3.5" />
+              <input
+                type="password"
+                required
+                value={loginPassword}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                placeholder="••••••••••••"
+                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="pixar-btn w-full flex items-center justify-center gap-2 rounded-[18px] bg-[#1E1B4B] text-white py-3 text-sm font-bold shadow-pixar disabled:opacity-50 mt-2 hover:bg-[#2D1B69]"
+          >
+            <ShieldCheck className="w-4 h-4 text-[#FFB703]" />
+            <span>{loading ? "Verifying Authorization..." : "Sign In as Admin"}</span>
+          </button>
+
+          <div className="pt-2 text-center">
+            <button
+              type="button"
+              onClick={() => handleTabChange("LOGIN")}
+              className="text-xs font-display font-bold text-[#1E1B4B]/70 hover:text-[#1E1B4B] underline transition-colors"
+            >
+              ← Back to Guardian Sign In
             </button>
           </div>
         </form>

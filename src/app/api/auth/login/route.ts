@@ -6,6 +6,7 @@ import VolunteerProfile from "@/lib/db/models/VolunteerProfile";
 import { signJwt } from "@/lib/auth/jwt";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/session";
 import { sendLoginEmail } from "@/lib/email/mailer";
+import { bootstrapAdminOnly } from "@/db/bootstrap";
 
 export async function POST(req: Request) {
   try {
@@ -19,6 +20,7 @@ export async function POST(req: Request) {
     }
 
     await connectDB();
+    await bootstrapAdminOnly();
 
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {

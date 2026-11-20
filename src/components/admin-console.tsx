@@ -59,6 +59,7 @@ export default function AdminConsole() {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [selectedVolunteerId, setSelectedVolunteerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [authDenied, setAuthDenied] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
@@ -74,6 +75,13 @@ export default function AdminConsole() {
         fetch("/api/incidents?limit=100"),
         fetch("/api/volunteers"),
       ]);
+
+      if (incRes.status === 401 || incRes.status === 403 || volRes.status === 401 || volRes.status === 403) {
+        setAuthDenied(true);
+        setLoading(false);
+        return;
+      }
+
       const incData = await incRes.json();
       const volData = await volRes.json();
 
@@ -220,6 +228,38 @@ export default function AdminConsole() {
       );
     }
   };
+
+  if (authDenied) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full pixar-card p-8 bg-[#FFF9F0] border-[3px] border-[#EF4444] rounded-[28px] text-center space-y-4 shadow-pixar">
+          <div className="w-14 h-14 rounded-[20px] bg-[#EF4444]/10 border-[2px] border-[#EF4444] text-[#EF4444] flex items-center justify-center mx-auto text-2xl shadow-pixar-sm">
+            🛡️
+          </div>
+          <h2 className="font-display text-xl font-black text-[#1E1B4B]">
+            Administrator Access Restricted
+          </h2>
+          <p className="font-sans text-xs text-[#1E1B4B]/75 leading-relaxed">
+            This console is strictly reserved for verified PawAlert platform administrators and field commanders. Normal users cannot view or dispatch distress incidents.
+          </p>
+          <div className="pt-2 flex flex-col gap-2">
+            <a
+              href="/login?mode=admin"
+              className="pixar-btn w-full bg-[#1E1B4B] text-white py-2.5 text-xs font-bold rounded-[16px] shadow-pixar-sm text-center"
+            >
+              Sign In as Administrator
+            </a>
+            <a
+              href="/"
+              className="pixar-btn w-full bg-[#FFF1DC] text-[#1E1B4B] py-2.5 text-xs font-bold rounded-[16px] border-[2px] border-[#1E1B4B] shadow-pixar-sm text-center"
+            >
+              Return to Homepage
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -528,13 +528,7 @@ export async function POST() {
 
     return NextResponse.json({
       message: "Database seeded successfully with authentic production records!",
-      credentials: {
-        admin: "admin@poweralert.org / password123",
-        ngo: "ngo@poweralert.org / password123",
-        volunteer: "volunteer@poweralert.org / password123",
-        vet: "vet@poweralert.org / password123",
-        user: "user@poweralert.org / password123",
-      },
+      status: "SUCCESS",
       counts: {
         users: 5,
         incidents: 3,
