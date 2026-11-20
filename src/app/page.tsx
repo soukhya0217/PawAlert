@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import DioramaHero from "@/components/diorama-hero";
-import AdminMap from "@/components/admin-map";
 import { useRecentIncidents } from "@/lib/use-recent-incidents";
 import { 
   ArrowRight, 
@@ -14,6 +14,24 @@ import {
   Compass,
   Activity
 } from "lucide-react";
+
+// Client-only dynamic import to ensure zero hydration issues and seamless Leaflet loading
+const AdminMap = dynamic(() => import("@/components/admin-map"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[520px] rounded-[24px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF1DC] dark:bg-[#17153B] flex flex-col items-center justify-center p-6 text-center shadow-pixar">
+      <div className="h-12 w-12 rounded-[16px] bg-[#FF7A00] flex items-center justify-center text-white mb-3 shadow-pixar-sm">
+        <Compass className="w-6 h-6 animate-spin" />
+      </div>
+      <p className="font-display font-bold text-sm text-[#1E1B4B] dark:text-[#FFF9F0]">
+        Connecting to Sanctuary Geospatial Radar...
+      </p>
+      <p className="font-mono text-xs text-[#1E1B4B]/70 dark:text-[#FFF9F0]/70 mt-1">
+        OpenStreetMap High-Resolution Tile Stream
+      </p>
+    </div>
+  ),
+});
 
 export default function HomePage() {
   const { incidents, loading } = useRecentIncidents();

@@ -197,6 +197,12 @@ export default function AdminMap({
     if (typeof window === "undefined" || !containerRef.current) return;
 
     let isMounted = true;
+    const handleResize = () => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize();
+      }
+    };
+    window.addEventListener("resize", handleResize);
 
     import("leaflet").then((importedLeaflet) => {
       if (!isMounted || !containerRef.current) return;
@@ -244,9 +250,11 @@ export default function AdminMap({
           subdomains: config.subdomains || ["a", "b", "c"],
         });
 
-        // Robust fallback if tile server errors
+        // Robust fallback if tile server errors (guarantee single fallback attachment)
+        let fallbackAdded = false;
         tileLayer.on("tileerror", () => {
-          if (leafletInstance && (initialStyleKey as MapTileStyle) !== "osm") {
+          if (!fallbackAdded && leafletInstance) {
+            fallbackAdded = true;
             const fallback = L.tileLayer(TILE_SERVERS.osm.url, {
               attribution: TILE_SERVERS.osm.attribution,
               maxZoom: 19,
@@ -321,21 +329,15 @@ export default function AdminMap({
         mapRef.current = leafletInstance;
         setMapReady(true);
 
-        // Periodic invalidateSize to guarantee tiles render over dynamic containers
-        const invalidate = () => {
-          if (mapRef.current) {
-            mapRef.current.invalidateSize();
-          }
-        };
-        setTimeout(invalidate, 50);
-        setTimeout(invalidate, 200);
-        setTimeout(invalidate, 500);
-        setTimeout(invalidate, 1000);
-        setTimeout(invalidate, 2000);
+        setTimeout(handleResize, 50);
+        setTimeout(handleResize, 200);
+        setTimeout(handleResize, 500);
+        setTimeout(handleResize, 1000);
+        setTimeout(handleResize, 2000);
 
         if (containerRef.current && window.ResizeObserver) {
           resizeObserverRef.current = new ResizeObserver(() => {
-            invalidate();
+            handleResize();
           });
           resizeObserverRef.current.observe(containerRef.current);
         }
@@ -348,6 +350,7 @@ export default function AdminMap({
 
     return () => {
       isMounted = false;
+      window.removeEventListener("resize", handleResize);
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
       }

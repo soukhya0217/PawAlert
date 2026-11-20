@@ -40,10 +40,16 @@ export default function ThemeToggle({ className = "", showLabel = true }: ThemeT
 
     const root = document.documentElement;
     root.setAttribute("data-theme", newTheme);
+    if (document.body) {
+      document.body.setAttribute("data-theme", newTheme);
+    }
+
     if (newTheme === "dark") {
       root.classList.add("dark");
+      if (document.body) document.body.classList.add("dark");
     } else {
       root.classList.remove("dark");
+      if (document.body) document.body.classList.remove("dark");
     }
 
     window.dispatchEvent(

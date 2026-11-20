@@ -157,7 +157,7 @@ export default function SiteHeader() {
                   </div>
                   <div className="py-1">
                     <a
-                      href={currentUser.role === "SUPER_ADMIN" ? "/admin/dashboard" : "/user/dashboard"}
+                      href={currentUser.role === "SUPER_ADMIN" || currentUser.role === "ADMIN" ? "/admin" : "/user/dashboard"}
                       className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] dark:text-[#FFF9F0] hover:bg-[#FFF1DC] dark:hover:bg-[#28235C] rounded-[12px]"
                     >
                       <ShieldCheck className="w-3.5 h-3.5" />

@@ -152,6 +152,22 @@
     color: rgba(255, 249, 240, 0.85) !important;
   }
 
+  [data-theme="dark"] .pixar-card a.pixar-btn,
+  .dark .pixar-card a.pixar-btn,
+  [data-theme="dark"] .pixar-card button.pixar-btn,
+  .dark .pixar-card button.pixar-btn {
+    background-color: #1E1B4B !important;
+    color: #FFF9F0 !important;
+    border-color: #3B286D !important;
+  }
+
+  [data-theme="dark"] .pixar-card a.pixar-btn span,
+  .dark .pixar-card a.pixar-btn span,
+  [data-theme="dark"] .pixar-card button.pixar-btn span,
+  .dark .pixar-card button.pixar-btn span {
+    color: #FFF9F0 !important;
+  }
+
   /* Form Inputs in Dark Theme */
   [data-theme="dark"] input,
   [data-theme="dark"] select,

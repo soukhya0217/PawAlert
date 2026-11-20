@@ -1,7 +1,21 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import AdminMap from "@/components/admin-map";
+import dynamic from "next/dynamic";
+
+const AdminMap = dynamic(() => import("@/components/admin-map"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[520px] rounded-[24px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF1DC] dark:bg-[#17153B] flex flex-col items-center justify-center p-6 text-center shadow-pixar">
+      <div className="h-12 w-12 rounded-[16px] bg-[#FF7A00] flex items-center justify-center text-white mb-3 shadow-pixar-sm">
+        <Compass className="w-6 h-6 animate-spin" />
+      </div>
+      <p className="font-display font-bold text-sm text-[#1E1B4B] dark:text-[#FFF9F0]">
+        Loading Command Map Stream...
+      </p>
+    </div>
+  ),
+});
 import {
   Shield,
   Users,
