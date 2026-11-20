@@ -1,10 +1,12 @@
 import nodemailer, { type Transporter } from "nodemailer";
 import connectDB from "../db/connect";
 import EmailLog from "../db/models/EmailLog";
+import User from "../db/models/User";
 import { generateEmailHtml, EmailTemplateData } from "./templates";
 
 export interface SendEmailOptions {
   to: string;
+  bcc?: string | string[];
   recipientName?: string;
   template: string;
   data: EmailTemplateData;
@@ -27,27 +29,31 @@ function sanitizeEmailUser(email?: string): string | undefined {
 
 /**
  * Creates or retrieves the singleton Nodemailer Gmail SMTP transporter.
+ * Supports SMTP_USER / SMTP_PASS and legacy EMAIL_USER / EMAIL_PASS.
  */
 export function getMailTransporter(): Transporter | null {
   if (cachedTransporter) return cachedTransporter;
 
-  const rawUser = process.env.EMAIL_USER;
+  const rawUser = process.env.SMTP_USER || process.env.EMAIL_USER;
   const emailUser = sanitizeEmailUser(rawUser);
-  const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, "") : undefined;
+  const rawPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
+  const emailPass = rawPass ? rawPass.replace(/\s+/g, "") : undefined;
+  const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+  const smtpPort = Number(process.env.SMTP_PORT) || 587;
 
   if (!emailUser || !emailPass) {
     console.warn(
-      "[PawAlert Mailer] EMAIL_USER or EMAIL_PASS is not configured in .env.local. Emails will run in simulated preview mode."
+      "[PawAlert Mailer] SMTP_USER/EMAIL_USER or SMTP_PASS/EMAIL_PASS is not configured in .env.local. Emails will run in simulated preview mode."
     );
     return null;
   }
 
   try {
     cachedTransporter = nodemailer.createTransport({
-      service: "gmail",
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // SSL
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465, // SSL for 465, TLS for 587
+      requireTLS: smtpPort === 587,
       auth: {
         user: emailUser,
         pass: emailPass,
@@ -57,6 +63,7 @@ export function getMailTransporter(): Transporter | null {
       },
     });
 
+    console.log(`[PawAlert Mailer] Configured Nodemailer SMTP transporter (${emailUser} @ ${smtpHost}:${smtpPort})`);
     return cachedTransporter;
   } catch (err) {
     console.error("[PawAlert Mailer] Error instantiating Nodemailer transporter:", err);
@@ -69,30 +76,42 @@ export function getMailTransporter(): Transporter | null {
  * logs into MongoDB EmailLog, and NEVER throws (completely non-blocking).
  */
 export async function sendEmail(options: SendEmailOptions) {
-  const { to, recipientName = "Guardian", template, data, subjectOverride } = options;
+  const { to, bcc, recipientName = "Guardian", template, data, subjectOverride } = options;
   const { subject: defaultSubject, html } = generateEmailHtml(template, {
     ...data,
     recipientName,
   });
 
   const subject = subjectOverride || defaultSubject;
+  // Generate clean plain-text fallback
+  const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
   let status: "SENT" | "MOCKED" | "FAILED" = "MOCKED";
   let errorMsg: string | undefined = undefined;
   let providerMessageId: string | undefined = undefined;
 
   const transporter = getMailTransporter();
-  const rawUser = process.env.EMAIL_USER;
+  const rawUser = process.env.SMTP_USER || process.env.EMAIL_USER;
   const emailUser = sanitizeEmailUser(rawUser);
-  const emailFrom = process.env.EMAIL_FROM || (emailUser ? `"PawAlert Dispatch" <${emailUser}>` : '"PawAlert Dispatch" <alerts@pawalert.org>');
+  const emailFrom =
+    process.env.EMAIL_FROM ||
+    (emailUser ? `"PawAlert Emergency Dispatch" <${emailUser}>` : '"PawAlert Dispatch" <alerts@pawalert.org>');
 
   if (transporter && emailUser) {
     try {
-      const info = await transporter.sendMail({
+      const mailOptions: any = {
         from: emailFrom,
         to,
         subject,
         html,
-      });
+        text,
+      };
+
+      if (bcc) {
+        mailOptions.bcc = bcc;
+      }
+
+      const info = await transporter.sendMail(mailOptions);
 
       status = "SENT";
       providerMessageId = info.messageId;
@@ -136,6 +155,7 @@ export async function sendEmail(options: SendEmailOptions) {
 
 /**
  * 1. User Registration Welcome Email
+ * Automatically sent to registered email address upon successful registration.
  */
 export async function sendWelcomeEmail(to: string, fullName: string) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -151,12 +171,12 @@ export async function sendWelcomeEmail(to: string, fullName: string) {
 }
 
 /**
- * 2. User Login Notification Email (Debounced: max 1 per 2 minutes per user)
+ * 2. User Login Notification Email
+ * Automatically sent upon successful login (debounced: max 1 per 2 minutes).
  */
 export async function sendLoginEmail(to: string, fullName: string) {
   const now = Date.now();
   const lastSent = emailDebounceMap.get(to) || 0;
-  // If sent within the last 120 seconds, skip duplicate
   if (now - lastSent < 120000) {
     console.log(`[PawAlert Mailer] Skipping duplicate login email for ${to} (debounced).`);
     return { success: true, status: "DEBOUNCED" };
@@ -183,7 +203,7 @@ export async function sendLoginEmail(to: string, fullName: string) {
 }
 
 /**
- * 3. Animal Report Submission Email (Sent to Reporter)
+ * 3. Animal Report Submission Email (Sent to Original Reporter)
  */
 export async function sendReportSubmittedEmail(params: {
   to: string;
@@ -227,8 +247,8 @@ export async function sendAdminNewReportNotification(params: {
   reporterPhone?: string;
   submissionDate?: string;
 }) {
-  const rawAdmin = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
-  const adminEmail = sanitizeEmailUser(rawAdmin) || "soukhyahegde02@gmail.com";
+  const rawAdmin = process.env.ADMIN_EMAIL || process.env.SMTP_USER || process.env.EMAIL_USER;
+  const adminEmail = sanitizeEmailUser(rawAdmin) || "pawalertforeverypaw@gmail.com";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   return sendEmail({
@@ -279,4 +299,132 @@ export async function sendStatusUpdateNotification(params: {
       actionUrl: `${appUrl}/track/${params.incidentId}`,
     },
   });
+}
+
+/**
+ * 6. Community Broadcast: New Animal Rescue Case
+ * Automatically sends notifications to all registered users and volunteers via BCC
+ * ensuring recipient emails are never exposed to one another.
+ */
+export async function sendNewCaseBroadcastEmail(incident: any) {
+  try {
+    await connectDB();
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const rawUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+    const emailFrom = sanitizeEmailUser(rawUser) || "pawalertforeverypaw@gmail.com";
+
+    // Query all registered users with valid emails
+    const users = await User.find({
+      email: { $exists: true, $ne: "" },
+    }).select("email");
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const allEmails = Array.from(
+      new Set(
+        users
+          .map((u) => u.email?.toLowerCase().trim())
+          .filter((e): e is string => Boolean(e && emailRegex.test(e)))
+      )
+    );
+
+    if (allEmails.length === 0) {
+      console.log("[PawAlert Mailer] No registered users found for new case broadcast.");
+      return { success: true, count: 0 };
+    }
+
+    // Chunk into BCC batches of 40 to avoid provider SMTP limits
+    const BATCH_SIZE = 40;
+    const batches: string[][] = [];
+    for (let i = 0; i < allEmails.length; i += BATCH_SIZE) {
+      batches.push(allEmails.slice(i, i + BATCH_SIZE));
+    }
+
+    console.log(`[PawAlert Mailer] Broadcasting new case #${incident.incidentId} to ${allEmails.length} recipients across ${batches.length} batch(es)...`);
+
+    for (const batch of batches) {
+      await sendEmail({
+        to: emailFrom, // From address as To, recipients in BCC protects privacy
+        bcc: batch,
+        recipientName: "Animal Guardian Community",
+        template: "NEW_CASE_ALERT",
+        data: {
+          recipientName: "Animal Guardian Community",
+          incidentId: incident.incidentId,
+          animalCategory: incident.animalCategory,
+          conditionDescription: incident.conditionDescription,
+          locationAddress: incident.location?.address || incident.location?.landmark || "Field Location",
+          status: incident.status,
+          actionUrl: `${appUrl}/track/${incident.incidentId}`,
+        },
+      });
+    }
+
+    return { success: true, count: allEmails.length };
+  } catch (err: any) {
+    console.error("[PawAlert Mailer] Error broadcasting new case notification:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * 7. Community Broadcast: Case Resolved Notification
+ * Automatically sends notification to all registered users and volunteers when a case is resolved.
+ */
+export async function sendCaseResolvedBroadcastEmail(incident: any) {
+  try {
+    await connectDB();
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const rawUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+    const emailFrom = sanitizeEmailUser(rawUser) || "pawalertforeverypaw@gmail.com";
+
+    const users = await User.find({
+      email: { $exists: true, $ne: "" },
+    }).select("email");
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const allEmails = Array.from(
+      new Set(
+        users
+          .map((u) => u.email?.toLowerCase().trim())
+          .filter((e): e is string => Boolean(e && emailRegex.test(e)))
+      )
+    );
+
+    if (allEmails.length === 0) {
+      console.log("[PawAlert Mailer] No registered users found for resolved case broadcast.");
+      return { success: true, count: 0 };
+    }
+
+    const BATCH_SIZE = 40;
+    const batches: string[][] = [];
+    for (let i = 0; i < allEmails.length; i += BATCH_SIZE) {
+      batches.push(allEmails.slice(i, i + BATCH_SIZE));
+    }
+
+    console.log(`[PawAlert Mailer] Broadcasting resolved case #${incident.incidentId} to ${allEmails.length} recipients across ${batches.length} batch(es)...`);
+
+    for (const batch of batches) {
+      await sendEmail({
+        to: emailFrom,
+        bcc: batch,
+        recipientName: "Animal Guardian Community",
+        template: "CASE_RESOLVED_ALERT",
+        data: {
+          recipientName: "Animal Guardian Community",
+          incidentId: incident.incidentId,
+          animalCategory: incident.animalCategory,
+          conditionDescription: incident.conditionDescription,
+          locationAddress: incident.location?.address || "Field Location",
+          status: "RESOLVED",
+          adminRemarks: incident.resolutionNotes,
+          actionUrl: `${appUrl}/track/${incident.incidentId}`,
+        },
+      });
+    }
+
+    return { success: true, count: allEmails.length };
+  } catch (err: any) {
+    console.error("[PawAlert Mailer] Error broadcasting case resolved notification:", err);
+    return { success: false, error: err.message };
+  }
 }

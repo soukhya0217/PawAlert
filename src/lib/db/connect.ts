@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import path from "path";
+import fs from "fs";
 
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -22,7 +24,7 @@ if (!global.mongooseCache) {
 }
 
 export async function connectDB(): Promise<typeof mongoose> {
-  if (cached.conn) {
+  if (cached.conn && cached.conn.connection.readyState === 1) {
     return cached.conn;
   }
 
@@ -32,45 +34,41 @@ export async function connectDB(): Promise<typeof mongoose> {
       maxPoolSize: 10,
     };
 
-    let uri: string = process.env.MONGODB_URI || "";
-    // If uri contains unconfigured placeholders, treat as empty to avoid DNS timeouts
+    let uri: string = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/pawalert";
     if (uri.includes("<username>") || uri.includes("<password>")) {
-      uri = "";
+      uri = "mongodb://127.0.0.1:27017/pawalert";
     }
 
-    // Fallback: If no URI provided, use MongoMemoryServer or local default
-    if (!uri) {
-      try {
-        const { MongoMemoryServer } = await import("mongodb-memory-server");
-        if (!cached.memoryServer) {
-          cached.memoryServer = await MongoMemoryServer.create();
+    cached.promise = mongoose
+      .connect(uri, opts)
+      .then((mongooseInstance) => {
+        console.log(`[MongoDB] Connected successfully to ${uri.replace(/\/\/.*@/, "//***:***@")}`);
+        return mongooseInstance;
+      })
+      .catch(async (err) => {
+        console.warn(`[MongoDB] Connection to ${uri} failed (${err.message}). Starting persistent local fallback...`);
+        try {
+          const { MongoMemoryServer } = await import("mongodb-memory-server");
+          if (!cached.memoryServer) {
+            const dataDir = path.resolve(process.cwd(), ".mongo-data");
+            if (!fs.existsSync(dataDir)) {
+              fs.mkdirSync(dataDir, { recursive: true });
+            }
+            cached.memoryServer = await MongoMemoryServer.create({
+              instance: {
+                dbPath: dataDir,
+                storageEngine: "wiredTiger",
+              },
+            });
+          }
+          const memUri = cached.memoryServer.getUri();
+          console.log(`[MongoDB] Connected to persistent local fallback instance at ${memUri}`);
+          return await mongoose.connect(memUri, opts);
+        } catch (memErr: any) {
+          console.error("[MongoDB] Fallback initialization error:", memErr);
+          throw err;
         }
-        uri = cached.memoryServer.getUri();
-        console.log("Using in-memory MongoDB instance at:", uri);
-      } catch (err) {
-        console.warn("Could not start MongoMemoryServer, attempting local connection:", err);
-        uri = "mongodb://127.0.0.1:27017/power_alert";
-      }
-    }
-
-    const finalUri: string = uri || "mongodb://127.0.0.1:27017/power_alert";
-
-    cached.promise = mongoose.connect(finalUri, opts).then((mongooseInstance) => {
-      console.log("Connected to MongoDB successfully");
-      return mongooseInstance;
-    }).catch(async (err) => {
-      console.error("Initial MongoDB connection error:", err.message);
-      // Attempt fallback to in-memory if external cluster failed
-      try {
-        const { MongoMemoryServer } = await import("mongodb-memory-server");
-        cached.memoryServer = await MongoMemoryServer.create();
-        const memUri: string = cached.memoryServer.getUri();
-        console.log("Fell back to in-memory MongoDB instance at:", memUri);
-        return await mongoose.connect(memUri, opts);
-      } catch (memErr) {
-        throw err;
-      }
-    });
+      });
   }
 
   try {

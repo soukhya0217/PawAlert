@@ -5,7 +5,7 @@ import AuditLog from "@/lib/db/models/AuditLog";
 import { getCurrentUser } from "@/lib/auth/session";
 import { analyzeIncidentDescription, detectDuplicateIncidents } from "@/lib/ai/triage";
 import { broadcastEmergencyToVolunteers } from "@/lib/services/matchingService";
-import { sendEmail, sendReportSubmittedEmail, sendAdminNewReportNotification } from "@/lib/email/mailer";
+import { sendEmail, sendReportSubmittedEmail, sendAdminNewReportNotification, sendNewCaseBroadcastEmail } from "@/lib/email/mailer";
 import { bootstrapAdminOnly } from "@/db/bootstrap";
 
 function generateIncidentId(): string {
@@ -204,6 +204,11 @@ export async function POST(req: Request) {
     } catch (e) {
       console.error("[Incidents] Admin alert email error:", e);
     }
+
+    // 3. Automatically broadcast new animal case notification to all registered users and volunteers
+    sendNewCaseBroadcastEmail(newIncident).catch((e) =>
+      console.error("[Incidents] New case broadcast email error:", e)
+    );
 
     // Broadcast in background to nearby volunteers
     broadcastEmergencyToVolunteers(newIncident).catch((e) =>

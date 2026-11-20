@@ -26,6 +26,7 @@ interface NavUser {
   fullName: string;
   email: string;
   role: string;
+  profileImage?: string;
 }
 
 export default function SiteHeader() {
@@ -74,7 +75,7 @@ export default function SiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0]/95 dark:bg-[#0F0E26]/95 backdrop-blur-md transition-colors duration-300">
+    <header className="sticky top-0 z-40 border-b-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 backdrop-blur-md transition-colors duration-300">
       {/* Top Warm Twilight-to-Sunset Mission Banner with Tagline Pill */}
       <div className="bg-gradient-to-r from-[#1E1B4B] via-[#3B286D] to-[#FF7A00] text-[#FFF9F0] py-1.5 px-4 text-center border-b-[2px] border-[#1E1B4B]">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 text-[11px] sm:text-xs font-display font-bold">
@@ -115,8 +116,8 @@ export default function SiteHeader() {
                       link.highlight
                         ? "bg-gradient-to-r from-[#FF7A00] to-[#F97316] text-white shadow-pixar-sm hover:scale-105"
                         : isActive
-                        ? "bg-[#1E1B4B] dark:bg-[#3B286D] text-white dark:text-[#FBBF24] shadow-pixar-sm border border-transparent dark:border-[#FBBF24]/30"
-                        : "text-[#1E1B4B] dark:text-[#FFF9F0] hover:bg-[#FFF1DC] dark:hover:bg-[#28235C]"
+                        ? "bg-[#1E1B4B] text-white shadow-pixar-sm border border-transparent"
+                        : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -128,40 +129,48 @@ export default function SiteHeader() {
           </ul>
         </nav>
 
-        {/* Right CTA Actions: Theme Switcher, Sign In / User Profile */}
+        {/* Right CTA Actions: Sign In / User Profile */}
         <div className="flex items-center gap-2 sm:gap-2.5">
-          {/* Theme Change Option (Storybook Sunlit vs Twilight Sanctuary) */}
-          <ThemeToggle />
-
           {currentUser ? (
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="pixar-btn inline-flex items-center gap-2 rounded-[16px] bg-[#FFF1DC] dark:bg-[#1E1B4B] px-3 py-2 text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] shadow-pixar-sm border-[2px] border-[#1E1B4B] dark:border-[#3B286D]"
+                className="pixar-btn inline-flex items-center gap-2 rounded-[16px] bg-[#FFF1DC] px-3 py-2 text-xs font-bold text-[#1E1B4B] shadow-pixar-sm border-[2px] border-[#1E1B4B]"
               >
-                <div className="w-5 h-5 rounded-full bg-[#FFB703] flex items-center justify-center text-[10px]">
-                  🐾
+                <div className="w-5 h-5 rounded-full bg-[#FFB703] overflow-hidden flex items-center justify-center text-[10px]">
+                  {currentUser.profileImage ? (
+                    <img src={currentUser.profileImage} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>🐾</span>
+                  )}
                 </div>
                 <span className="max-w-[100px] truncate">{currentUser.fullName}</span>
               </button>
 
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-52 rounded-[20px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#17153B] p-2 shadow-pixar z-50">
-                  <div className="px-3 py-2 border-b-[2px] border-[#1E1B4B]/10 dark:border-white/10">
-                    <p className="text-xs font-bold font-display text-[#1E1B4B] dark:text-[#FFF9F0] truncate">
+                <div className="absolute right-0 mt-2 w-52 rounded-[20px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-2 shadow-pixar z-50">
+                  <div className="px-3 py-2 border-b-[2px] border-[#1E1B4B]/10">
+                    <p className="text-xs font-bold font-display text-[#1E1B4B] truncate">
                       {currentUser.fullName}
                     </p>
-                    <p className="text-[10px] font-mono text-[#D97706] dark:text-[#FBBF24] truncate">
+                    <p className="text-[10px] font-mono text-[#D97706] truncate">
                       {currentUser.email}
                     </p>
                   </div>
                   <div className="py-1">
                     <a
                       href={currentUser.role === "SUPER_ADMIN" || currentUser.role === "ADMIN" ? "/admin" : "/user/dashboard"}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] dark:text-[#FFF9F0] hover:bg-[#FFF1DC] dark:hover:bg-[#28235C] rounded-[12px]"
+                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] hover:bg-[#FFF1DC] rounded-[12px]"
                     >
                       <ShieldCheck className="w-3.5 h-3.5" />
                       <span>Command Dashboard</span>
+                    </a>
+                    <a
+                      href="/user/profile"
+                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold font-display text-[#1E1B4B] hover:bg-[#FFF1DC] rounded-[12px]"
+                    >
+                      <User className="w-3.5 h-3.5" />
+                      <span>Guardian Profile</span>
                     </a>
                     <button
                       onClick={handleLogout}
@@ -178,7 +187,7 @@ export default function SiteHeader() {
             <div className="flex items-center gap-1.5">
               <a
                 href="/login"
-                className="pixar-btn rounded-[16px] bg-[#1E1B4B] text-white border-[2px] border-[#1E1B4B] dark:border-[#3B286D] px-4 py-2 text-xs font-bold shadow-pixar-sm hover:bg-[#2D1B69]"
+                className="pixar-btn rounded-[16px] bg-[#1E1B4B] text-white border-[2px] border-[#1E1B4B] px-4 py-2 text-xs font-bold shadow-pixar-sm hover:bg-[#2D1B69]"
               >
                 Sign In
               </a>
@@ -188,7 +197,7 @@ export default function SiteHeader() {
           {/* Mobile Menu Hamburger */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden pixar-btn rounded-[14px] bg-[#FFF1DC] dark:bg-[#1E1B4B] p-2 text-[#1E1B4B] dark:text-[#FFF9F0] border-[2px] border-[#1E1B4B] dark:border-[#3B286D]"
+            className="lg:hidden pixar-btn rounded-[14px] bg-[#FFF1DC] p-2 text-[#1E1B4B] border-[2px] border-[#1E1B4B]"
             aria-label="Toggle navigation menu"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -198,19 +207,14 @@ export default function SiteHeader() {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#17153B] p-4 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-[#1E1B4B]/20 dark:border-white/10">
-            <span className="text-xs font-display font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">Appearance Mode</span>
-            <ThemeToggle showLabel={true} />
-          </div>
-
+        <div className="lg:hidden border-t-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-3">
           {navLinks.map((link) => {
             const Icon = link.icon;
             return (
               <a
                 key={link.href}
                 href={link.href}
-                className="flex items-center gap-2.5 rounded-[16px] p-2.5 text-xs font-bold font-display text-[#1E1B4B] dark:text-[#FFF9F0] hover:bg-[#FFF1DC] dark:hover:bg-[#28235C]"
+                className="flex items-center gap-2.5 rounded-[16px] p-2.5 text-xs font-bold font-display text-[#1E1B4B] hover:bg-[#FFF1DC]"
               >
                 <Icon className="w-4 h-4 text-[#FF7A00]" />
                 <span>{link.label}</span>

@@ -6,11 +6,11 @@ import dynamic from "next/dynamic";
 const AdminMap = dynamic(() => import("@/components/admin-map"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[520px] rounded-[24px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF1DC] dark:bg-[#17153B] flex flex-col items-center justify-center p-6 text-center shadow-pixar">
+    <div className="w-full h-[520px] rounded-[24px] border-[3px] border-[#1E1B4B] bg-[#FFF1DC] flex flex-col items-center justify-center p-6 text-center shadow-pixar">
       <div className="h-12 w-12 rounded-[16px] bg-[#FF7A00] flex items-center justify-center text-white mb-3 shadow-pixar-sm">
         <Compass className="w-6 h-6 animate-spin" />
       </div>
-      <p className="font-display font-bold text-sm text-[#1E1B4B] dark:text-[#FFF9F0]">
+      <p className="font-display font-bold text-sm text-[#1E1B4B]">
         Loading Command Map Stream...
       </p>
     </div>
@@ -241,16 +241,16 @@ export default function AdminConsole() {
       )}
 
       {/* Top Command Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b-[3px] border-[#1E1B4B] dark:border-[#3B286D] pb-5">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b-[3px] border-[#1E1B4B] pb-5">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded-[12px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFB703] px-3 py-1 font-display text-xs font-black text-[#1E1B4B] shadow-pixar-sm mb-2">
+          <div className="inline-flex items-center gap-1.5 rounded-[12px] border-[2px] border-[#1E1B4B] bg-[#FFB703] px-3 py-1 font-display text-xs font-black text-[#1E1B4B] shadow-pixar-sm mb-2">
             <span>🛡️</span>
             <span>ADMINISTRATIVE COMMAND CENTER</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black font-display text-[#1E1B4B] dark:text-[#FFF9F0] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black font-display text-[#1E1B4B] tracking-tight">
             Field Dispatch & SLA Control
           </h1>
-          <p className="text-xs sm:text-sm text-[#1E1B4B]/75 dark:text-[#FFF9F0]/80 mt-1 font-sans">
+          <p className="text-xs sm:text-sm text-[#1E1B4B]/75 mt-1 font-sans">
             Oversee live animal distress emergencies, dispatch nearby volunteers, verify responders, and audit SLA response milestones.
           </p>
         </div>
@@ -268,7 +268,7 @@ export default function AdminConsole() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="pixar-btn bg-[#FFF1DC] dark:bg-[#1E1B4B] text-[#1E1B4B] dark:text-[#FFF9F0] px-3.5 py-2 text-xs font-bold border-[2px] border-[#1E1B4B] dark:border-[#3B286D] shadow-pixar-sm flex items-center gap-1.5"
+            className="pixar-btn bg-[#FFF1DC] text-[#1E1B4B] px-3.5 py-2 text-xs font-bold border-[2px] border-[#1E1B4B] shadow-pixar-sm flex items-center gap-1.5"
             title="Refresh Data"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
@@ -282,11 +282,11 @@ export default function AdminConsole() {
         
         {/* Left Column (7 cols): Leaflet Interactive Map */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="pixar-card p-3 sm:p-4 bg-[#FFF9F0] dark:bg-[#17153B] border-[3px] border-[#1E1B4B] dark:border-[#3B286D]">
-            <div className="flex items-center justify-between px-2 pb-3 border-b-[2px] border-[#1E1B4B]/10 dark:border-white/10 mb-3">
+          <div className="pixar-card p-3 sm:p-4 bg-[#FFF9F0] border-[3px] border-[#1E1B4B]">
+            <div className="flex items-center justify-between px-2 pb-3 border-b-[2px] border-[#1E1B4B]/10 mb-3">
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-[#FF7A00]" />
-                <span className="font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+                <span className="font-display text-xs font-bold text-[#1E1B4B]">
                   Live Tactical Grid (Click pins to inspect cases)
                 </span>
               </div>
@@ -306,10 +306,10 @@ export default function AdminConsole() {
         {/* Right Column (5 cols): Case Inspection & Status Controls */}
         <div className="lg:col-span-5 space-y-4">
           {selectedIncident ? (
-            <div className="pixar-card p-5 sm:p-6 bg-[#FFF9F0] dark:bg-[#17153B] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] space-y-4 shadow-pixar">
-              <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B]/10 dark:border-white/10 pb-3">
+            <div className="pixar-card p-5 sm:p-6 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] space-y-4 shadow-pixar">
+              <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B]/10 pb-3">
                 <div>
-                  <span className="font-mono text-[10px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60 uppercase tracking-wider block font-bold">
+                  <span className="font-mono text-[10px] text-[#1E1B4B]/60 uppercase tracking-wider block font-bold">
                     SELECTED CASE
                   </span>
                   <span className="font-mono text-base font-black text-[#FF7A00]">
@@ -318,7 +318,7 @@ export default function AdminConsole() {
                 </div>
 
                 <span
-                  className={`px-3 py-1 rounded-[12px] font-display text-[11px] font-black uppercase border-[2px] border-[#1E1B4B] dark:border-[#3B286D] shadow-pixar-sm ${
+                  className={`px-3 py-1 rounded-[12px] font-display text-[11px] font-black uppercase border-[2px] border-[#1E1B4B] shadow-pixar-sm ${
                     selectedIncident.priority === "CRITICAL"
                       ? "bg-[#EF4444] text-white"
                       : "bg-[#FFB703] text-[#1E1B4B]"
@@ -330,21 +330,21 @@ export default function AdminConsole() {
 
               {/* Animal & Condition */}
               <div className="space-y-1">
-                <p className="font-display text-sm font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+                <p className="font-display text-sm font-bold text-[#1E1B4B]">
                   🐾 {selectedIncident.animalCategory || "Animal in Distress"}
                 </p>
-                <p className="font-sans text-xs text-[#1E1B4B]/75 dark:text-[#FFF9F0]/80 leading-relaxed">
+                <p className="font-sans text-xs text-[#1E1B4B]/75 leading-relaxed">
                   {selectedIncident.conditionDescription}
                 </p>
-                <div className="flex items-center gap-1.5 text-[11px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60 font-mono mt-1">
+                <div className="flex items-center gap-1.5 text-[11px] text-[#1E1B4B]/60 font-mono mt-1">
                   <MapPin className="w-3.5 h-3.5 text-[#FF7A00] flex-shrink-0" />
                   <span className="truncate">{selectedIncident.location?.address || "Address recorded"}</span>
                 </div>
               </div>
 
               {/* Status Transition Control Buttons */}
-              <div className="pt-2 border-t-[2px] border-[#1E1B4B]/10 dark:border-white/10 space-y-2">
-                <span className="font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] block">
+              <div className="pt-2 border-t-[2px] border-[#1E1B4B]/10 space-y-2">
+                <span className="font-display text-xs font-bold text-[#1E1B4B] block">
                   Update Mission Status:
                 </span>
                 <div className="grid grid-cols-3 gap-2">
@@ -375,15 +375,15 @@ export default function AdminConsole() {
               </div>
 
               {/* Volunteer Assignment Dropdown */}
-              <div className="pt-3 border-t-[2px] border-[#1E1B4B]/10 dark:border-white/10 space-y-2">
-                <span className="font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] block">
+              <div className="pt-3 border-t-[2px] border-[#1E1B4B]/10 space-y-2">
+                <span className="font-display text-xs font-bold text-[#1E1B4B] block">
                   Assign Volunteer Squad:
                 </span>
                 <div className="flex items-center gap-2">
                   <select
                     value={selectedVolunteerId}
                     onChange={(e) => setSelectedVolunteerId(e.target.value)}
-                    className="flex-1 rounded-[14px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF1DC] dark:bg-[#1E1B4B] p-2 text-xs font-sans text-[#1E1B4B] dark:text-[#FFF9F0]"
+                    className="flex-1 rounded-[14px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] p-2 text-xs font-sans text-[#1E1B4B]"
                   >
                     <option value="">Select verified responder...</option>
                     {volunteers
@@ -398,7 +398,7 @@ export default function AdminConsole() {
                   <button
                     onClick={handleAssignVolunteer}
                     disabled={updatingId === selectedIncident._id || !selectedVolunteerId}
-                    className="pixar-btn bg-[#1E1B4B] dark:bg-[#3B286D] text-white px-3.5 py-2 text-xs font-bold shadow-pixar-sm disabled:opacity-40"
+                    className="pixar-btn bg-[#1E1B4B] text-white px-3.5 py-2 text-xs font-bold shadow-pixar-sm disabled:opacity-40"
                   >
                     Assign
                   </button>
@@ -412,12 +412,12 @@ export default function AdminConsole() {
             </div>
           ) : (
             /* Clean Empty State when 0 incidents exist */
-            <div className="pixar-card p-6 bg-[#FFF9F0] dark:bg-[#17153B] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] text-center space-y-3 shadow-pixar">
+            <div className="pixar-card p-6 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] text-center space-y-3 shadow-pixar">
               <span className="text-3xl">🕊️</span>
-              <h3 className="font-display text-base font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+              <h3 className="font-display text-base font-bold text-[#1E1B4B]">
                 All quiet right now — Report an animal in need
               </h3>
-              <p className="text-xs text-[#1E1B4B]/70 dark:text-[#FFF9F0]/70 font-sans">
+              <p className="text-xs text-[#1E1B4B]/70 font-sans">
                 Zero active distress cases logged. All rescue ambulances are on standby.
               </p>
               <a
@@ -430,35 +430,35 @@ export default function AdminConsole() {
           )}
 
           {/* Volunteer Verification Widget */}
-          <div className="pixar-card p-4 sm:p-5 bg-[#FFF9F0] dark:bg-[#17153B] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b-[2px] border-[#1E1B4B]/10 dark:border-white/10">
+          <div className="pixar-card p-4 sm:p-5 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b-[2px] border-[#1E1B4B]/10">
               <div className="flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-[#10B981]" />
-                <span className="font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+                <span className="font-display text-xs font-bold text-[#1E1B4B]">
                   Responder Roster ({volunteers.length})
                 </span>
               </div>
-              <span className="font-mono text-[10px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60 font-bold">
+              <span className="font-mono text-[10px] text-[#1E1B4B]/60 font-bold">
                 VERIFY APPLICANTS
               </span>
             </div>
 
             <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
               {volunteers.length === 0 ? (
-                <p className="text-xs text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60 text-center py-3 font-sans">
+                <p className="text-xs text-[#1E1B4B]/60 text-center py-3 font-sans">
                   Zero pending applicants.
                 </p>
               ) : (
                 volunteers.map((vol) => (
                   <div
                     key={vol._id}
-                    className="p-2.5 rounded-[14px] border-[2px] border-[#1E1B4B]/15 dark:border-white/10 bg-[#FFF1DC] dark:bg-[#1E1B4B] flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-[14px] border-[2px] border-[#1E1B4B]/15 bg-[#FFF1DC] flex items-center justify-between text-xs"
                   >
                     <div>
-                      <p className="font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+                      <p className="font-bold text-[#1E1B4B]">
                         {vol.userId?.fullName || "Applicant"}
                       </p>
-                      <p className="text-[10px] text-[#1E1B4B]/70 dark:text-[#FFF9F0]/70 font-mono">
+                      <p className="text-[10px] text-[#1E1B4B]/70 font-mono">
                         {vol.category} • {vol.status}
                       </p>
                     </div>
@@ -496,12 +496,12 @@ export default function AdminConsole() {
       </div>
 
       {/* Incident Roster Table with Click to Fly Map */}
-      <div className="pixar-card p-5 sm:p-6 bg-[#FFF9F0] dark:bg-[#17153B] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b-[2px] border-[#1E1B4B]/10 dark:border-white/10">
-          <h3 className="font-display text-sm font-bold text-[#1E1B4B] dark:text-[#FFF9F0] flex items-center gap-2">
+      <div className="pixar-card p-5 sm:p-6 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b-[2px] border-[#1E1B4B]/10">
+          <h3 className="font-display text-sm font-bold text-[#1E1B4B] flex items-center gap-2">
             <span>📋</span> Active Distress Logs ({incidents.length})
           </h3>
-          <span className="font-mono text-[10px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60 font-bold">
+          <span className="font-mono text-[10px] text-[#1E1B4B]/60 font-bold">
             CLICK ROW TO FOCUS MAP PIN
           </span>
         </div>
@@ -509,7 +509,7 @@ export default function AdminConsole() {
         {incidents.length === 0 ? (
           <div className="text-center py-8 space-y-2">
             <span className="text-3xl">🐾</span>
-            <p className="font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+            <p className="font-display text-xs font-bold text-[#1E1B4B]">
               All quiet right now — Report an animal in need
             </p>
           </div>
@@ -517,7 +517,7 @@ export default function AdminConsole() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-sans">
               <thead>
-                <tr className="border-b-[2px] border-[#1E1B4B]/20 dark:border-white/15 text-[10px] font-mono text-[#1E1B4B]/70 dark:text-[#FFF9F0]/70 uppercase">
+                <tr className="border-b-[2px] border-[#1E1B4B]/20 text-[10px] font-mono text-[#1E1B4B]/70 uppercase">
                   <th className="py-2.5 px-3">Case ID</th>
                   <th className="py-2.5 px-3">Animal</th>
                   <th className="py-2.5 px-3">Priority</th>
@@ -527,7 +527,7 @@ export default function AdminConsole() {
                   <th className="py-2.5 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1E1B4B]/10 dark:divide-white/10">
+              <tbody className="divide-y divide-[#1E1B4B]/10">
                 {incidents.map((inc) => {
                   const isSelected = selectedIncident?._id === inc._id;
                   return (
@@ -536,14 +536,14 @@ export default function AdminConsole() {
                       onClick={() => setSelectedIncident(inc)}
                       className={`cursor-pointer transition-colors ${
                         isSelected
-                          ? "bg-[#FFB703]/25 dark:bg-[#FBBF24]/20 font-bold"
-                          : "hover:bg-[#FFF1DC] dark:hover:bg-[#1E1B4B]/60"
+                          ? "bg-[#FFB703]/25 font-bold"
+                          : "hover:bg-[#FFF1DC]"
                       }`}
                     >
                       <td className="py-3 px-3 font-mono font-bold text-[#FF7A00]">
                         #{inc.incidentId}
                       </td>
-                      <td className="py-3 px-3 font-display font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+                      <td className="py-3 px-3 font-display font-bold text-[#1E1B4B]">
                         {inc.animalCategory}
                       </td>
                       <td className="py-3 px-3">
@@ -557,13 +557,13 @@ export default function AdminConsole() {
                           {inc.priority}
                         </span>
                       </td>
-                      <td className="py-3 px-3 font-display font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+                      <td className="py-3 px-3 font-display font-bold text-[#1E1B4B]">
                         {inc.status.replace(/_/g, " ")}
                       </td>
-                      <td className="py-3 px-3 text-[#1E1B4B]/75 dark:text-[#FFF9F0]/80 max-w-xs truncate">
+                      <td className="py-3 px-3 text-[#1E1B4B]/75 max-w-xs truncate">
                         {inc.location?.address || "Coordinates Logged"}
                       </td>
-                      <td className="py-3 px-3 font-mono text-[11px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60">
+                      <td className="py-3 px-3 font-mono text-[11px] text-[#1E1B4B]/60">
                         {formatDate(inc.createdAt)}
                       </td>
                       <td className="py-3 px-3 text-right">
@@ -572,7 +572,7 @@ export default function AdminConsole() {
                             e.stopPropagation();
                             setSelectedIncident(inc);
                           }}
-                          className="pixar-btn bg-[#1E1B4B] dark:bg-[#3B286D] text-white px-2.5 py-1 text-[10px] rounded-[8px] shadow-pixar-sm"
+                          className="pixar-btn bg-[#1E1B4B] text-white px-2.5 py-1 text-[10px] rounded-[8px] shadow-pixar-sm"
                         >
                           Focus
                         </button>

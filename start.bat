@@ -9,10 +9,13 @@ echo   "Every Life Matters. Every Alert Counts."
 echo ==============================================================
 echo.
 
-:: 1. Ensure uploads/ directory exists
+:: 1. Ensure uploads/ and .mongo-data/ directories exist
 if not exist "uploads" (
     echo [1/4] Creating local uploads directory...
     mkdir uploads
+)
+if not exist ".mongo-data" (
+    mkdir .mongo-data
 )
 
 :: 2. Ensure .env.local exists with MONGODB_URI

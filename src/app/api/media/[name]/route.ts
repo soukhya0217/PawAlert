@@ -23,6 +23,8 @@ export async function GET(
     if (ext === ".jpg" || ext === ".jpeg") contentType = "image/jpeg";
     else if (ext === ".png") contentType = "image/png";
     else if (ext === ".webp") contentType = "image/webp";
+    else if (ext === ".gif") contentType = "image/gif";
+    else if (ext === ".svg") contentType = "image/svg+xml";
     else if (ext === ".mp4") contentType = "video/mp4";
 
     return new NextResponse(fileBuffer, {

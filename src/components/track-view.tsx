@@ -119,10 +119,10 @@ export default function TrackView({ trackingId: initialTrackingId }: TrackViewPr
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
       {/* Top Header & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b-[3px] border-[#1E1B4B] dark:border-[#3B286D] pb-5">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b-[3px] border-[#1E1B4B] pb-5">
         <a
           href="/"
-          className="pixar-btn inline-flex items-center gap-1.5 rounded-[16px] bg-[#FFF9F0] dark:bg-[#1E1B4B] px-3.5 py-2 text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] shadow-pixar-sm w-fit"
+          className="pixar-btn inline-flex items-center gap-1.5 rounded-[16px] bg-[#FFF9F0] px-3.5 py-2 text-xs font-bold text-[#1E1B4B] border-[2px] border-[#1E1B4B] shadow-pixar-sm w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Home</span>
@@ -135,7 +135,7 @@ export default function TrackView({ trackingId: initialTrackingId }: TrackViewPr
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search Case ID (e.g. PAW-...)"
-            className="flex-1 rounded-[16px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] px-3 py-2 text-xs font-mono font-bold text-[#1E1B4B] dark:text-[#FFF9F0] placeholder:text-[#1E1B4B]/40 dark:placeholder:text-[#FFF9F0]/40 focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+            className="flex-1 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] px-3 py-2 text-xs font-mono font-bold text-[#1E1B4B] placeholder:text-[#1E1B4B]/40 focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
           />
           <button
             type="submit"
@@ -148,15 +148,15 @@ export default function TrackView({ trackingId: initialTrackingId }: TrackViewPr
 
       {loading ? (
         <div className="min-h-[50vh] flex flex-col items-center justify-center p-6 text-center space-y-3">
-          <div className="h-12 w-12 rounded-[18px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFB703] flex items-center justify-center text-2xl shadow-pixar animate-bounce">
+          <div className="h-12 w-12 rounded-[18px] border-[3px] border-[#1E1B4B] bg-[#FFB703] flex items-center justify-center text-2xl shadow-pixar animate-bounce">
             🐾
           </div>
-          <p className="font-display text-sm font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+          <p className="font-display text-sm font-bold text-[#1E1B4B]">
             Connecting to Live Rescue Radar...
           </p>
         </div>
       ) : incident ? (
-        <div className="pixar-card p-6 sm:p-8 bg-[#FFF9F0] dark:bg-[#17153B] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] space-y-6 relative overflow-hidden shadow-pixar">
+        <div className="pixar-card p-6 sm:p-8 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] space-y-6 relative overflow-hidden shadow-pixar">
           
           {/* Resolved Stamp Badge */}
           {currentStageIdx === 3 && (
@@ -169,15 +169,15 @@ export default function TrackView({ trackingId: initialTrackingId }: TrackViewPr
           )}
 
           {/* Heading & Copy ID Pill */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-[2px] border-[#1E1B4B]/10 dark:border-white/10 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b-[2px] border-[#1E1B4B]/10 pb-4">
             <div>
-              <span className="inline-block rounded-[14px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFB703] px-3.5 py-1 font-display text-xs font-bold text-[#1E1B4B] shadow-pixar-sm mb-2">
+              <span className="inline-block rounded-[14px] border-[2px] border-[#1E1B4B] bg-[#FFB703] px-3.5 py-1 font-display text-xs font-bold text-[#1E1B4B] shadow-pixar-sm mb-2">
                 {incident.animalCategory || "Animal in Distress"}
               </span>
-              <h1 className="text-2xl sm:text-3xl font-black font-display text-[#1E1B4B] dark:text-[#FFF9F0]">
+              <h1 className="text-2xl sm:text-3xl font-black font-display text-[#1E1B4B]">
                 Rescue Mission Telemetry
               </h1>
-              <p className="text-xs text-[#1E1B4B]/75 dark:text-[#FFF9F0]/80 mt-1 font-sans">
+              <p className="text-xs text-[#1E1B4B]/75 mt-1 font-sans">
                 {incident.conditionDescription}
               </p>
             </div>
@@ -185,7 +185,7 @@ export default function TrackView({ trackingId: initialTrackingId }: TrackViewPr
             {/* Copy Tracking ID Button */}
             <button
               onClick={handleCopyId}
-              className="pixar-btn bg-[#FFF1DC] dark:bg-[#1E1B4B] text-[#1E1B4B] dark:text-[#FFF9F0] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] px-3.5 py-2 text-xs font-mono font-bold shadow-pixar-sm inline-flex items-center gap-2 self-start sm:self-center"
+              className="pixar-btn bg-[#FFF1DC] text-[#1E1B4B] border-[2px] border-[#1E1B4B] px-3.5 py-2 text-xs font-mono font-bold shadow-pixar-sm inline-flex items-center gap-2 self-start sm:self-center"
               title="Click to copy tracking ID"
             >
               <span>#{incident.incidentId || trackingId}</span>
@@ -194,8 +194,8 @@ export default function TrackView({ trackingId: initialTrackingId }: TrackViewPr
           </div>
 
           {/* 4-Stage Walking Paw Trail */}
-          <div className="py-5 border-y-[3px] border-[#1E1B4B] dark:border-[#3B286D] space-y-4">
-            <span className="font-mono text-[11px] font-bold text-[#1E1B4B] dark:text-[#FFF9F0] uppercase tracking-wider block">
+          <div className="py-5 border-y-[3px] border-[#1E1B4B] space-y-4">
+            <span className="font-mono text-[11px] font-bold text-[#1E1B4B] uppercase tracking-wider block">
               4-STAGE RESCUE TRAIL
             </span>
 
@@ -207,12 +207,12 @@ export default function TrackView({ trackingId: initialTrackingId }: TrackViewPr
                 return (
                   <div
                     key={st.id}
-                    className={`walking-paw-step rounded-[20px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] p-3.5 transition-all flex flex-col justify-between ${
+                    className={`walking-paw-step rounded-[20px] border-[3px] border-[#1E1B4B] p-3.5 transition-all flex flex-col justify-between ${
                       isCurrent
                         ? "bg-[#FF7A00] text-white shadow-pixar scale-[1.02]"
                         : isPast
                         ? "bg-[#10B981] text-white shadow-pixar-sm"
-                        : "bg-[#FFF1DC] dark:bg-[#1E1B4B] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60"
+                        : "bg-[#FFF1DC] text-[#1E1B4B]/60"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -240,31 +240,31 @@ export default function TrackView({ trackingId: initialTrackingId }: TrackViewPr
 
           {/* Location & Volunteer Squad Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="rounded-[20px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] p-4 space-y-1 shadow-pixar-sm">
-              <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+            <div className="rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-1 shadow-pixar-sm">
+              <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B]">
                 <MapPin className="w-4 h-4 text-[#FF7A00]" />
                 <span>Distress Coordinates</span>
               </div>
-              <p className="text-xs text-[#1E1B4B]/80 dark:text-[#FFF9F0]/80 font-sans truncate">
+              <p className="text-xs text-[#1E1B4B]/80 font-sans truncate">
                 {incident.location?.address || "Address logged"}
               </p>
               {incident.location?.coordinates && (
-                <p className="font-mono text-[10px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60">
+                <p className="font-mono text-[10px] text-[#1E1B4B]/60">
                   GPS: {incident.location.coordinates[1]?.toFixed(4)}° N, {incident.location.coordinates[0]?.toFixed(4)}° E
                 </p>
               )}
             </div>
 
-            <div className="rounded-[20px] border-[2px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#1E1B4B] p-4 space-y-1 shadow-pixar-sm">
-              <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+            <div className="rounded-[20px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] p-4 space-y-1 shadow-pixar-sm">
+              <div className="flex items-center gap-2 text-xs font-display font-bold text-[#1E1B4B]">
                 <ShieldCheck className="w-4 h-4 text-[#10B981]" />
                 <span>Assigned Squad</span>
               </div>
-              <p className="text-xs text-[#1E1B4B]/80 dark:text-[#FFF9F0]/80 font-sans">
+              <p className="text-xs text-[#1E1B4B]/80 font-sans">
                 {incident.assignedVolunteerId?.fullName || "Dispatch team en route"}
               </p>
               {incident.assignedVolunteerId?.mobile && (
-                <p className="font-mono text-[10px] text-[#1E1B4B]/60 dark:text-[#FFF9F0]/60">
+                <p className="font-mono text-[10px] text-[#1E1B4B]/60">
                   Direct Line: {incident.assignedVolunteerId.mobile}
                 </p>
               )}
@@ -291,14 +291,14 @@ export default function TrackView({ trackingId: initialTrackingId }: TrackViewPr
         </div>
       ) : (
         /* Empty State */
-        <div className="pixar-card p-8 bg-[#FFF9F0] dark:bg-[#17153B] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] text-center space-y-4 shadow-pixar">
-          <div className="w-16 h-16 rounded-[22px] border-[3px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF1DC] dark:bg-[#1E1B4B] flex items-center justify-center text-3xl mx-auto shadow-pixar-sm">
+        <div className="pixar-card p-8 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] text-center space-y-4 shadow-pixar">
+          <div className="w-16 h-16 rounded-[22px] border-[3px] border-[#1E1B4B] bg-[#FFF1DC] flex items-center justify-center text-3xl mx-auto shadow-pixar-sm">
             🐶
           </div>
-          <h2 className="text-xl font-black font-display text-[#1E1B4B] dark:text-[#FFF9F0]">
+          <h2 className="text-xl font-black font-display text-[#1E1B4B]">
             {error || "No active rescue case found."}
           </h2>
-          <p className="text-xs text-[#1E1B4B]/70 dark:text-[#FFF9F0]/70 max-w-sm mx-auto font-sans">
+          <p className="text-xs text-[#1E1B4B]/70 max-w-sm mx-auto font-sans">
             Enter a valid tracking ID above or report a new animal in need.
           </p>
           <a

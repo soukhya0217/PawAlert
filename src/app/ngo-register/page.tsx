@@ -100,7 +100,7 @@ export default function NGORegisterPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white dark:bg-[#17153B] rounded-3xl p-6 sm:p-10 border border-cream-200 dark:border-[#3B286D] shadow-soft space-y-6 transition-colors"
+        className="bg-white rounded-3xl p-6 sm:p-10 border border-cream-200 shadow-soft space-y-6 transition-colors"
       >
         {errorMsg && (
           <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">

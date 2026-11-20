@@ -26,28 +26,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html: `(function() {
               try {
-                var saved = localStorage.getItem('pawalert_theme');
-                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                var isDark = saved === 'dark' || (!saved && prefersDark);
-                if (isDark) {
-                  document.documentElement.classList.add('dark');
-                  document.documentElement.setAttribute('data-theme', 'dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                  document.documentElement.setAttribute('data-theme', 'light');
-                }
+                localStorage.removeItem('pawalert_theme');
+                document.documentElement.classList.remove('dark');
+                document.documentElement.removeAttribute('data-theme');
               } catch (e) {}
             })();`,
           }}
         />
       </head>
-      <body className="min-h-screen flex flex-col font-sans bg-[#FFF9F0] dark:bg-[#0F0E26] text-[#1E1B4B] dark:text-[#FFF9F0] antialiased selection:bg-[#FFB703]/30 selection:text-[#1E1B4B] transition-colors duration-300">
+      <body className="min-h-screen flex flex-col font-sans bg-[#FFF9F0] text-[#1E1B4B] antialiased selection:bg-[#FFB703]/30 selection:text-[#1E1B4B]">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

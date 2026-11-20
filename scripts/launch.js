@@ -72,6 +72,51 @@ function openBrowser(url) {
 }
 
 let activeChild = null;
+let mongoChild = null;
+
+async function ensureMongoDatabase() {
+  const fs = require('fs');
+  console.log('[0/3] Checking MongoDB database availability...');
+  const isPort27017Free = await isPortFree(27017);
+  if (!isPort27017Free) {
+    console.log('  - MongoDB is already active on port 27017.');
+    return;
+  }
+
+  const projectRoot = path.resolve(__dirname, '..');
+  const dataDir = path.join(projectRoot, '.mongo-data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+
+  const candidateMongodPaths = [
+    'C:\\Program Files\\MongoDB\\Server\\8.2\\bin\\mongod.exe',
+    'C:\\Program Files\\MongoDB\\Server\\7.0\\bin\\mongod.exe',
+    'C:\\Program Files\\MongoDB\\Server\\6.0\\bin\\mongod.exe',
+  ];
+
+  let mongodBin = candidateMongodPaths.find((p) => fs.existsSync(p));
+
+  if (mongodBin) {
+    console.log(`  - Launching local MongoDB Server with persistent storage at .mongo-data ...`);
+    const logPath = path.join(dataDir, 'mongod.log');
+    mongoChild = spawn(mongodBin, ['--dbpath', dataDir, '--logpath', logPath, '--port', '27017'], {
+      detached: false,
+      stdio: 'ignore',
+    });
+    // Wait briefly for server to bind
+    for (let i = 0; i < 15; i++) {
+      await new Promise((r) => setTimeout(r, 200));
+      const free = await isPortFree(27017);
+      if (!free) {
+        console.log('  - Local MongoDB Server started successfully on port 27017.');
+        break;
+      }
+    }
+  } else {
+    console.log('  - Local mongod.exe binary not detected; Mongoose will use persistent disk-backed fallback.');
+  }
+}
 
 function killChild(child) {
   if (!child || child.killed) return;
@@ -207,18 +252,22 @@ async function main() {
   console.log('  "Because Every Paw Matters. Every Alert Counts."');
   console.log('==============================================================\n');
 
+  await ensureMongoDatabase();
+
   console.log('[1/3] Detecting available network port...');
   await launchOnPortIndex(0);
 }
 
 process.on('SIGINT', () => {
-  console.log('\n[INFO] Shutting down POWER ALERT...');
+  console.log('\n[INFO] Shutting down PAWALERT...');
   killChild(activeChild);
+  if (mongoChild) killChild(mongoChild);
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
   killChild(activeChild);
+  if (mongoChild) killChild(mongoChild);
   process.exit(0);
 });
 

@@ -4,7 +4,7 @@ import Incident, { IncidentStatus } from "@/lib/db/models/Incident";
 import AuditLog from "@/lib/db/models/AuditLog";
 import Notification from "@/lib/db/models/Notification";
 import { getCurrentUser } from "@/lib/auth/session";
-import { sendEmail, sendStatusUpdateNotification } from "@/lib/email/mailer";
+import { sendEmail, sendStatusUpdateNotification, sendCaseResolvedBroadcastEmail } from "@/lib/email/mailer";
 
 export async function POST(
   req: Request,
@@ -68,21 +68,30 @@ export async function POST(
       details: notes,
     });
 
-    // Notify Reporter of status update
-    const reporterEmail = incident.reporterEmail;
-    if (reporterEmail) {
-      try {
-        await sendStatusUpdateNotification({
-          to: reporterEmail,
-          recipientName: incident.reporterName,
-          incidentId: incident.incidentId,
-          animalCategory: incident.animalCategory,
-          previousStatus: previousStatus,
-          newStatus: status,
-          adminRemarks: notes,
-        });
-      } catch (e) {
-        console.error("[Status Update] Email notification error:", e);
+    // Notify Reporter of status update (avoid duplicate notification if status unchanged)
+    if (previousStatus !== status) {
+      const reporterEmail = incident.reporterEmail;
+      if (reporterEmail) {
+        try {
+          await sendStatusUpdateNotification({
+            to: reporterEmail,
+            recipientName: incident.reporterName,
+            incidentId: incident.incidentId,
+            animalCategory: incident.animalCategory,
+            previousStatus: previousStatus,
+            newStatus: status,
+            adminRemarks: notes,
+          });
+        } catch (e) {
+          console.error("[Status Update] Email notification error:", e);
+        }
+      }
+
+      // Automatically broadcast case resolution notification to all registered users and volunteers
+      if (status === "RESOLVED" || status === "ANIMAL_RESCUED") {
+        sendCaseResolvedBroadcastEmail(incident).catch((e) =>
+          console.error("[Status Update] Case resolved broadcast email error:", e)
+        );
       }
     }
 

@@ -131,31 +131,11 @@ export default function AdminMap({
   const [currentStyle, setCurrentStyle] = useState<MapTileStyle>("osm");
   const [showStyleMenu, setShowStyleMenu] = useState(false);
   const [mapReady, setMapReady] = useState(false);
-  const [activeTheme, setActiveTheme] = useState<"light" | "dark">("light");
   const [isStatusCollapsed, setIsStatusCollapsed] = useState(false);
   const [droppedPinCoords, setDroppedPinCoords] = useState<[number, number] | null>(null);
 
   const centerLat = initialCenter[0] || 12.9716;
   const centerLon = initialCenter[1] || 77.5946;
-
-  // Listen to Global Theme Changes to adapt map tiles automatically
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const currentDocTheme = document.documentElement.getAttribute("data-theme") || "light";
-    const isDark = currentDocTheme === "dark";
-    setActiveTheme(isDark ? "dark" : "light");
-    setCurrentStyle(isDark ? "dark" : "osm");
-
-    const handleThemeChange = (e: any) => {
-      const darkNow = e.detail?.theme === "dark";
-      setActiveTheme(darkNow ? "dark" : "light");
-      switchTileLayer(darkNow ? "dark" : "osm");
-    };
-
-    window.addEventListener("pawalert-theme-change", handleThemeChange);
-    return () => window.removeEventListener("pawalert-theme-change", handleThemeChange);
-  }, []);
 
   // Switch Active Tile Layer safely
   const switchTileLayer = useCallback((styleKey: MapTileStyle) => {
@@ -230,7 +210,7 @@ export default function AdminMap({
       });
 
       try {
-        const initialStyleKey: MapTileStyle = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "osm";
+        const initialStyleKey: MapTileStyle = "osm";
         const config = TILE_SERVERS[initialStyleKey];
 
         const leafletInstance = L.map(containerRef.current, {
@@ -427,15 +407,15 @@ export default function AdminMap({
     );
   };
 
-  const isDarkMode = activeTheme === "dark";
+
 
   return (
-    <div className={`relative w-full rounded-[28px] sm:rounded-[32px] border-[3px] sm:border-[4px] ${isDarkMode ? "border-[#3B286D] bg-[#17153B]" : "border-[#1E1B4B] bg-[#FFF9F0]"} overflow-hidden shadow-pixar transition-colors duration-300 ${className}`}>
+    <div className={`relative w-full rounded-[28px] sm:rounded-[32px] border-[3px] sm:border-[4px] border-[#1E1B4B] bg-[#FFF9F0] overflow-hidden shadow-pixar transition-colors duration-300 ${className}`}>
       
       {/* Top Map HUD Controls */}
       <div className="absolute top-3 left-3 right-3 sm:top-4 sm:left-4 sm:right-auto z-20 flex flex-wrap items-center gap-2">
         {/* Status Pill */}
-        <div className={`flex items-center gap-1.5 rounded-[16px] sm:rounded-[20px] border-[2px] sm:border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#1E1B4B]/95 text-[#FFF9F0]" : "border-[#1E1B4B] bg-[#FFF9F0]/95 text-[#1E1B4B]"} px-3 py-1.5 sm:px-4 sm:py-2 shadow-pixar-sm backdrop-blur-md`}>
+        <div className="flex items-center gap-1.5 rounded-[16px] sm:rounded-[20px] border-[2px] sm:border-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 text-[#1E1B4B] px-3 py-1.5 sm:px-4 sm:py-2 shadow-pixar-sm backdrop-blur-md">
           <span className={`h-2.5 w-2.5 rounded-full ${incidents.length > 0 ? "bg-[#EF4444] animate-ping" : "bg-[#10B981]"}`} />
           <span className="font-display text-[11px] sm:text-xs font-bold">
             {incidents.length > 0 ? `${incidents.length} ACTIVE ALERTS` : "4 SANCTUARY SQUADS ACTIVE"}
@@ -443,15 +423,15 @@ export default function AdminMap({
         </div>
 
         {/* Priority Filter */}
-        <div className={`hidden sm:flex items-center gap-1 rounded-[18px] border-[2px] sm:border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#1E1B4B]/95" : "border-[#1E1B4B] bg-[#FFF9F0]/95"} p-1 shadow-pixar-sm backdrop-blur-md`}>
+        <div className="hidden sm:flex items-center gap-1 rounded-[18px] border-[2px] sm:border-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 p-1 shadow-pixar-sm backdrop-blur-md">
           {["ALL", "CRITICAL", "HIGH"].map((p) => (
             <button
               key={p}
               onClick={() => setFilterPriority(p)}
               className={`rounded-[14px] px-3 py-1.5 text-xs font-bold font-display transition-all ${
                 filterPriority === p
-                  ? isDarkMode ? "bg-[#FBBF24] text-[#1E1B4B]" : "bg-[#1E1B4B] text-white"
-                  : isDarkMode ? "text-[#FFF9F0] hover:bg-[#2D1B69]" : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
+                  ? "bg-[#1E1B4B] text-white"
+                  : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
               }`}
             >
               {p}
@@ -473,9 +453,7 @@ export default function AdminMap({
         <div className="relative">
           <button
             onClick={() => setShowStyleMenu(!showStyleMenu)}
-            className={`pixar-btn px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold ${
-              isDarkMode ? "bg-[#28235C] text-[#FFF9F0] border-[#3B286D]" : "bg-[#FFF1DC] text-[#1E1B4B] border-[#1E1B4B]"
-            }`}
+            className="pixar-btn px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs shadow-pixar-sm flex items-center gap-1.5 font-bold bg-[#FFF1DC] text-[#1E1B4B] border-[#1E1B4B]"
             title="Change Map Style"
           >
             <Layers className="w-3.5 h-3.5 text-[#FF7A00]" />
@@ -484,7 +462,7 @@ export default function AdminMap({
           </button>
 
           {showStyleMenu && (
-            <div className={`absolute left-0 mt-2 w-52 rounded-[20px] border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#1E1B4B]" : "border-[#1E1B4B] bg-[#FFF9F0]"} p-2 shadow-pixar z-50`}>
+            <div className="absolute left-0 mt-2 w-52 rounded-[20px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] p-2 shadow-pixar z-50">
               <div className="text-[10px] font-mono uppercase tracking-wider font-bold px-2 py-1 text-[#FF7A00]">
                 Select Map Style
               </div>
@@ -497,8 +475,8 @@ export default function AdminMap({
                     onClick={() => switchTileLayer(key)}
                     className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold font-display rounded-[12px] transition-colors ${
                       isSelected
-                        ? isDarkMode ? "bg-[#3B286D] text-[#FBBF24]" : "bg-[#FFF1DC] text-[#FF7A00]"
-                        : isDarkMode ? "text-[#FFF9F0] hover:bg-[#28235C]" : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
+                        ? "bg-[#FFF1DC] text-[#FF7A00]"
+                        : "text-[#1E1B4B] hover:bg-[#FFF1DC]"
                     }`}
                   >
                     <span>{s.name}</span>
@@ -515,7 +493,7 @@ export default function AdminMap({
       <div className="w-full h-[520px] relative z-0 overflow-hidden">
         
         {/* Animated Geospatial Radar Screen SVG Background (Guarantees map is never a blank void) */}
-        <div className={`absolute inset-0 z-0 flex items-center justify-center pointer-events-none transition-colors duration-500 ${isDarkMode ? "bg-[#090817]" : "bg-[#FFF4E5]"}`}>
+        <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none transition-colors duration-500 bg-[#FFF4E5]">
           <svg className="w-full h-full opacity-35" viewBox="0 0 800 500" preserveAspectRatio="none">
             <defs>
               <radialGradient id="radarSweep" cx="50%" cy="50%" r="50%">
@@ -524,17 +502,17 @@ export default function AdminMap({
                 <stop offset="100%" stopColor="#1E1B4B" stopOpacity="0" />
               </radialGradient>
               <pattern id="radarGrid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke={isDarkMode ? "#3B286D" : "#F59E0B"} strokeWidth="0.75" strokeOpacity="0.4" />
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#F59E0B" strokeWidth="0.75" strokeOpacity="0.4" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#radarGrid)" />
             {/* Concentric distance perimeter circles */}
-            <circle cx="400" cy="250" r="80" fill="none" stroke={isDarkMode ? "#818CF8" : "#FF7A00"} strokeWidth="1.5" strokeDasharray="4 4" />
-            <circle cx="400" cy="250" r="160" fill="none" stroke={isDarkMode ? "#6366F1" : "#FFB703"} strokeWidth="1.5" strokeOpacity="0.6" />
-            <circle cx="400" cy="250" r="240" fill="none" stroke={isDarkMode ? "#4F46E5" : "#F59E0B"} strokeWidth="1.5" strokeOpacity="0.3" />
+            <circle cx="400" cy="250" r="80" fill="none" stroke="#FF7A00" strokeWidth="1.5" strokeDasharray="4 4" />
+            <circle cx="400" cy="250" r="160" fill="none" stroke="#FFB703" strokeWidth="1.5" strokeOpacity="0.6" />
+            <circle cx="400" cy="250" r="240" fill="none" stroke="#F59E0B" strokeWidth="1.5" strokeOpacity="0.3" />
             {/* Crosshairs */}
-            <line x1="400" y1="0" x2="400" y2="500" stroke={isDarkMode ? "#818CF8" : "#FF7A00"} strokeWidth="1" strokeOpacity="0.4" />
-            <line x1="0" y1="250" x2="800" y2="250" stroke={isDarkMode ? "#818CF8" : "#FF7A00"} strokeWidth="1" strokeOpacity="0.4" />
+            <line x1="400" y1="0" x2="400" y2="500" stroke="#FF7A00" strokeWidth="1" strokeOpacity="0.4" />
+            <line x1="0" y1="250" x2="800" y2="250" stroke="#FF7A00" strokeWidth="1" strokeOpacity="0.4" />
             {/* Center Sanctuary Pulse */}
             <circle cx="400" cy="250" r="12" fill="url(#radarSweep)" />
             <circle cx="400" cy="250" r="6" fill="#FF7A00" />
@@ -575,7 +553,7 @@ export default function AdminMap({
 
       {/* Heartwarming Collapsible Status Card */}
       {incidents.length === 0 && (
-        <div className={`absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-auto z-20 max-w-md rounded-[22px] sm:rounded-[26px] border-[2px] sm:border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#17153B]/95 text-[#FFF9F0]" : "border-[#1E1B4B] bg-[#FFF9F0]/95 text-[#1E1B4B]"} p-3 sm:p-4 shadow-pixar backdrop-blur-md transition-all duration-300`}>
+        <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-auto z-20 max-w-md rounded-[22px] sm:rounded-[26px] border-[2px] sm:border-[3px] border-[#1E1B4B] bg-[#FFF9F0]/95 text-[#1E1B4B] p-3 sm:p-4 shadow-pixar backdrop-blur-md transition-all duration-300">
           {isStatusCollapsed ? (
             <button
               onClick={() => setIsStatusCollapsed(false)}
@@ -590,7 +568,7 @@ export default function AdminMap({
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   {/* Cute Sleeping Puppy SVG with floating Zzz */}
-                  <div className={`relative flex-shrink-0 w-12 h-12 rounded-[18px] border-[2px] ${isDarkMode ? "border-[#3B286D] bg-[#1E1B4B]" : "border-[#1E1B4B] bg-[#FFF1DC]"} flex items-center justify-center shadow-pixar-sm overflow-visible`}>
+                  <div className="relative flex-shrink-0 w-12 h-12 rounded-[18px] border-[2px] border-[#1E1B4B] bg-[#FFF1DC] flex items-center justify-center shadow-pixar-sm overflow-visible">
                     <svg viewBox="0 0 40 40" className="w-8 h-8">
                       <circle cx="20" cy="22" r="12" fill="#FBBF24" stroke="#1E1B4B" strokeWidth="2.5" />
                       <path d="M 14 20 Q 17 23 20 20" fill="none" stroke="#1E1B4B" strokeWidth="2" strokeLinecap="round" />
@@ -609,7 +587,7 @@ export default function AdminMap({
                     <h4 className="font-display text-xs sm:text-sm font-bold">
                       Sanctuary All Quiet • 4 Hubs On Guard
                     </h4>
-                    <p className={`text-[11px] ${isDarkMode ? "text-[#FFF9F0]/75" : "text-[#1E1B4B]/75"} leading-tight font-sans`}>
+                    <p className="text-[11px] text-[#1E1B4B]/75 leading-tight font-sans">
                       Zero active distress emergencies in flight. 4 verified sanctuary hubs are monitoring radar.
                     </p>
                   </div>
@@ -643,7 +621,7 @@ export default function AdminMap({
 
       {/* Selected Sanctuary Hub Modal Card */}
       {selectedHub && (
-        <div className={`absolute bottom-3 left-3 right-3 sm:bottom-5 sm:right-5 sm:left-auto z-20 w-auto sm:w-80 max-w-full rounded-[24px] sm:rounded-[26px] border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#17153B] text-[#FFF9F0]" : "border-[#1E1B4B] bg-[#FFF9F0] text-[#1E1B4B]"} p-4 sm:p-5 shadow-pixar animate-in fade-in slide-in-from-bottom-4`}>
+        <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:right-5 sm:left-auto z-20 w-auto sm:w-80 max-w-full rounded-[24px] sm:rounded-[26px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] text-[#1E1B4B] p-4 sm:p-5 shadow-pixar animate-in fade-in slide-in-from-bottom-4">
           <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B]/20 pb-2 mb-2">
             <span className="font-mono text-[10px] font-black text-[#10B981] flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
@@ -658,7 +636,7 @@ export default function AdminMap({
           <p className="text-xs text-[#FF7A00] font-bold mt-0.5">
             {selectedHub.type}
           </p>
-          <p className={`text-[11px] ${isDarkMode ? "text-[#FFF9F0]/80" : "text-[#1E1B4B]/80"} font-sans mt-1.5`}>
+          <p className="text-[11px] text-[#1E1B4B]/80 font-sans mt-1.5">
             🚑 Active Resources: {selectedHub.squads}
           </p>
           <p className="text-[11px] font-mono text-[#10B981] mt-1 font-bold">
@@ -674,7 +652,7 @@ export default function AdminMap({
             </a>
             <button
               onClick={() => setSelectedHub(null)}
-              className={`pixar-btn px-3 py-1.5 ${isDarkMode ? "bg-[#1E1B4B] text-[#FFF9F0]" : "bg-[#FFF1DC] text-[#1E1B4B]"} text-xs font-bold shadow-pixar-sm`}
+              className="pixar-btn px-3 py-1.5 bg-[#FFF1DC] text-[#1E1B4B] text-xs font-bold shadow-pixar-sm"
             >
               Close
             </button>
@@ -684,7 +662,7 @@ export default function AdminMap({
 
       {/* Selected Incident Drawer */}
       {selectedIncident && (
-        <div className={`absolute bottom-3 left-3 right-3 sm:bottom-5 sm:right-5 sm:left-auto z-20 w-auto sm:w-84 max-w-full rounded-[24px] sm:rounded-[26px] border-[3px] ${isDarkMode ? "border-[#3B286D] bg-[#17153B] text-[#FFF9F0]" : "border-[#1E1B4B] bg-[#FFF9F0] text-[#1E1B4B]"} p-4 sm:p-5 shadow-pixar animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-right-4`}>
+        <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:right-5 sm:left-auto z-20 w-auto sm:w-84 max-w-full rounded-[24px] sm:rounded-[26px] border-[3px] border-[#1E1B4B] bg-[#FFF9F0] text-[#1E1B4B] p-4 sm:p-5 shadow-pixar animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-right-4">
           <div className="flex items-center justify-between border-b-[2px] border-[#1E1B4B]/20 pb-2 mb-2.5">
             <span className="font-mono text-[11px] font-black text-[#FF7A00]">
               {selectedIncident.incidentId}
@@ -699,10 +677,10 @@ export default function AdminMap({
           <p className="font-display text-base font-bold">
             {selectedIncident.animalCategory}
           </p>
-          <p className={`text-xs ${isDarkMode ? "text-[#FFF9F0]/80" : "text-[#1E1B4B]/80"} line-clamp-2 mt-1 font-sans`}>
+          <p className="text-xs text-[#1E1B4B]/80 line-clamp-2 mt-1 font-sans">
             {selectedIncident.conditionDescription}
           </p>
-          <p className={`text-[11px] ${isDarkMode ? "text-[#FFF9F0]/60" : "text-[#1E1B4B]/60"} font-mono mt-1.5 truncate`}>
+          <p className="text-[11px] text-[#1E1B4B]/60 font-mono mt-1.5 truncate">
             📍 {selectedIncident.location?.address || "Bangalore Location"}
           </p>
 
@@ -715,7 +693,7 @@ export default function AdminMap({
             </a>
             <button
               onClick={() => setSelectedIncident(null)}
-              className={`pixar-btn px-3 py-2 ${isDarkMode ? "bg-[#1E1B4B] text-[#FFF9F0]" : "bg-[#FFF1DC] text-[#1E1B4B]"} text-xs font-bold shadow-pixar-sm`}
+              className="pixar-btn px-3 py-2 bg-[#FFF1DC] text-[#1E1B4B] text-xs font-bold shadow-pixar-sm"
             >
               Close
             </button>

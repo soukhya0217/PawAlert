@@ -187,7 +187,7 @@ export default function PawMark({
       <div className="flex flex-col leading-none">
         <div className="flex items-center gap-1">
           <span
-            className={`font-display ${fontSize} font-black tracking-tight text-[#1E1B4B] dark:text-[#FFF9F0] flex items-center transition-colors`}
+            className={`font-display ${fontSize} font-black tracking-tight text-[#1E1B4B] flex items-center transition-colors`}
             style={{
               textShadow: "0 2px 0 rgba(255, 122, 0, 0.2)",
             }}
@@ -208,7 +208,7 @@ export default function PawMark({
 
         {showTagline && (
           <span
-            className={`font-display ${taglineSize} font-bold text-[#D97706] dark:text-[#FBBF24] tracking-wider uppercase mt-0.5 transition-colors`}
+            className={`font-display ${taglineSize} font-bold text-[#D97706] tracking-wider uppercase mt-0.5 transition-colors`}
           >
             Because Every Paw Matters
           </span>

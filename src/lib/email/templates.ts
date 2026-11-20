@@ -1,5 +1,5 @@
 export interface EmailTemplateData {
-  recipientName: string;
+  recipientName?: string;
   actionUrl?: string;
   incidentId?: string;
   animalCategory?: string;
@@ -405,6 +405,138 @@ export function generateEmailHtml(
 
           <p style="font-size: 12px; color: #6B6580; text-align: center;">
             Thank you for being part of our rescue network.
+          </p>
+          `
+        ),
+      };
+
+    // -------------------------------------------------------------
+    // 6. NEW ANIMAL CASE BROADCAST TO ALL USERS & VOLUNTEERS
+    // -------------------------------------------------------------
+    case "NEW_CASE_ALERT":
+    case "NEW_ANIMAL_CASE":
+      return {
+        subject: `🐾 New Animal Rescue Case #${data.incidentId || "PAW-ALERT"}: ${data.animalCategory || "Animal"} in Need of Support`,
+        html: wrapTemplate(
+          "New Animal Rescue Alert",
+          `
+          <div style="background: #FF7A00; color: white; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 11px; display: inline-block; margin-bottom: 14px; text-transform: uppercase;">
+            📢 COMMUNITY RESCUE BROADCAST
+          </div>
+          <h2 style="color: #1E1B4B; margin-top: 0; font-size: 22px; font-weight: 800;">
+            A New Animal in Need Has Been Reported: #${data.incidentId}
+          </h2>
+          <p style="font-size: 14px; color: #373356;">
+            Dear Animal Guardian, a new distress alert has just been logged into our community rescue network. We encourage local rescuers, volunteers, and neighbors to support this rescue effort.
+          </p>
+
+          <div style="background: #FFF9F0; border: 2px solid #1E1B4B; border-radius: 16px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 0 #1E1B4B;">
+            <table role="presentation" cellpadding="5" cellspacing="0" style="width: 100%; font-size: 13px; color: #1E1B4B;">
+              <tr>
+                <td style="font-weight: 700; width: 35%;">Case ID:</td>
+                <td><strong style="color: #FF7A00; font-family: monospace;">#${data.incidentId}</strong></td>
+              </tr>
+              <tr>
+                <td style="font-weight: 700;">Animal Type:</td>
+                <td><strong>${data.animalCategory || "Community Animal"}</strong></td>
+              </tr>
+              <tr>
+                <td style="font-weight: 700;">Description:</td>
+                <td>${data.conditionDescription || "In need of field assistance"}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 700;">Reported Location:</td>
+                <td>📍 ${data.locationAddress || "Pinpointed on Map"}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 700;">Current Status:</td>
+                <td>
+                  <span style="background: #FFB703; color: #1E1B4B; border: 1.5px solid #1E1B4B; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 11px;">
+                    ${formatFriendlyStatus(data.status || "REPORTED")}
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="font-size: 13px; color: #4B4668; line-height: 1.6;">
+            <strong>How You Can Help:</strong> If you are near this location, check the case tracking link below for real-time dispatch updates, transport coordination, or first-aid supply assistance. Every minute counts!
+          </p>
+
+          <p style="text-align: center; margin: 28px 0 16px 0;">
+            <a href="${data.actionUrl || `http://localhost:3000/track/${data.incidentId}`}" 
+               style="background: linear-gradient(135deg, #FF7A00 0%, #F97316 100%); color: #FFFFFF; padding: 14px 32px; text-decoration: none; border-radius: 9999px; font-weight: 800; font-size: 14px; display: inline-block; border: 2px solid #1E1B4B; box-shadow: 0 4px 0 #1E1B4B;">
+              View & Support Rescue Case →
+            </a>
+          </p>
+          `
+        ),
+      };
+
+    // -------------------------------------------------------------
+    // 7. CASE RESOLVED BROADCAST TO ALL USERS & VOLUNTEERS
+    // -------------------------------------------------------------
+    case "CASE_RESOLVED_ALERT":
+    case "CASE_RESOLVED":
+      return {
+        subject: `✅ Animal Rescue Case #${data.incidentId || "PAW-ALERT"} Successfully Resolved! 🐾`,
+        html: wrapTemplate(
+          "Rescue Case Resolved",
+          `
+          <div style="background: #10B981; color: white; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 11px; display: inline-block; margin-bottom: 14px; text-transform: uppercase;">
+            🎉 RESCUE MISSION ACCOMPLISHED
+          </div>
+          <h2 style="color: #1E1B4B; margin-top: 0; font-size: 22px; font-weight: 800;">
+            Case #${data.incidentId} Has Been Successfully Resolved!
+          </h2>
+          <p style="font-size: 14px; color: #373356;">
+            We are overjoyed to share that the distressed <strong>${data.animalCategory || "animal"}</strong> has received the necessary rescue assistance, medical triage, and sanctuary care.
+          </p>
+
+          <div style="background: #FFF9F0; border: 2px solid #1E1B4B; border-radius: 16px; padding: 20px; margin: 20px 0; box-shadow: 0 4px 0 #1E1B4B;">
+            <table role="presentation" cellpadding="5" cellspacing="0" style="width: 100%; font-size: 13px; color: #1E1B4B;">
+              <tr>
+                <td style="font-weight: 700; width: 35%;">Case ID:</td>
+                <td><strong style="color: #10B981; font-family: monospace;">#${data.incidentId}</strong></td>
+              </tr>
+              <tr>
+                <td style="font-weight: 700;">Animal Details:</td>
+                <td>${data.animalCategory || "Animal"} • ${data.conditionDescription || "Successfully assisted"}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 700;">Location:</td>
+                <td>📍 ${data.locationAddress || "Sanctuary / Clinic Care"}</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 700;">Resolution Status:</td>
+                <td>
+                  <span style="background: #10B981; color: white; padding: 2px 10px; border-radius: 6px; font-weight: 800; font-size: 11px;">
+                    SAFE & RESCUED ✅
+                  </span>
+                </td>
+              </tr>
+              ${data.adminRemarks ? `
+              <tr>
+                <td style="font-weight: 700; vertical-align: top;">Resolution Summary:</td>
+                <td style="background: #FFF1DC; padding: 6px 10px; border-radius: 6px; font-style: italic;">
+                  "${data.adminRemarks}"
+                </td>
+              </tr>` : ""}
+            </table>
+          </div>
+
+          <p style="font-size: 14px; color: #1E1B4B; font-weight: 700; text-align: center; margin-top: 24px;">
+            🙏 Thank You to Every Rescuer, Volunteer & Community Guardian!
+          </p>
+          <p style="font-size: 13px; color: #4B4668; text-align: center; line-height: 1.5;">
+            Because of your vigilance, compassion, and rapid action, another community animal is safe, healing, and loved.
+          </p>
+
+          <p style="text-align: center; margin: 28px 0 16px 0;">
+            <a href="${data.actionUrl || `http://localhost:3000/track/${data.incidentId}`}" 
+               style="background: #1E1B4B; color: #FFFFFF; padding: 14px 32px; text-decoration: none; border-radius: 9999px; font-weight: 800; font-size: 14px; display: inline-block; border: 2px solid #1E1B4B; box-shadow: 0 4px 0 #10B981;">
+              View Complete Case Story & Recovery →
+            </a>
           </p>
           `
         ),

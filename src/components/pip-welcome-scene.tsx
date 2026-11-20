@@ -12,6 +12,11 @@ interface PipWelcomeSceneProps {
 export default function PipWelcomeScene({ isInputFocused = false }: PipWelcomeSceneProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const animTimelineRef = useRef<anime.AnimeTimelineInstance | null>(null);
+  const isInputFocusedRef = useRef(isInputFocused);
+
+  useEffect(() => {
+    isInputFocusedRef.current = isInputFocused;
+  }, [isInputFocused]);
 
   // References for live 3D animation controls
   const pipRigRef = useRef<{
@@ -485,8 +490,9 @@ export default function PipWelcomeScene({ isInputFocused = false }: PipWelcomeSc
       const delta = clock.getDelta();
 
       // Tail wagging physics (accelerates if user is typing/focused)
-      const wagSpeed = isInputFocused ? 14 : 7;
-      const wagAngle = isInputFocused ? 0.65 : 0.42;
+      const isFocused = isInputFocusedRef.current;
+      const wagSpeed = isFocused ? 14 : 7;
+      const wagAngle = isFocused ? 0.65 : 0.42;
       tailGroup.rotation.y = Math.sin(elapsed * wagSpeed) * wagAngle;
 
       // Gentle breathing body compression
@@ -577,7 +583,7 @@ export default function PipWelcomeScene({ isInputFocused = false }: PipWelcomeSc
         container.removeChild(renderer.domElement);
       }
     };
-  }, [isInputFocused]);
+  }, []);
 
   const handleReplayIntro = () => {
     if (!pipRigRef.current) return;
