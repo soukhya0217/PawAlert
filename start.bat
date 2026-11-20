@@ -29,7 +29,7 @@ if not exist ".env.local" (
             echo MONGODB_URI=mongodb://127.0.0.1:27017/pawalert
             echo JWT_SECRET=pawalert_super_secret_jwt_key_2026
             echo ADMIN_EMAIL=admin@pawalert.org
-            echo ADMIN_PASSWORD=AdminPass2026!
+            echo ADMIN_PASSWORD=ChangeThisPassword123!
             echo NEXT_PUBLIC_APP_URL=http://localhost:3000
         ) > ".env.local"
     )

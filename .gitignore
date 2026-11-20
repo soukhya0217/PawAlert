@@ -30,10 +30,14 @@ yarn-error.log*
 .env*.local
 .env.local
 .env.*
+!.env.example
 
 # database storage & local uploads
 /.mongo-data/
 /uploads/
+*.wt
+*.lock
+*.log
 
 # vercel
 .vercel
