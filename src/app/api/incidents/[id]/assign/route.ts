@@ -24,7 +24,17 @@ export async function POST(
     }
 
     const { id } = params;
-    const result = await takeResponsibilityAtomic(id, user._id.toString());
+    let targetUserId = user._id.toString();
+    try {
+      const body = await req.json();
+      if (body?.volunteerId && (user.role === "SUPER_ADMIN" || user.role === "NGO_ADMIN")) {
+        targetUserId = body.volunteerId;
+      }
+    } catch {
+      // body is optional when responder takes self-responsibility
+    }
+
+    const result = await takeResponsibilityAtomic(id, targetUserId);
 
     if (!result.success) {
       return NextResponse.json({ error: result.message }, { status: 409 });

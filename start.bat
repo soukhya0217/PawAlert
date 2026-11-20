@@ -1,22 +1,48 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-title POWER ALERT - Animal Rescue Platform
+title PAWALERT - Animal Rescue & Emergency Dispatch Platform
 
 echo ==============================================================
-echo   POWER ALERT: Animal Rescue Platform
+echo   PAWALERT: Animal Rescue & Emergency Dispatch Platform
 echo   "Every Life Matters. Every Alert Counts."
 echo ==============================================================
 echo.
 
+:: 1. Ensure uploads/ directory exists
+if not exist "uploads" (
+    echo [1/4] Creating local uploads directory...
+    mkdir uploads
+)
+
+:: 2. Ensure .env.local exists with MONGODB_URI
 if not exist ".env.local" (
     if exist ".env.example" (
-        echo [1/3] Initializing environment settings...
+        echo [2/4] Initializing .env.local from template...
         copy /y ".env.example" ".env.local" >nul
+    ) else (
+        echo [2/4] Creating default .env.local...
+        (
+            echo MONGODB_URI=mongodb://127.0.0.1:27017/pawalert
+            echo JWT_SECRET=pawalert_super_secret_jwt_key_2026
+            echo ADMIN_EMAIL=admin@pawalert.org
+            echo ADMIN_PASSWORD=AdminPass2026!
+            echo NEXT_PUBLIC_APP_URL=http://localhost:3000
+        ) > ".env.local"
     )
 )
 
-echo [2/3] Verifying Node.js environment...
+:: 3. Try to start MongoDB service if present locally
+echo [3/4] Checking local MongoDB service...
+net start MongoDB >nul 2>&1
+if %errorlevel% equ 0 (
+    echo   - Local MongoDB service is running.
+) else (
+    echo   - Local MongoDB check completed.
+)
+
+:: 4. Verify Node.js environment
+echo [4/4] Verifying Node.js environment...
 where node >nul 2>nul
 if %errorlevel% neq 0 (
     echo.
@@ -27,13 +53,14 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo [3/3] Launching POWER ALERT and opening browser...
+echo.
+echo Launching PawAlert Dispatch Platform and opening browser...
 echo.
 
 node scripts/launch.js
 
 echo.
 echo ==============================================================
-echo [INFO] POWER ALERT process has ended.
+echo [INFO] PawAlert process has ended.
 echo ==============================================================
 pause

@@ -156,6 +156,11 @@ const config: Config = {
         wiggle: "wiggle 1s ease-in-out infinite",
         "pulse-glow": "pulseGlow 2.5s ease-in-out infinite",
       },
+      fontFamily: {
+        display: ["Fredoka", "Plus Jakarta Sans", "system-ui", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
+      },
     },
   },
   plugins: [],

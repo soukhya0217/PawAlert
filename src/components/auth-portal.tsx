@@ -106,11 +106,10 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
         setSuccessMsg("Signed in successfully! Redirecting...");
         const role = data.user?.role;
         setTimeout(() => {
-          if (role === "SUPER_ADMIN") router.push("/admin/dashboard");
+          if (role === "SUPER_ADMIN" || role === "ADMIN") router.push("/admin");
           else if (role === "NGO_ADMIN") router.push("/ngo/dashboard");
           else if (role === "VETERINARIAN") router.push("/vet/dashboard");
-          else if (role && role.includes("VOLUNTEER")) router.push("/volunteer/dashboard");
-          else router.push("/user/dashboard");
+          else router.push("/");
           router.refresh();
         }, 500);
       } else {
@@ -159,7 +158,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
       if (res.ok) {
         setSuccessMsg("Account created! Welcome email dispatched. Redirecting...");
         setTimeout(() => {
-          router.push("/user/dashboard");
+          router.push("/");
           router.refresh();
         }, 800);
       } else {

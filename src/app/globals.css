@@ -98,6 +98,8 @@
     color: #FFF9F0 !important;
   }
 
+  [data-theme="dark"] [class*="text-[#1E1B4B]/"],
+  .dark [class*="text-[#1E1B4B]/"],
   [data-theme="dark"] [class*="text-\[\#1E1B4B\]\/"],
   .dark [class*="text-\[\#1E1B4B\]\/"] {
     color: rgba(255, 249, 240, 0.85) !important;
@@ -108,6 +110,8 @@
     border-color: #3B286D !important;
   }
 
+  [data-theme="dark"] [class*="border-[#1E1B4B]/"],
+  .dark [class*="border-[#1E1B4B]/"],
   [data-theme="dark"] [class*="border-\[\#1E1B4B\]\/"],
   .dark [class*="border-\[\#1E1B4B\]\/"] {
     border-color: rgba(59, 40, 109, 0.6) !important;
@@ -173,6 +177,8 @@
     color: #FFF9F0 !important;
   }
 
+  [data-theme="dark"] [class*="text-[#1B3B2B]/"],
+  .dark [class*="text-[#1B3B2B]/"],
   [data-theme="dark"] [class*="text-\[\#1B3B2B\]\/"],
   .dark [class*="text-\[\#1B3B2B\]\/"] {
     color: rgba(255, 249, 240, 0.85) !important;
@@ -231,9 +237,9 @@
   .dark .bg-\[\#FBBF24\],
   [data-theme="dark"] .bg-\[\#FBBF24\] *,
   .dark .bg-\[\#FBBF24\] *,
-  [data-theme="dark"] [class*="bg-\[\#FFB703\]"],
-  .dark [class*="bg-\[\#FFB703\]"],
-  [data-theme="dark"] [class*="bg-\[\#FFB703\]"] * {
+  [data-theme="dark"] [class*="bg-[#FFB703]"],
+  .dark [class*="bg-[#FFB703]"],
+  [data-theme="dark"] [class*="bg-[#FFB703]"] * {
     color: #1E1B4B !important;
   }
 
@@ -244,8 +250,8 @@
   .dark .bg-\[\#EF4444\] *,
   [data-theme="dark"] .bg-\[\#10B981\] *,
   .dark .bg-\[\#10B981\] *,
-  [data-theme="dark"] [class*="bg-gradient-to-r from-\[\#FF7A00\]"] *,
-  .dark [class*="bg-gradient-to-r from-\[\#FF7A00\]"] * {
+  [data-theme="dark"] [class*="bg-gradient-to-r from-[#FF7A00]"] *,
+  .dark [class*="bg-gradient-to-r from-[#FF7A00]"] * {
     color: #FFFFFF !important;
   }
 

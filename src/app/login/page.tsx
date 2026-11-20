@@ -1,9 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
-import PipWelcomeScene from "@/components/pip-welcome-scene";
+import dynamic from "next/dynamic";
 import AuthPortal from "@/components/auth-portal";
 import { HeartHandshake, Building2, Compass, ShieldCheck } from "lucide-react";
+
+// Client-side only dynamic import for WebGL/Three.js scene
+const PipWelcomeScene = dynamic(() => import("@/components/pip-welcome-scene"), {
+  ssr: false,
+  loading: () => (
+    <div className="relative w-full h-[380px] sm:h-[460px] lg:h-full min-h-[420px] rounded-[28px] sm:rounded-[36px] border-[3px] sm:border-[4px] border-[#1E1B4B] dark:border-[#3B286D] bg-[#FFF9F0] dark:bg-[#17153B] overflow-hidden shadow-pixar flex items-center justify-center">
+      <div className="text-center space-y-2">
+        <div className="text-4xl animate-bounce">🐶</div>
+        <p className="font-display text-xs font-bold text-[#1E1B4B] dark:text-[#FFF9F0]">
+          Loading Pip&apos;s Sanctuary Scene...
+        </p>
+      </div>
+    </div>
+  ),
+});
 
 export default function LoginPage() {
   const [isInputFocused, setIsInputFocused] = useState(false);
