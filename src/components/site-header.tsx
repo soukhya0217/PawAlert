@@ -194,14 +194,16 @@ export default function SiteHeader() {
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-1.5">
-              <a
-                href="/login"
-                className="pixar-btn rounded-[16px] bg-[#1E1B4B] text-white border-[2px] border-[#1E1B4B] px-4 py-2 text-xs font-bold shadow-pixar-sm hover:bg-[#2D1B69]"
-              >
-                Sign In
-              </a>
-            </div>
+            pathname !== "/login" && (
+              <div className="flex items-center gap-1.5">
+                <a
+                  href="/login"
+                  className="pixar-btn rounded-[16px] bg-[#1E1B4B] text-white border-[2px] border-[#1E1B4B] px-4 py-2 text-xs font-bold shadow-pixar-sm hover:bg-[#2D1B69]"
+                >
+                  Sign In
+                </a>
+              </div>
+            )
           )}
 
           {/* Mobile Menu Hamburger */}

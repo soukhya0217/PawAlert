@@ -47,21 +47,44 @@ export async function connectDB(): Promise<typeof mongoose> {
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000, // 5s timeout instead of hanging 30s
     };
 
-    let uri: string = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/pawalert";
-    if (uri.includes("<username>") || uri.includes("<password>")) {
+    const isVercel = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
+    let uri: string | undefined = process.env.MONGODB_URI;
+
+    // Check if URI is missing or has unreplaced template placeholders
+    if (!uri || uri.includes("<username>") || uri.includes("<password>")) {
+      if (isVercel) {
+        const msg = "Cloud MongoDB connection required on Vercel. Please add MONGODB_URI in your Vercel Project Settings > Environment Variables.";
+        console.warn(`[MongoDB] ${msg}`);
+        throw new Error(msg);
+      }
       uri = "mongodb://127.0.0.1:27017/pawalert";
+    }
+
+    // On Vercel, localhost/127.0.0.1 will always be refused
+    if (isVercel && (uri.includes("127.0.0.1") || uri.includes("localhost"))) {
+      const msg = "Localhost MongoDB cannot run inside Vercel serverless containers. Please add your MongoDB Atlas cluster URI in Vercel Environment Variables.";
+      console.warn(`[MongoDB] ${msg}`);
+      throw new Error(msg);
     }
 
     cached.promise = mongoose
       .connect(uri, opts)
       .then((mongooseInstance) => {
-        console.log(`[MongoDB] Connected successfully to ${uri.replace(/\/\/.*@/, "//***:***@")}`);
+        console.log(`[MongoDB] Connected successfully to ${uri?.replace(/\/\/.*@/, "//***:***@")}`);
         return mongooseInstance;
       })
       .catch(async (err) => {
-        console.warn(`[MongoDB] Direct connection to ${uri} failed (${err.message}). Starting persistent local fallback...`);
+        console.warn(`[MongoDB] Connection to ${uri} failed (${err.message}).`);
+
+        // If running on Vercel, in-memory server is not supported; throw clean informative error
+        if (isVercel) {
+          throw new Error(`Database connection failed: ${err.message}. Please verify your MONGODB_URI in Vercel settings.`);
+        }
+
+        // Local development fallback
         try {
           const { MongoMemoryServer } = await import("mongodb-memory-server");
           if (!cached.memoryServer) {
@@ -84,7 +107,7 @@ export async function connectDB(): Promise<typeof mongoose> {
             }
           }
           const memUri = cached.memoryServer.getUri();
-          console.log(`[MongoDB] Connected to fallback instance at ${memUri}`);
+          console.log(`[MongoDB] Connected to local fallback instance at ${memUri}`);
           return await mongoose.connect(memUri, opts);
         } catch (memErr: any) {
           console.error("[MongoDB] Fallback initialization error:", memErr);

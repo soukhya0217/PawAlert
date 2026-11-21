@@ -14,7 +14,8 @@ import {
   Sparkles,
   HeartHandshake,
   CheckCircle2,
-  ArrowLeft
+  ArrowLeft,
+  HelpCircle
 } from "lucide-react";
 import anime from "animejs";
 
@@ -30,7 +31,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
 
   const [mode, setMode] = useState<AuthMode>("LOGIN");
 
-  // Login form state (empty by default - zero credentials exposed)
+  // Login form state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
@@ -45,6 +46,19 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Helper to translate raw serverless connection errors into actionable messages
+  const formatErrorMessage = (rawError: string): string => {
+    if (
+      rawError.includes("ECONNREFUSED") ||
+      rawError.includes("127.0.0.1") ||
+      rawError.includes("MONGODB_URI") ||
+      rawError.includes("server selection")
+    ) {
+      return "Cloud Database Setup Required: Please add your MongoDB Atlas connection string (MONGODB_URI) in your Vercel Project Settings > Environment Variables.";
+    }
+    return rawError;
+  };
 
   // Animate card entrance with spring physics on mount
   useEffect(() => {
@@ -92,7 +106,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
     if (onFocusChange) onFocusChange(false);
   };
 
-  // 1. Login Handler (Handles both normal login and admin login securely)
+  // 1. Login Handler
   const handleLoginSubmit = async (e?: React.FormEvent, customEmail?: string, customPass?: string) => {
     if (e) e.preventDefault();
     setErrorMsg(null);
@@ -150,16 +164,16 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
           router.refresh();
         }, 500);
       } else {
-        setErrorMsg(data.error || "Invalid email or password.");
+        setErrorMsg(formatErrorMessage(data.error || "Invalid email or password."));
       }
     } catch (err: any) {
-      setErrorMsg(err.message || "Network error. Please try again.");
+      setErrorMsg(formatErrorMessage(err.message || "Network error. Please try again."));
     } finally {
       setLoading(false);
     }
   };
 
-  // 2. Real Registration
+  // 2. Registration Handler
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
@@ -193,16 +207,16 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
       const data = await res.json();
 
       if (res.ok) {
-        setSuccessMsg("Account created! Welcome email dispatched. Redirecting...");
+        setSuccessMsg("Account created! Redirecting to dashboard...");
         setTimeout(() => {
           router.push("/user/dashboard");
           router.refresh();
         }, 800);
       } else {
-        setErrorMsg(data.error || "Could not complete registration.");
+        setErrorMsg(formatErrorMessage(data.error || "Could not complete registration."));
       }
     } catch (err: any) {
-      setErrorMsg(err.message || "Registration failed. Please try again.");
+      setErrorMsg(formatErrorMessage(err.message || "Registration failed. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -210,7 +224,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
 
   return (
     <div
-      className={`auth-portal-card pixar-card p-6 sm:p-8 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] rounded-[28px] shadow-pixar transition-colors duration-300 ${className}`}
+      className={`auth-portal-card pixar-card p-5 sm:p-8 bg-[#FFF9F0] border-[3px] border-[#1E1B4B] rounded-[28px] shadow-pixar transition-colors duration-300 ${className}`}
     >
       {/* Tab Switcher: Sign In vs Join Guardian vs Admin Mode */}
       {mode === "ADMIN_LOGIN" ? (
@@ -260,9 +274,9 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
 
       {/* Notifications */}
       {errorMsg && (
-        <div className="mb-4 p-3.5 rounded-[16px] border-[2px] border-[#EF4444] bg-[#EF4444]/10 text-[#EF4444] text-xs font-bold flex items-center gap-2 animate-in fade-in">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span>{errorMsg}</span>
+        <div className="mb-4 p-3.5 rounded-[16px] border-[2px] border-[#EF4444] bg-[#EF4444]/10 text-[#EF4444] text-xs font-bold flex items-start gap-2 animate-in fade-in leading-relaxed">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <span className="flex-1">{errorMsg}</span>
         </div>
       )}
 
@@ -290,7 +304,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onBlur={handleInputBlur}
                 onChange={(e) => setLoginEmail(e.target.value)}
                 placeholder="rescuer@pawalert.org"
-                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-sm font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
@@ -317,7 +331,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onBlur={handleInputBlur}
                 onChange={(e) => setLoginPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-sm font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
@@ -325,7 +339,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
           <button
             type="submit"
             disabled={loading}
-            className="pixar-btn w-full flex items-center justify-center gap-2 rounded-[18px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] py-3 text-sm font-bold text-white shadow-pixar disabled:opacity-50 mt-2"
+            className="pixar-btn w-full flex items-center justify-center gap-2 rounded-[18px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] py-3 text-sm font-bold text-white shadow-pixar disabled:opacity-50 mt-2 hover:opacity-95"
           >
             <span>{loading ? "Authenticating..." : "Sign In to Dispatch"}</span>
             <ArrowRight className="w-4 h-4" />
@@ -372,7 +386,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onBlur={handleInputBlur}
                 onChange={(e) => setLoginEmail(e.target.value)}
                 placeholder="admin@pawalert.org"
-                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-sm font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
@@ -391,7 +405,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onBlur={handleInputBlur}
                 onChange={(e) => setLoginPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-10 pr-4 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-sm font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
@@ -432,7 +446,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                 onBlur={handleInputBlur}
                 onChange={(e) => setRegFullName(e.target.value)}
                 placeholder="Maya Sharma"
-                className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-sm font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
               />
             </div>
           </div>
@@ -452,7 +466,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                   onBlur={handleInputBlur}
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="maya@example.com"
-                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-sm font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                 />
               </div>
             </div>
@@ -471,7 +485,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                   onBlur={handleInputBlur}
                   onChange={(e) => setRegMobile(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-sm font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                 />
               </div>
             </div>
@@ -492,7 +506,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                   onBlur={handleInputBlur}
                   onChange={(e) => setRegCity(e.target.value)}
                   placeholder="Bangalore"
-                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-sm font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                 />
               </div>
             </div>
@@ -511,7 +525,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
                   onBlur={handleInputBlur}
                   onChange={(e) => setRegPassword(e.target.value)}
                   placeholder="At least 6 chars"
-                  className="w-full pl-10 pr-4 py-2 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-xs font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-[16px] border-[2px] border-[#1E1B4B] bg-[#FFF9F0] text-sm font-sans text-[#1E1B4B] focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
                 />
               </div>
             </div>
@@ -526,7 +540,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
               <button
                 type="button"
                 onClick={() => setRegRole("PUBLIC_USER")}
-                className={`p-2 rounded-[14px] border-[2px] text-xs font-bold font-display text-center transition-all ${
+                className={`p-2.5 rounded-[14px] border-[2px] text-xs font-bold font-display text-center transition-all ${
                   regRole === "PUBLIC_USER"
                     ? "border-[#1E1B4B] bg-[#FFB703] text-[#1E1B4B] shadow-pixar-sm"
                     : "border-[#1E1B4B]/20 bg-[#FFF1DC] text-[#1E1B4B]/70"
@@ -537,7 +551,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
               <button
                 type="button"
                 onClick={() => setRegRole("RESCUE_VOLUNTEER")}
-                className={`p-2 rounded-[14px] border-[2px] text-xs font-bold font-display text-center transition-all ${
+                className={`p-2.5 rounded-[14px] border-[2px] text-xs font-bold font-display text-center transition-all ${
                   regRole === "RESCUE_VOLUNTEER"
                     ? "border-[#1E1B4B] bg-[#10B981] text-white shadow-pixar-sm"
                     : "border-[#1E1B4B]/20 bg-[#FFF1DC] text-[#1E1B4B]/70"
@@ -551,7 +565,7 @@ export default function AuthPortal({ onFocusChange, className = "" }: AuthPortal
           <button
             type="submit"
             disabled={loading}
-            className="pixar-btn w-full flex items-center justify-center gap-2 rounded-[18px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] py-3 text-sm font-bold text-white shadow-pixar disabled:opacity-50 mt-3"
+            className="pixar-btn w-full flex items-center justify-center gap-2 rounded-[18px] bg-gradient-to-r from-[#FF7A00] to-[#F97316] py-3 text-sm font-bold text-white shadow-pixar disabled:opacity-50 mt-3 hover:opacity-95"
           >
             <span>{loading ? "Creating Account..." : "Join PawAlert Dispatch"}</span>
             <Sparkles className="w-4 h-4" />
