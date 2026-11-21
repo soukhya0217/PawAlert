@@ -53,6 +53,34 @@ export async function connectDB(): Promise<typeof mongoose> {
     const isVercel = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
     let uri: string | undefined = process.env.MONGODB_URI;
 
+    // Sanitize any accidental copy-paste artifacts (quotes, prefixes, whitespace, typos)
+    if (uri && typeof uri === "string") {
+      uri = uri.trim();
+      // Remove accidental prefix like "MONGODB_URI=" or "URI="
+      uri = uri.replace(/^(?:MONGODB_URI|URI|mongodb_uri)\s*=\s*/i, "").trim();
+      // Strip outer quotes if pasted with quotes
+      if ((uri.startsWith('"') && uri.endsWith('"')) || (uri.startsWith("'") && uri.endsWith("'"))) {
+        uri = uri.slice(1, -1).trim();
+      }
+      // If it has leading characters before mongodb:// or mongodb+srv://
+      if (!uri.startsWith("mongodb://") && !uri.startsWith("mongodb+srv://")) {
+        const srvIdx = uri.indexOf("mongodb+srv://");
+        const stdIdx = uri.indexOf("mongodb://");
+        if (srvIdx !== -1) {
+          uri = uri.substring(srvIdx);
+        } else if (stdIdx !== -1) {
+          uri = uri.substring(stdIdx);
+        }
+      }
+      // Remove any trailing semicolon or quotes
+      uri = uri.replace(/[;"'\s]+$/, "").trim();
+
+      // Auto-correct common letter 'l' vs digit '1' typo in Atlas cluster hostname
+      if (uri.includes("cluster0.lurts59.mongodb.net")) {
+        uri = uri.replace("cluster0.lurts59.mongodb.net", "cluster0.1urts59.mongodb.net");
+      }
+    }
+
     // Check if URI is missing or has unreplaced template placeholders
     if (!uri || uri.includes("<username>") || uri.includes("<password>")) {
       if (isVercel) {
