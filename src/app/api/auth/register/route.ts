@@ -66,13 +66,6 @@ export async function POST(req: Request) {
         role: role || "PUBLIC_USER",
         isEmailVerified: false,
       });
-
-      // Send Welcome Email
-      try {
-        await sendWelcomeEmail(user.email, user.fullName);
-      } catch (err) {
-        console.error("[Register] Welcome email trigger error:", err);
-      }
     } catch (dbErr: any) {
       console.warn("[Register] Database connection unavailable:", dbErr.message);
 
@@ -84,6 +77,13 @@ export async function POST(req: Request) {
         role: role || "PUBLIC_USER",
         city: cleanCity,
       };
+    }
+
+    // Trigger Welcome Email (runs non-blocking for both DB and preview sessions)
+    try {
+      await sendWelcomeEmail(user.email, user.fullName);
+    } catch (err) {
+      console.error("[Register] Welcome email trigger error:", err);
     }
 
     // Sign JWT

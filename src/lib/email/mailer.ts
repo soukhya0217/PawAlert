@@ -49,21 +49,33 @@ export function getMailTransporter(): Transporter | null {
   }
 
   try {
-    cachedTransporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpPort === 465, // SSL for 465, TLS for 587
-      requireTLS: smtpPort === 587,
-      auth: {
-        user: emailUser,
-        pass: emailPass,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
+    const isGmail = smtpHost.includes("gmail") || emailUser.toLowerCase().includes("@gmail.com");
 
-    console.log(`[PawAlert Mailer] Configured Nodemailer SMTP transporter (${emailUser} @ ${smtpHost}:${smtpPort})`);
+    const transportConfig: any = isGmail
+      ? {
+          service: "gmail",
+          auth: {
+            user: emailUser,
+            pass: emailPass,
+          },
+        }
+      : {
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpPort === 465,
+          requireTLS: smtpPort === 587,
+          auth: {
+            user: emailUser,
+            pass: emailPass,
+          },
+          tls: {
+            rejectUnauthorized: false,
+          },
+        };
+
+    cachedTransporter = nodemailer.createTransport(transportConfig);
+
+    console.log(`[PawAlert Mailer] Configured Nodemailer SMTP transporter (${emailUser} via ${isGmail ? "Gmail Service" : smtpHost})`);
     return cachedTransporter;
   } catch (err) {
     console.error("[PawAlert Mailer] Error instantiating Nodemailer transporter:", err);
