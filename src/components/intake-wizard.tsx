@@ -280,6 +280,20 @@ export default function IntakeWizard() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Auto-prefill reporter info if logged in
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.user) {
+          if (data.user.fullName) setReporterName((prev) => prev || data.user.fullName);
+          if (data.user.mobile) setReporterPhone((prev) => prev || data.user.mobile);
+          if (data.user.email) setReporterEmail((prev) => prev || data.user.email);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Map Refs
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);

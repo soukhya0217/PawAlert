@@ -19,7 +19,9 @@ export default function MyReportsPage() {
         setCurrentUser(meData.user);
 
         if (meData.user) {
-          const incRes = await fetch(`/api/incidents?reporterId=${meData.user.id}`);
+          const userParam = meData.user.id ? `reporterId=${meData.user.id}` : "";
+          const emailParam = meData.user.email ? `&reporterEmail=${encodeURIComponent(meData.user.email)}` : "";
+          const incRes = await fetch(`/api/incidents?${userParam}${emailParam}`);
           const incData = await incRes.json();
           setIncidents(incData.incidents || []);
         }

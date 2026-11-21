@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import connectDB from "@/lib/db/connect";
 import Incident from "@/lib/db/models/Incident";
 import AuditLog from "@/lib/db/models/AuditLog";
@@ -31,6 +32,7 @@ export async function GET(req: Request) {
     const animalCategory = searchParams.get("category");
     const city = searchParams.get("city");
     const reporterId = searchParams.get("reporterId");
+    const reporterEmail = searchParams.get("reporterEmail");
     const volunteerId = searchParams.get("volunteerId");
     const ngoId = searchParams.get("ngoId");
     const search = searchParams.get("search");
@@ -42,9 +44,28 @@ export async function GET(req: Request) {
     if (priority && priority !== "ALL") query.priority = priority;
     if (animalCategory && animalCategory !== "ALL") query.animalCategory = animalCategory;
     if (city) query["location.city"] = new RegExp(city, "i");
-    if (reporterId) query.reporterId = reporterId;
-    if (volunteerId) query.assignedVolunteerId = volunteerId;
-    if (ngoId) query.assignedNgoId = ngoId;
+
+    if (volunteerId && mongoose.Types.ObjectId.isValid(volunteerId)) {
+      query.assignedVolunteerId = new mongoose.Types.ObjectId(volunteerId);
+    }
+    if (ngoId && mongoose.Types.ObjectId.isValid(ngoId)) {
+      query.assignedNgoId = new mongoose.Types.ObjectId(ngoId);
+    }
+
+    if (reporterId || reporterEmail) {
+      const orConditions: any[] = [];
+      if (reporterId && mongoose.Types.ObjectId.isValid(reporterId)) {
+        orConditions.push({ reporterId: new mongoose.Types.ObjectId(reporterId) });
+      }
+      if (reporterEmail && reporterEmail.trim()) {
+        orConditions.push({
+          reporterEmail: new RegExp(`^${reporterEmail.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
+        });
+      }
+      if (orConditions.length > 0) {
+        query.$or = orConditions;
+      }
+    }
 
     if (search) {
       query.$or = [
@@ -135,7 +156,7 @@ export async function POST(req: Request) {
         },
         images: Array.isArray(images) ? images : [images],
         videoUrl,
-        reporterId: user ? user._id : undefined,
+        reporterId: user && user._id && mongoose.Types.ObjectId.isValid(user._id.toString()) ? new mongoose.Types.ObjectId(user._id.toString()) : undefined,
         reporterName: reporterName || user?.fullName || "Anonymous Guardian",
         reporterPhone: reporterPhone || user?.mobile || "Not Provided",
         reporterEmail: reporterEmail || user?.email,
