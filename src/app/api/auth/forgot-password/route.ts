@@ -32,8 +32,10 @@ export async function POST(req: Request) {
     user.passwordResetExpires = tokenExpires;
     await user.save();
 
-    // Construct reset action URL
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // Construct dynamic reset action URL for current domain
+    const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+    const proto = req.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${proto}://${host}` : "https://paw-alert-wine.vercel.app");
     const resetUrl = `${appUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
 
     // Dispatch Password Reset Email via mailer
