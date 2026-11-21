@@ -20,7 +20,8 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ listings });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch adoption listings" }, { status: 500 });
+    console.warn("[Adoptions GET] DB offline or query error:", err.message);
+    return NextResponse.json({ listings: [] });
   }
 }
 

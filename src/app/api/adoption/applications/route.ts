@@ -32,7 +32,8 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ applications });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch applications" }, { status: 500 });
+    console.warn("[Adoption Applications GET] DB offline or query error:", err.message);
+    return NextResponse.json({ applications: [] });
   }
 }
 

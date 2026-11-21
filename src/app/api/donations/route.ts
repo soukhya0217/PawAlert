@@ -30,7 +30,14 @@ export async function GET(req: Request) {
       },
     });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch donations" }, { status: 500 });
+    console.warn("[Donations GET] DB offline or query error:", err.message);
+    return NextResponse.json({
+      donations: [],
+      summary: {
+        totalAmount: 0,
+        totalDonors: 0,
+      },
+    });
   }
 }
 

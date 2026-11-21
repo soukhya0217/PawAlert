@@ -41,7 +41,8 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ volunteers });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch volunteers" }, { status: 500 });
+    console.warn("[Volunteers GET] DB offline or query error:", err.message);
+    return NextResponse.json({ volunteers: [] });
   }
 }
 

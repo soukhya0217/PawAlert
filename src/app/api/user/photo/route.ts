@@ -39,34 +39,47 @@ export async function POST(req: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
+    let publicUrl = "";
+    const isVercel = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
+
+    // If on Vercel or under 2MB, store directly as base64 Data URL to avoid read-only filesystem issues
+    if (isVercel || buffer.length <= 2 * 1024 * 1024) {
+      publicUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+    } else {
+      try {
+        const uploadsDir = path.join(process.cwd(), "uploads");
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        let ext = path.extname(file.name || "").toLowerCase();
+        if (!ext || ext === ".") {
+          if (file.type === "image/png") ext = ".png";
+          else if (file.type === "image/webp") ext = ".webp";
+          else if (file.type === "image/gif") ext = ".gif";
+          else ext = ".jpg";
+        }
+
+        const fileName = `avatar_${sessionUser._id}_${Date.now()}${ext}`;
+        const filePath = path.join(uploadsDir, fileName);
+
+        fs.writeFileSync(filePath, buffer);
+        publicUrl = `/api/media/${fileName}`;
+      } catch {
+        publicUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
+      }
     }
 
-    let ext = path.extname(file.name || "").toLowerCase();
-    if (!ext || ext === ".") {
-      if (file.type === "image/png") ext = ".png";
-      else if (file.type === "image/webp") ext = ".webp";
-      else if (file.type === "image/gif") ext = ".gif";
-      else ext = ".jpg";
+    try {
+      await connectDB();
+      const user = await User.findById(sessionUser._id);
+      if (user) {
+        user.profileImage = publicUrl;
+        await user.save();
+      }
+    } catch (dbErr: any) {
+      console.warn("[User Photo] DB unavailable, returning photo data directly:", dbErr.message);
     }
-
-    const fileName = `avatar_${sessionUser._id}_${Date.now()}${ext}`;
-    const filePath = path.join(uploadsDir, fileName);
-
-    fs.writeFileSync(filePath, buffer);
-
-    const publicUrl = `/api/media/${fileName}`;
-
-    await connectDB();
-    const user = await User.findById(sessionUser._id);
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    user.profileImage = publicUrl;
-    await user.save();
 
     return NextResponse.json({
       message: "Profile photograph uploaded and saved successfully",

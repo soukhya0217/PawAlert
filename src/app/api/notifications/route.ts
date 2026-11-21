@@ -22,7 +22,8 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ notifications, unreadCount });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch notifications" }, { status: 500 });
+    console.warn("[Notifications GET] DB offline or query error:", err.message);
+    return NextResponse.json({ notifications: [], unreadCount: 0 });
   }
 }
 

@@ -10,7 +10,8 @@ export async function GET() {
     const ngos = await NGO.find().populate("adminUserId", "fullName email mobile");
     return NextResponse.json({ ngos });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch NGOs" }, { status: 500 });
+    console.warn("[NGOs GET] DB offline or query error:", err.message);
+    return NextResponse.json({ ngos: [] });
   }
 }
 

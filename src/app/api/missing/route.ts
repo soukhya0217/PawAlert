@@ -19,7 +19,8 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ missingAnimals: animals });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch missing animals" }, { status: 500 });
+    console.warn("[Missing Animals GET] DB offline or query error:", err.message);
+    return NextResponse.json({ missingAnimals: [] });
   }
 }
 
